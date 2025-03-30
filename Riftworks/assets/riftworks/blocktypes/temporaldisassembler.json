@@ -1,0 +1,26 @@
+{
+	"code": "temporaldisassembler",
+	"class": "riftworks:BlockTemporalDisassembler",
+	"entityClass": "riftworks:BETemporalDisassembler",
+	"behaviors": [ { "name": "HorizontalOrientable" } ],
+	"creativeinventory": { "general": ["*-north"], "mechanics": ["*-north"] },
+		"variantgroups": [
+		{ "code":"side", "loadFromProperties": "abstract/horizontalorientation" }
+	],
+		"shapebytype": {
+		"*-north": { "base": "block/temporaldisassembler", "rotateY": 180 },
+		"*-east": { "base": "block/temporaldisassembler", "rotateY": 90 },
+		"*-south": { "base": "block/temporaldisassembler", "rotateY": 0 },
+		"*-west": { "base": "block/temporaldisassembler", "rotateY": 270 }
+	},
+	"blockmaterial": "Metal",
+	"drawtype": "json",
+	"shape": {
+		"base": "block/temporaldisassembler"
+	},
+	"resistance": 3.5,
+	"sounds": {
+		"place": "game:block/anvil",
+		"walk": "game:walk/stone"
+	}
+}

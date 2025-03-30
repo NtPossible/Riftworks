@@ -1,0 +1,53 @@
+{
+	"ingredientPattern": "ABC,DEF,GHI",
+	"ingredients": {
+		"A": {
+			"type": "block",
+			"code": "game:metal-parts",
+			"quantity": 4
+		},
+		"B": {
+			"type": "item",
+			"code": "game:metalplate-steel"
+		},
+		"C": {
+			"type": "block",
+			"code": "game:metal-parts",
+			"quantity": 4
+		},
+		"D": {
+			"type": "item",
+			"code": "game:ingot-cupronickel",
+			"quantity": 6
+		},
+		"E": {
+			"type": "item",
+			"code": "game:gear-temporal"
+		},
+		"F": {
+			"type": "item",
+			"code": "game:ingot-electrum",
+			"quantity": 6
+		},
+		"G": {
+			"type": "block",
+			"code": "game:metal-parts",
+			"quantity": 4
+		},
+		"H": {
+			"type": "item",
+			"code": "game:metalplate-steel"
+		},
+		"I": {
+			"type": "block",
+			"code": "game:metal-parts",
+			"quantity": 4
+		}
+	},
+	"width": 3,
+	"height": 3,
+	"output": {
+		"type": "item",
+		"code": "temporalcompressionchamber"
+	}
+}

@@ -1,0 +1,13 @@
+{
+    "type": "code",
+    "modid": "riftworks",
+    "name": "Riftworks",
+    "authors": [
+        "Notpossible"
+    ],
+    "description": "Adds lategame tech devices",
+    "version": "1.0.0",
+    "dependencies": {
+        "game": ""
+    }
+}

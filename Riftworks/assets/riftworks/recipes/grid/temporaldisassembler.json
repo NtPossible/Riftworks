@@ -1,0 +1,54 @@
+{
+	"ingredientPattern": "ABC,DEF,GHI",
+	"ingredients": {
+		"A": {
+			"type": "item",
+			"code": "game:metalnailsandstrips-*",
+			"quantity": 4
+		},
+		"B": {
+			"type": "item",
+			"code": "game:ingot-cupronickel",
+			"quantity": 8
+		},
+		"C": {
+			"type": "item",
+			"code": "game:metalnailsandstrips-*",
+			"quantity": 4
+		},
+		"D": {
+			"type": "block",
+			"code": "game:metal-parts",
+			"quantity": 4
+		},
+		"E": {
+			"type": "item",
+			"code": "temporalcompressionchamber"
+		},
+		"F": {
+			"type": "block",
+			"code": "game:metal-parts",
+			"quantity": 4
+		},
+		"G": {
+			"type": "block",
+			"code": "game:metal-parts",
+			"quantity": 4
+		},
+		"H": {
+			"type": "item",
+			"code": "game:metalplate-steel"
+		},
+		"I": {
+			"type": "block",
+			"code": "game:metal-parts",
+			"quantity": 4
+		}
+	},
+	"width": 3,
+	"height": 3,
+	"output": {
+		"type": "block",
+		"code": "temporaldisassembler-north"
+	}
+}
