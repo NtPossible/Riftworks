@@ -1,9 +1,16 @@
 {
+  // devices
   "block-temporaldisassembler": "Temporal Disassembler",
   "block-temporaldisassembler-north": "Temporal Disassembler",
-  "item-temporalcompressionchamber": "Temporal Compression Chamber",
   "item-riftblade": "Riftblade",
   "item-vectorstasisunit": "Vector Stasis Unit",
   "item-adaptivereconstitutiongear": "Adaptive Reconstitution Gear",
+
+  // ingredient items
+  "item-temporalcompressionchamber": "Temporal Compression Chamber",
+  "item-reactivefieldcollapser": "Reactive Field Collapser",
+  "item-temporalstreaminverter": "Temporal Stream Inverter",
+
+  // errors
   "ingameerror-vectorstasisunit-full": "Vector Stasis Unit is already at maximum fuel capacity"
 }

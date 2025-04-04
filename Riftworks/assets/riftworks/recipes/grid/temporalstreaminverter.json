@@ -8,7 +8,7 @@
 		},
 		"B": {
 			"type": "item",
-			"code": "game:metalplate-steel"
+			"code": "game:gear-temporal"
 		},
 		"C": {
 			"type": "block",
@@ -17,8 +17,7 @@
 		},
 		"D": {
 			"type": "item",
-			"code": "game:rod-cupronickel",
-			"quantity": 6
+			"code": "game:rod-cupronickel"
 		},
 		"E": {
 			"type": "item",
@@ -26,8 +25,7 @@
 		},
 		"F": {
 			"type": "item",
-			"code": "game:rod-electrum",
-			"quantity": 2
+			"code": "game:rod-cupronickel"
 		},
 		"G": {
 			"type": "block",
@@ -36,7 +34,7 @@
 		},
 		"H": {
 			"type": "item",
-			"code": "game:metalplate-steel"
+			"code": "game:gear-temporal"
 		},
 		"I": {
 			"type": "block",
@@ -48,6 +46,6 @@
 	"height": 3,
 	"output": {
 		"type": "item",
-		"code": "temporalcompressionchamber"
+		"code": "temporalstreaminverter"
 	}
 }

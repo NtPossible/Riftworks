@@ -1,0 +1,47 @@
+{
+	"ingredientPattern": "ABC,DEF,GHI",
+	"ingredients": {
+		"A": {
+			"type": "item",
+			"code": "game:metalnailsandstrips-*"
+		},
+		"B": {
+			"type": "item",
+			"code": "game:rod-cupronickel"
+		},
+		"C": {
+			"type": "item",
+			"code": "game:metalnailsandstrips-*"
+		},
+		"D": {
+			"type": "item",
+			"code": "game:gear-temporal"
+		},
+		"E": {
+			"type": "item",
+			"code": "game:gear-temporal"
+		},
+		"F": {
+			"type": "item",
+			"code": "game:gear-temporal"
+		},
+		"G": {
+			"type": "block",
+			"code": "game:metal-parts"
+		},
+		"H": {
+			"type": "item",
+			"code": "game:rod-iron"
+		},
+		"I": {
+			"type": "block",
+			"code": "game:metal-parts"
+		}
+	},
+	"width": 3,
+	"height": 3,
+	"output": {
+		"type": "block",
+		"code": "vectorstasisunit"
+	}
+}
