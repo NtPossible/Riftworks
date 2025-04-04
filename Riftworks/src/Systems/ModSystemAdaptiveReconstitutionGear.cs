@@ -87,13 +87,9 @@ namespace Riftworks.src.Systems
         private const float BASE_ADAPTATION_RATE = 0.002f * 10; // 0.2% per second
         private float adaptationSpeed = BASE_ADAPTATION_RATE;
 
-        public void HandleDamageTaken(EnumDamageType damageType, ItemSlot inSlot)
+        public void HandleDamageTaken(EnumDamageType damageType)
         {
             if (damageType == EnumDamageType.Heal) { return; } 
-
-            ITreeAttribute resistanceLevels = inSlot.Itemstack.Attributes.GetOrAddTreeAttribute("resistances");
-
-            float currentResistance = resistanceLevels.GetFloat(damageType.ToString(), 0f);
 
             // If its a different damage type switch adaptation and reset timer and speed
             if (currentAdaptingDamageType != damageType)
@@ -226,8 +222,7 @@ namespace Riftworks.src.Systems
 
                     }
 
-                    ItemSlot itemSlot = inv?[(int)EnumCharacterDressType.ArmorHead];
-                    gear.HandleDamageTaken(damageSource.Type, itemSlot);
+                    gear.HandleDamageTaken(damageSource.Type);
                 }
             }
             return damage;
