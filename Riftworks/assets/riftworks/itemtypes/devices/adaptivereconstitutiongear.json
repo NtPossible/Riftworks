@@ -7,7 +7,7 @@
 		"clothescategory": "armorhead"
 	},
 	"shape": {
-		"base": "item/adaptivereconstitutiongear",
+		"base": "item/devices/adaptivereconstitutiongear",
 		"type": "wearable"
 	},
 	"textures": {

@@ -8,7 +8,7 @@
     "warmth": 0
   },
   "shape": {
-    "base": "item/vectorstasisunit"
+    "base": "item/devices/vectorstasisunit"
   },
   "textures": {
     "seraph": {

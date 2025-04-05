@@ -61,7 +61,7 @@
       }
     }
   ],
-  "shape": { "base": "item/riftblade" },
+  "shape": { "base": "item/devices/riftblade" },
   "heldTpHitAnimation": "spearhit",
   "attackRange": 3.5,
   "tooltier": 5,
