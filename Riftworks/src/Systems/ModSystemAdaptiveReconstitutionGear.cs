@@ -32,6 +32,7 @@ namespace Riftworks.src.Systems
             base.StartServerSide(api);
             sapi = api;
             api.Event.RegisterGameTickListener(OnTickServer1s, 1000, 200);
+            api.Event.OnEntityDeath += OnEntityDeath;
         }
 
         private void OnTickServer1s(float dt)
@@ -68,7 +69,32 @@ namespace Riftworks.src.Systems
                         {
                             playerEntity.RemoveBehavior(behavior);
                         }
+        private void OnEntityDeath(Entity entity, DamageSource damageSource)
+        {
+            if (!(entity is EntityPlayer player)) return;
+
+            IInventory inv = player.Player.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
+            if (inv == null) return;
+
+            ItemSlot headSlot = inv[(int)EnumCharacterDressType.ArmorHead];
+
+            if (headSlot?.Itemstack?.Collectible is ItemAdaptiveReconstitutionGear gear)
+            {
+                gear.ResetResistances(headSlot);
+
+                ItemStack stackToDrop = headSlot.TakeOut(1);
+                if (stackToDrop != null)
+                {
+                    sapi.World.SpawnItemEntity(stackToDrop, player.Pos.XYZ);
+                }
+
+                headSlot.MarkDirty();
                     }
+
+                EntityBehaviorAdaptiveResistance behavior = player.GetBehavior<EntityBehaviorAdaptiveResistance>();
+                if (behavior != null)
+                {
+                    player.RemoveBehavior(behavior);
                 }
             }
         }
@@ -195,7 +221,7 @@ namespace Riftworks.src.Systems
     {
         public EntityBehaviorAdaptiveResistance(Entity entity) : base(entity)
         {
-            var healthBehavior = entity.GetBehavior<EntityBehaviorHealth>();
+            EntityBehaviorHealth healthBehavior = entity.GetBehavior<EntityBehaviorHealth>();
             if (healthBehavior != null)
             {
                 healthBehavior.onDamaged += ReduceDamage;
