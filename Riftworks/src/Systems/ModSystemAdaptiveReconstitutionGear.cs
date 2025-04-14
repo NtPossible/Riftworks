@@ -107,60 +107,74 @@ namespace Riftworks.src.Systems
 
     public class ItemAdaptiveReconstitutionGear : ItemWearable
     {
-        private EnumDamageType? currentAdaptingDamageType = null;
-        private float adaptationTimer = 0f;
         private const float ADAPTATION_DURATION = 60f; 
         private const float BASE_ADAPTATION_RATE = 0.002f * 10; // 0.2% per second
         private float adaptationSpeed = BASE_ADAPTATION_RATE;
 
-        public void HandleDamageTaken(EnumDamageType damageType)
-        {
-            if (damageType == EnumDamageType.Heal) { return; } 
+        private const string damageTypeKey = "adaptType";
+        private const string timerKey = "adaptTimer";
+        private const string speedKey = "adaptSpeed";
 
-            // If its a different damage type switch adaptation and reset timer and speed
-            if (currentAdaptingDamageType != damageType)
+        public void HandleDamageTaken(EnumDamageType damageType, ItemSlot inSlot)
+        {
+            if (damageType == EnumDamageType.Heal || GetResistance(inSlot, damageType) >= 1f)
             {
-                currentAdaptingDamageType = damageType;
-                adaptationTimer = 0f;
-                adaptationSpeed = BASE_ADAPTATION_RATE;
+                return;
+            }
+
+            ITreeAttribute attributes = inSlot.Itemstack.Attributes;
+
+            string current = attributes.GetString(damageTypeKey, null);
+
+            if (current != damageType.ToString())
+            {
+                attributes.SetString(damageTypeKey, damageType.ToString());
+                attributes.SetFloat(timerKey, 0f);
+                attributes.SetFloat(speedKey, BASE_ADAPTATION_RATE);
             }
             else
             {
-                // If hit by the same type, reset timer & increase speed
-                adaptationTimer = 0f;
-                adaptationSpeed *= 1.05f;
+                attributes.SetFloat(timerKey, 0f);
+                attributes.SetFloat(speedKey, attributes.GetFloat(speedKey, BASE_ADAPTATION_RATE) * 1.05f);
             }
         }
 
         public void UpdateAdaptation(float dt, ItemSlot inSlot)
         {
-            if (currentAdaptingDamageType == null) return;
+            ITreeAttribute attributes = inSlot.Itemstack.Attributes;
+            string damageTypeKey = attributes.GetString("adaptType", null);
 
-            adaptationTimer += dt;
-            if (adaptationTimer >= ADAPTATION_DURATION)
+            if (damageTypeKey == null || !Enum.TryParse(damageTypeKey, out EnumDamageType damageType))
             {
-                currentAdaptingDamageType = null;
+                attributes.RemoveAttribute("adaptType");
                 return;
             }
 
-            ITreeAttribute resistanceLevels = inSlot.Itemstack.Attributes.GetOrAddTreeAttribute("resistances");
-            float currentResistance = resistanceLevels.GetFloat(currentAdaptingDamageType.ToString(), 0f);
+            float timer = attributes.GetFloat("adaptTimer", 0f) + dt;
+            if (timer >= ADAPTATION_DURATION)
+            {
+                attributes.RemoveAttribute("adaptType");
+                return;
+            }
+
+            float speed = attributes.GetFloat("adaptSpeed", BASE_ADAPTATION_RATE);
+            float currentResistance = GetResistance(inSlot, damageType);
 
             if (currentResistance >= 1f)
             {
-                currentAdaptingDamageType = null;
+                attributes.RemoveAttribute("adaptType");
                 return;
             }
 
-            // Get previous and new resistance percentage (rounded to nearest 10%)
-            int previousPercent = (int)(currentResistance * 10) * 10;
-            float newResistance = Math.Min(currentResistance + adaptationSpeed * dt, 1f);
-            int newPercent = (int)(newResistance * 10) * 10;
+            float newResist = Math.Min(currentResistance + speed * dt, 1f);
+            SetResistance(inSlot, damageType, newResist);
 
-            resistanceLevels.SetFloat(currentAdaptingDamageType.ToString(), newResistance);
+            int oldPercentage = (int)(currentResistance * 10) * 10;
+            int newPercentage = (int)(newResist * 10) * 10;
 
-            // For playing the sound and animations (hopefully)
-            if (newPercent > previousPercent)
+            attributes.SetFloat("adaptTimer", timer);
+
+            if (newPercentage > oldPercentage)
             {
                 IPlayer player = (inSlot.Inventory as InventoryCharacter)?.Player;
                 if (player?.Entity is EntityPlayer entityPlayer)
@@ -168,7 +182,16 @@ namespace Riftworks.src.Systems
                     PlayGearSound(api.World, entityPlayer);
                 }
             }
+        }
 
+        private float GetResistance(ItemSlot slot, EnumDamageType type)
+        {
+            return slot.Itemstack.Attributes.GetOrAddTreeAttribute("resistances").GetFloat(type.ToString(), 0f);
+        }
+
+        private void SetResistance(ItemSlot slot, EnumDamageType type, float value)
+        {
+            slot.Itemstack.Attributes.GetOrAddTreeAttribute("resistances").SetFloat(type.ToString(), value);
         }
 
         private void PlayGearSound(IWorldAccessor world, EntityPlayer player)
@@ -206,15 +229,19 @@ namespace Riftworks.src.Systems
             }
         }
 
-        // Currently unused
         public void ResetResistances(ItemSlot inSlot)
         {
-            ITreeAttribute resistanceLevels = inSlot.Itemstack.Attributes.GetOrAddTreeAttribute("resistances");
+            ItemStack stack = inSlot.Itemstack;
+            ITreeAttribute resistanceLevels = stack.Attributes.GetOrAddTreeAttribute("resistances");
 
-            foreach (EnumDamageType damageType in Enum.GetValues(typeof(EnumDamageType)).Cast<EnumDamageType>())
+            foreach (EnumDamageType damageType in Enum.GetValues(typeof(EnumDamageType)))
             {
                 resistanceLevels.SetFloat(damageType.ToString(), 0f);
             }
+
+            inSlot.Itemstack.Attributes.RemoveAttribute(damageTypeKey);
+            inSlot.Itemstack.Attributes.RemoveAttribute(timerKey);
+            inSlot.Itemstack.Attributes.RemoveAttribute(speedKey);
         }
     }
     public class EntityBehaviorAdaptiveResistance : EntityBehavior
@@ -230,6 +257,11 @@ namespace Riftworks.src.Systems
 
         private float ReduceDamage(float damage, DamageSource damageSource)
         {
+            if (damageSource.Type == EnumDamageType.Heal)
+            {
+                return damage;
+            }
+
             if (entity is EntityPlayer player)
             {
                 IInventory inv = player.Player.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
@@ -248,7 +280,7 @@ namespace Riftworks.src.Systems
 
                     }
 
-                    gear.HandleDamageTaken(damageSource.Type);
+                    gear.HandleDamageTaken(damageSource.Type, inv[(int)EnumCharacterDressType.ArmorHead]);
                 }
             }
             return damage;
