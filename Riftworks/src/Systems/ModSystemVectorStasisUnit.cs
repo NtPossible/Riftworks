@@ -44,12 +44,12 @@ namespace Riftworks.src.Systems
 
             if (hoursPassed > 0.05)
             {
-                foreach (var plr in sapi.World.AllOnlinePlayers)
+                foreach (IPlayer plr in sapi.World.AllOnlinePlayers)
                 {
-                    var inv = plr.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
+                    IInventory inv = plr.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
                     if (inv == null) continue;
 
-                    var armSlot = inv[(int)EnumCharacterDressType.Arm];
+                    ItemSlot armSlot = inv[(int)EnumCharacterDressType.Arm];
                     if (armSlot.Itemstack?.Collectible is ItemVectorStasisUnit stasisUnit)
                     {
                         stasisUnit.AddFuelHours(armSlot.Itemstack, -hoursPassed);
@@ -66,23 +66,23 @@ namespace Riftworks.src.Systems
         {
             frozenEntities.RemoveWhere(entityId => sapi.World.GetEntityById(entityId) == null);
 
-            foreach (var plr in sapi.World.AllOnlinePlayers)
+            foreach (IPlayer plr in sapi.World.AllOnlinePlayers)
             {
-                var inv = plr.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
+                IInventory inv = plr.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
                 if (inv == null) continue;
 
-                var armSlot = inv[(int)EnumCharacterDressType.Arm];
-                var stack = armSlot?.Itemstack;
+                ItemSlot armSlot = inv[(int)EnumCharacterDressType.Arm];
+                ItemStack stack = armSlot?.Itemstack;
 
                 if (stack?.Collectible is ItemVectorStasisUnit itemStasis && itemStasis.GetFuelHours(stack) > 0)
                 {
-                    var playerPos = plr.Entity.ServerPos.XYZ;
+                    Vec3d playerPos = plr.Entity.ServerPos.XYZ;
 
-                    var entities = sapi.World.GetEntitiesAround(playerPos, 29, 29)
+                    IEnumerable<Entity> entities = sapi.World.GetEntitiesAround(playerPos, 29, 29)
                         .Where(e => e is EntityProjectile proj && !proj.Collided && !frozenEntities.Contains(e.EntityId)
                             || e.ServerPos.Motion.Length() > 0.05 && !frozenEntities.Contains(e.EntityId));
 
-                    foreach (var entity in entities)
+                    foreach (Entity entity in entities)
                     {
                         // Predict next tick position and then freeze if within 4 blocks
                         Vec3d projectedPos = entity.ServerPos.XYZ + entity.ServerPos.Motion * dt; 
