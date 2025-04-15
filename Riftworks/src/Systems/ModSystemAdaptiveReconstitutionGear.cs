@@ -71,7 +71,7 @@ namespace Riftworks.src.Systems
                         }
         private void OnEntityDeath(Entity entity, DamageSource damageSource)
         {
-            if (!(entity is EntityPlayer player)) return;
+            if (entity is not EntityPlayer player) return;
 
             IInventory inv = player.Player.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
             if (inv == null) return;
@@ -109,7 +109,6 @@ namespace Riftworks.src.Systems
     {
         private const float ADAPTATION_DURATION = 60f; 
         private const float BASE_ADAPTATION_RATE = 0.002f * 10; // 0.2% per second
-        private float adaptationSpeed = BASE_ADAPTATION_RATE;
 
         private const string damageTypeKey = "adaptType";
         private const string timerKey = "adaptTimer";
