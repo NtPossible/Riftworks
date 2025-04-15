@@ -9,7 +9,7 @@
 		"B": {
 			"type": "item",
 			"code": "game:rod-cupronickel",
-			"quantity": 8
+			"quantity": 2
 		},
 		"C": {
 			"type": "item",
@@ -26,7 +26,7 @@
 		},
 		"F": {
 			"type": "item",
-			"code": "reactivefieldcollapser"
+			"code": "reactivefielddisruptor"
 		},
 		"G": {
 			"type": "block",

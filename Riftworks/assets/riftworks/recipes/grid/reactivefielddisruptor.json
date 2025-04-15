@@ -2,18 +2,16 @@
 	"ingredientPattern": "ABC,DEF,GHI",
 	"ingredients": {
 		"A": {
-			"type": "block",
-			"code": "game:metal-parts",
-			"quantity": 4
-		},
-		"B": {
 			"type": "item",
 			"code": "game:gear-temporal"
 		},
+		"B": {
+			"type": "item",
+			"code": "game:rod-cupronickel"
+		},
 		"C": {
-			"type": "block",
-			"code": "game:metal-parts",
-			"quantity": 4
+			"type": "item",
+			"code": "game:gear-temporal"
 		},
 		"D": {
 			"type": "item",
@@ -21,31 +19,29 @@
 		},
 		"E": {
 			"type": "item",
-			"code": "game:gear-temporal"
+			"code": "game:rod-electrum"
 		},
 		"F": {
 			"type": "item",
 			"code": "game:rod-cupronickel"
 		},
 		"G": {
-			"type": "block",
-			"code": "game:metal-parts",
-			"quantity": 4
-		},
-		"H": {
 			"type": "item",
 			"code": "game:gear-temporal"
 		},
+		"H": {
+			"type": "item",
+			"code": "game:rod-cupronickel"
+		},
 		"I": {
-			"type": "block",
-			"code": "game:metal-parts",
-			"quantity": 4
+			"type": "item",
+			"code": "game:gear-temporal"
 		}
 	},
 	"width": 3,
 	"height": 3,
 	"output": {
 		"type": "item",
-		"code": "reactivefieldcollapser"
+		"code": "reactivefielddisruptor"
 	}
 }

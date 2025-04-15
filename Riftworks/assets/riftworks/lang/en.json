@@ -8,7 +8,7 @@
 
   // ingredient items
   "item-temporalcompressionchamber": "Temporal Compression Chamber",
-  "item-reactivefieldcollapser": "Reactive Field Collapser",
+  "item-reactivefielddisruptor": "Reactive Field Disruptor",
   "item-temporalstreaminverter": "Temporal Stream Inverter",
 
   // errors
