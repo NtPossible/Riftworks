@@ -1,13 +1,10 @@
 ﻿using Vintagestory.API.Client;
 using Vintagestory.API.Server;
-using Vintagestory.API.Config;
 using Vintagestory.API.Common;
 using Riftworks.src.Blocks;
 using Riftworks.src.BlockEntity;
 using Riftworks.src.Items;
-using Vintagestory.GameContent;
 using Riftworks.src.Systems;
-using Vintagestory.Client.NoObf;
 
 namespace Riftworks.src;
 
@@ -25,12 +22,10 @@ public class RiftworksModSystem : ModSystem
 
     public override void StartServerSide(ICoreServerAPI api)
     {
-        Mod.Logger.Notification("Hello from template mod server side");
     }
 
     public override void StartClientSide(ICoreClientAPI api)
     {
-        Mod.Logger.Notification("Hello from template mod client side");
         base.StartClientSide(api);
     }
 
