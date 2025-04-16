@@ -108,7 +108,7 @@ namespace Riftworks.src.Systems
     public class ItemAdaptiveReconstitutionGear : ItemWearable
     {
         private const float ADAPTATION_DURATION = 60f; 
-        private const float BASE_ADAPTATION_RATE = 0.002f * 10; // 0.2% per second
+        private const float BASE_ADAPTATION_RATE = 0.0005f; // 0.05% per second
 
         private const string damageTypeKey = "adaptType";
         private const string timerKey = "adaptTimer";
