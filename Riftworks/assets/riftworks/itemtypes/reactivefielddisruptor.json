@@ -4,6 +4,7 @@
   "creativeinventory": {
     "general": [ "*" ]
   },
+  "maxstacksize": 32,
   "shape": {
     "base": "item/reactivefielddisruptor"
   },

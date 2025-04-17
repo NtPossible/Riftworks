@@ -139,12 +139,39 @@ namespace Riftworks.src.BlockEntity
 
             foreach (ItemStack item in disassembledItems)
             {
-                ItemSlot outputSlot = inventory.Skip(2).FirstOrDefault(slot => slot.Empty);
+                if (item == null) continue;
 
-                if (outputSlot != null)
+                // Try to merge into existing stacks first
+                foreach (var slot in inventory.Skip(2).Take(9))
                 {
-                    outputSlot.Itemstack = item?.Clone();
-                    outputSlot.MarkDirty();
+                    if (!slot.Empty && slot.Itemstack.Equals(Api.World, item, GlobalConstants.IgnoredStackAttributes))
+                    {
+                        // if the items match merge the item into the slot only if max stack size isnt reached
+                        if (slot.Itemstack.StackSize < item.Collectible.MaxStackSize)
+                        {
+                            slot.Itemstack.StackSize = slot.Itemstack.StackSize + item.StackSize;
+                            item.StackSize = item.StackSize - item.StackSize;
+                            slot.MarkDirty();
+                        }
+
+                        if (item.StackSize <= 0) break;
+                    }
+                }
+
+                // If item is still not empty, try placing in an empty slot
+                if (item.StackSize > 0)
+                {
+                    ItemSlot emptySlot = inventory.Skip(2).FirstOrDefault(slot => slot.Empty);
+                    if (emptySlot != null)
+                    {
+                        emptySlot.Itemstack = item.Clone();
+                        emptySlot.MarkDirty();
+                    }
+                    else
+                    {
+                        // drop the item if no space
+                        Api.World.SpawnItemEntity(item, Pos.ToVec3d().Add(0.5, 0.5, 0.5));
+                    }
                 }
             }
 

@@ -4,6 +4,7 @@
 	"entityClass": "riftworks:BETemporalDisassembler",
 	"behaviors": [ { "name": "HorizontalOrientable" } ],
 	"creativeinventory": { "general": ["*-north"], "mechanics": ["*-north"] },
+	"maxstacksize": 64,
 		"variantgroups": [
 		{ "code":"side", "loadFromProperties": "abstract/horizontalorientation" }
 	],
