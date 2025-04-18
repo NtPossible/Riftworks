@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using HarmonyLib;
+using System.Text;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
@@ -17,6 +18,7 @@ namespace Riftworks.src.Systems
         public override void StartServerSide(ICoreServerAPI api)
         {
             sapi = api;
+            new Harmony("riftworks.divinghelmet").PatchAll();
             api.Event.RegisterGameTickListener(OnServerTick1s, 1000);
         }
 
@@ -45,14 +47,15 @@ namespace Riftworks.src.Systems
                 {
                     breathe.MaxOxygen = maxOxygen;
 
-                    //if (entity.Swimming)
-                    //{
-                        
-                    //}
-                    //else
-                    //{
-                        
-                    //}
+                    if (entity.Swimming)
+                    {
+                        entity.WatchedAttributes.SetBool("riftworksHelmetLight", true);
+                    }
+                    else
+                    {
+                        entity.WatchedAttributes.SetBool("riftworksHelmetLight", false);
+                    }
+
                 }
                 else
                 {
@@ -63,6 +66,9 @@ namespace Riftworks.src.Systems
                     {
                         breathe.Oxygen = defaultMax;
                     }
+
+                    entity.WatchedAttributes.SetBool("riftworksHelmetLight", false);
+
                 }
             }
         }
