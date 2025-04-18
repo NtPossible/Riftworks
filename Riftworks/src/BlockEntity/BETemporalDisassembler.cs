@@ -17,7 +17,7 @@ namespace Riftworks.src.BlockEntity
         GuiDialogBlockEntityTemporalDisassembler clientDialog;
 
         private float disassemblyTime = 0;
-        private const float maxDisassemblyTime = 3f;
+        private const float maxDisassemblyTime = 60f;
         private bool lastValidDisassemblyState = false;
 
         // Dictionary of preferred wildcard variants
