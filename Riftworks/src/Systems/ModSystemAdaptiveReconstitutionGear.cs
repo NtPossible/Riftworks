@@ -10,6 +10,7 @@ using Vintagestory.API.Server;
 using Vintagestory.GameContent;
 using Vintagestory.API.Datastructures;
 using Vintagestory.Common;
+using Vintagestory.API.Util;
 
 namespace Riftworks.src.Systems
 {
@@ -18,6 +19,7 @@ namespace Riftworks.src.Systems
         ICoreClientAPI capi;
         ICoreServerAPI sapi;
         EntityBehaviorPlayerInventory bh;
+        private Dictionary<string, EntityAdaptiveReconstitutionGear> playerGearEntities = new Dictionary<string, EntityAdaptiveReconstitutionGear>();
 
         public override bool ShouldLoad(EnumAppSide forSide) => true;
 
@@ -52,6 +54,15 @@ namespace Riftworks.src.Systems
 
                     if (playerEntity != null)
                     {
+                        //if (!playerGearEntities.ContainsKey(plr.PlayerUID))
+                        //{
+                        //    EntityProperties entityType = sapi.World.GetEntityType(new AssetLocation("riftworks:entityadaptivereconstitutiongear"));
+                        //    EntityAdaptiveReconstitutionGear gearEntity = sapi.World.ClassRegistry.CreateEntity(entityType) as EntityAdaptiveReconstitutionGear;
+
+                        //    gearEntity.owner = playerEntity;
+                        //    playerGearEntities[plr.PlayerUID] = gearEntity;
+                        //    sapi.World.SpawnEntity(gearEntity);
+                        //}
                         if (playerEntity.GetBehavior<EntityBehaviorAdaptiveResistance>() == null)
                         {
                             playerEntity.AddBehavior(new EntityBehaviorAdaptiveResistance(playerEntity));
@@ -69,6 +80,18 @@ namespace Riftworks.src.Systems
                         {
                             playerEntity.RemoveBehavior(behavior);
                         }
+
+                        //if (playerGearEntities.TryGetValue(plr.PlayerUID, out EntityAdaptiveReconstitutionGear value))
+                        //{
+                        //    Entity gearEntity = value;
+                        //    gearEntity.Die();
+                        //    playerGearEntities.Remove(plr.PlayerUID);
+                        //}
+                    }
+                }
+            }
+        }
+
         private void OnEntityDeath(Entity entity, DamageSource damageSource)
         {
             if (entity is not EntityPlayer player) return;
@@ -89,7 +112,13 @@ namespace Riftworks.src.Systems
                 }
 
                 headSlot.MarkDirty();
-                    }
+
+                //if (playerGearEntities.TryGetValue(player.PlayerUID, out EntityAdaptiveReconstitutionGear value))
+                //{
+                //    Entity gearEntity = value;
+                //    gearEntity.Die();
+                //    playerGearEntities.Remove(player.PlayerUID);
+                //}
 
                 EntityBehaviorAdaptiveResistance behavior = player.GetBehavior<EntityBehaviorAdaptiveResistance>();
                 if (behavior != null)
@@ -242,7 +271,40 @@ namespace Riftworks.src.Systems
             inSlot.Itemstack.Attributes.RemoveAttribute(timerKey);
             inSlot.Itemstack.Attributes.RemoveAttribute(speedKey);
         }
+
+        //public override void OnBeforeRender(ICoreClientAPI capi, ItemStack itemstack, EnumItemRenderTarget target, ref ItemRenderInfo renderinfo)
+        //{
+        //    MultiTextureMeshRef meshRef = ObjectCacheUtil.GetOrCreate(capi, "adaptiveGearMesh", () =>
+        //    {
+        //        Shape shape = capi.Assets.TryGet(new AssetLocation("riftworks:shapes/item/devices/adaptivereconstitutiongear.json")).ToObject<Shape>();
+        //        capi.Tesselator.TesselateShape(this, shape, out MeshData meshdata);
+        //        return capi.Render.UploadMultiTextureMesh(meshdata);
+        //    });
+
+        //    base.OnBeforeRender(capi, itemstack, target, ref renderinfo);
+        //    renderinfo.ModelRef = meshRef;
+        //}
+
+        //public bool IsAttachable(Entity toEntity, ItemStack itemStack) => true;
+
+        //public void CollectTextures(ItemStack stack, Shape shape, string texturePrefixCode, Dictionary<string, CompositeTexture> intoDict)
+        //{
+        //}
+
+        //public string GetCategoryCode(ItemStack stack) => "adaptivegear";
+
+        //CompositeShape IAttachableToEntity.GetAttachedShape(ItemStack stack, string slotCode)
+        //{
+        //    return null; 
+        //}
+
+        //public string[] GetDisableElements(ItemStack stack) => null;
+
+        //public string[] GetKeepElements(ItemStack stack) => null;
+
+        //public string GetTexturePrefixCode(ItemStack stack) => "adaptivegear";
     }
+
     public class EntityBehaviorAdaptiveResistance : EntityBehavior
     {
         public EntityBehaviorAdaptiveResistance(Entity entity) : base(entity)
@@ -286,5 +348,41 @@ namespace Riftworks.src.Systems
         }
 
         public override string PropertyName() => "adaptiveResistance";
+    }
+
+    public class EntityAdaptiveReconstitutionGear : Entity
+    {
+        public EntityPlayer owner;
+
+        public override bool IsInteractable => false;
+
+        public override void Initialize(EntityProperties properties, ICoreAPI api, long chunkindex3d)
+        {
+            this.Properties = properties;
+            base.Initialize(properties, api, chunkindex3d);
+
+            if (api.Side == EnumAppSide.Client)
+            {
+                AnimManager?.StartAnimation("slowspin");
+            }
+        }
+
+        public override void OnGameTick(float dt)
+        {
+            base.OnGameTick(dt);
+
+            if (Api.Side == EnumAppSide.Server && owner != null)
+            {
+                // Make entity fly above player’s head
+                Pos.SetFrom(owner.Pos);
+                Pos.Y += 2;
+                ServerPos.SetFrom(Pos);
+
+                // stop motion
+                ServerPos.Yaw = 0f;
+                ServerPos.Roll = 0f;
+                ServerPos.Pitch = 0f;
+            }
+        }
     }
 }

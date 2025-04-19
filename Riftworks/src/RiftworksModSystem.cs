@@ -19,6 +19,7 @@ public class RiftworksModSystem : ModSystem
         api.RegisterItemClass($"{Mod.Info.ModID}:ItemVectorStasisUnit", typeof(ItemVectorStasisUnit));
         api.RegisterItemClass($"{Mod.Info.ModID}:ItemAdaptiveReconstitutionGear", typeof(ItemAdaptiveReconstitutionGear));
         api.RegisterItemClass($"{Mod.Info.ModID}:ItemDivingHelmet", typeof(ItemDivingHelmet));
+        api.RegisterItemClass($"{Mod.Info.ModID}:ItemOreScanner", typeof(ItemOreScanner));
         api.RegisterEntity("EntityAdaptiveReconstitutionGear", typeof(EntityAdaptiveReconstitutionGear));
     }
 

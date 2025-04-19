@@ -1,0 +1,47 @@
+﻿{
+  "code": "entityadaptivereconstitutiongear",
+  "class": "EntityAdaptiveReconstitutionGear",
+  "client": {
+    "renderer": "Shape",
+    "shape": { "base": "entities/adaptivereconstitutiongear" },
+    "behaviors": [
+      { "code": "interpolateposition" }
+    ],
+    "animations": [
+      {
+        "code": "slowspin",
+        "animation": "slowspin",
+        "animationSpeed": 1,
+        "weight": 1,
+        "blendMode": "Average",
+        "loop": true
+      },
+      {
+        "code": "fastspin",
+        "animation": "fastspin",
+        "animationSpeed": 1,
+        "weight": 1,
+        "blendMode": "Average",
+        "loop": true
+      },
+      {
+        "code": "30degree",
+        "animation": "30degree",
+        "animationSpeed": 1,
+        "weight": 1,
+        "blendMode": "Average"
+      },
+      {
+        "code": "60degree",
+        "animation": "60degree",
+        "animationSpeed": 1,
+        "weight": 1,
+        "blendMode": "Average"
+      }
+    ]
+  },
+  "server": {
+    "behaviors": []
+  },
+  "sounds": {}
+}

@@ -1,0 +1,141 @@
+{
+	"editor": {
+		"collapsedPaths": "Root/monocle-lens/chain1,Root/monocle-lens/side,Root/monocle-lens/chain6",
+		"allAngles": false,
+		"entityTextureMode": false
+	},
+	"textureWidth": 16,
+	"textureHeight": 16,
+	"textureSizes": {
+		"temporalgear": [16,16]
+	},
+	"textures": {
+		"plain": "game:block/glass/plain",
+		"brass": "game:block/metal/ingot/cupronickel",
+		"temporalgear": "game:item/resource/temporalgear"
+	},
+	"elements": [
+		{
+			"name": "monocle-lens",
+			"stepParentName": "Head",
+			"from": [ -0.2, 1.7, 0.9 ],
+			"to": [ -0.1, 2.7, 1.9 ],
+			"renderPass": 3,
+			"rotationOrigin": [ -0.2, 2.2, 1.4 ],
+			"faces": {
+				"west": { "texture": "#plain", "uv": [ 0.0, 0.0, 1.0, 1.0 ] }
+			},
+			"children": [
+				{
+					"name": "edge-d",
+					"from": [ -0.05, -0.1, 0.0 ],
+					"to": [ 0.15, 0.0, 1.1 ],
+					"rotationOrigin": [ 0.0, -0.1, 0.0 ],
+					"faces": {
+						"south": { "texture": "#brass", "uv": [ 0.0, 0.0, 0.5, 0.5 ] },
+						"west": { "texture": "#brass", "uv": [ 0.0, 0.0, 1.0, 0.5 ] },
+						"up": { "texture": "#brass", "uv": [ 0.0, 0.0, 0.5, 1.0 ] },
+						"down": { "texture": "#brass", "uv": [ 0.0, 0.0, 0.5, 1.0 ] }
+					}
+				},
+				{
+					"name": "edge-u",
+					"from": [ -0.05, 1.0, -0.1 ],
+					"to": [ 0.15, 1.1, 1.0 ],
+					"rotationOrigin": [ 0.0, 1.0, -0.1 ],
+					"faces": {
+						"north": { "texture": "#brass", "uv": [ 0.0, 0.0, 0.5, 0.5 ] },
+						"west": { "texture": "#brass", "uv": [ 0.0, 0.0, 1.0, 0.5 ] },
+						"up": { "texture": "#brass", "uv": [ 0.0, 0.0, 0.5, 1.0 ] },
+						"down": { "texture": "#brass", "uv": [ 0.0, 0.0, 0.5, 1.0 ] }
+					}
+				},
+				{
+					"name": "edge-r",
+					"from": [ -0.05, -0.1, -0.1 ],
+					"to": [ 0.15, 1.0, 0.0 ],
+					"rotationOrigin": [ 0.0, -0.1, -0.1 ],
+					"faces": {
+						"north": { "texture": "#brass", "uv": [ 0.0, 0.0, 0.5, 1.0 ] },
+						"south": { "texture": "#brass", "uv": [ 0.0, 0.0, 0.5, 1.0 ] },
+						"west": { "texture": "#brass", "uv": [ 0.0, 0.0, 0.5, 1.0 ] },
+						"down": { "texture": "#brass", "uv": [ 0.0, 0.0, 0.5, 0.5 ] }
+					}
+				},
+				{
+					"name": "edge-l",
+					"from": [ -0.05, 0.0, 1.0 ],
+					"to": [ 0.15, 1.1, 1.1 ],
+					"rotationOrigin": [ 0.0, 0.0, 1.0 ],
+					"faces": {
+						"north": { "texture": "#brass", "uv": [ 0.0, 0.0, 0.5, 1.0 ] },
+						"south": { "texture": "#brass", "uv": [ 0.0, 0.0, 0.5, 1.0 ] },
+						"west": { "texture": "#brass", "uv": [ 0.0, 0.0, 0.5, 1.0 ] },
+						"up": { "texture": "#brass", "uv": [ 0.0, 0.0, 0.5, 0.5 ] }
+					}
+				},
+				{
+					"name": "side",
+					"from": [ -0.0453, 0.7226, -1.1 ],
+					"to": [ 0.1547, 1.1226, 0.0 ],
+					"rotationOrigin": [ 0.0047, -0.0774, -1.1 ],
+					"rotationZ": 0.0,
+					"faces": {
+						"north": { "texture": "#brass", "uv": [ 0.0, 0.0, 0.5, 0.5 ] },
+						"east": { "texture": "#brass", "uv": [ 0.0, 0.0, 1.0, 0.5 ] },
+						"south": { "texture": "#brass", "uv": [ 0.0, 0.0, 0.5, 0.5 ] },
+						"west": { "texture": "#brass", "uv": [ 0.0, 0.0, 1.0, 0.5 ] },
+						"up": { "texture": "#brass", "uv": [ 0.0, 0.0, 0.5, 1.0 ] },
+						"down": { "texture": "#brass", "uv": [ 0.0, 0.0, 0.5, 1.0 ] }
+					},
+					"children": [
+						{
+							"name": "edge-r3",
+							"from": [ 0.0, 0.0, -0.3 ],
+							"to": [ 0.2, 0.35, 0.8 ],
+							"rotationOrigin": [ 0.05, -0.8, 0.0 ],
+							"rotationX": 17.9897,
+							"rotationY": -0.6179,
+							"rotationZ": 0.0978,
+							"faces": {
+								"north": { "texture": "#brass", "uv": [ 0.0, 0.0, 0.5, 0.5 ] },
+								"east": { "texture": "#brass", "uv": [ 0.0, 0.0, 1.0, 0.5 ] },
+								"south": { "texture": "#brass", "uv": [ 0.0, 0.0, 0.5, 0.5 ] },
+								"west": { "texture": "#brass", "uv": [ 0.0, 0.0, 1.0, 0.5 ] },
+								"up": { "texture": "#brass", "uv": [ 0.0, 0.0, 0.5, 1.0 ] },
+								"down": { "texture": "#brass", "uv": [ 0.0, 0.0, 0.5, 1.0 ] }
+							}
+						},
+						{
+							"name": "edge-r4",
+							"from": [ 0.0, 0.0, 0.0 ],
+							"to": [ 2.2, 0.4, 0.1 ],
+							"rotationOrigin": [ 0.05, -0.8, 0.0 ],
+							"faces": {
+								"north": { "texture": "#brass", "uv": [ 0.0, 0.0, 2.0, 0.5 ] },
+								"east": { "texture": "#brass", "uv": [ 0.0, 0.0, 0.5, 0.5 ] },
+								"south": { "texture": "#brass", "uv": [ 0.0, 0.0, 2.0, 0.5 ] },
+								"west": { "texture": "#brass", "uv": [ 0.0, 0.0, 0.5, 0.5 ] },
+								"up": { "texture": "#brass", "uv": [ 0.0, 0.0, 2.0, 0.5 ] },
+								"down": { "texture": "#brass", "uv": [ 0.0, 0.0, 2.0, 0.5 ] }
+							}
+						},
+						{
+							"name": "edge-r5",
+							"from": [ -0.0333, 0.057, 0.4 ],
+							"to": [ 0.2667, 0.257, 0.9 ],
+							"rotationOrigin": [ 0.05, -0.8, 1.0 ],
+							"faces": {
+								"north": { "texture": "#temporalgear", "uv": [ 0.0, 0.0, 0.5, 0.5 ] },
+								"east": { "texture": "#temporalgear", "uv": [ 0.0, 0.0, 0.5, 0.5 ] },
+								"south": { "texture": "#temporalgear", "uv": [ 0.0, 0.0, 0.5, 0.5 ] },
+								"west": { "texture": "#temporalgear", "uv": [ 0.0, 0.0, 0.5, 0.5 ] },
+								"up": { "texture": "#temporalgear", "uv": [ 0.0, 0.0, 0.5, 0.5 ] },
+								"down": { "texture": "#temporalgear", "uv": [ 0.0, 0.0, 0.5, 0.5 ] }
+							}
+						}
+					]
+				}
+			]
+		}
+	]}

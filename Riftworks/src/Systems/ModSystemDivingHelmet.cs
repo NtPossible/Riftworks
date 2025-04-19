@@ -19,10 +19,10 @@ namespace Riftworks.src.Systems
         {
             sapi = api;
             new Harmony("riftworks.divinghelmet").PatchAll();
-            api.Event.RegisterGameTickListener(OnServerTick1s, 1000);
+            api.Event.RegisterGameTickListener(OnTickServer1s, 1000);
         }
 
-        private void OnServerTick1s(float dt)
+        private void OnTickServer1s(float dt)
         {
             foreach (IPlayer player in sapi.World.AllOnlinePlayers)
             {

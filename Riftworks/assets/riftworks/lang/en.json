@@ -6,6 +6,7 @@
   "item-vectorstasisunit": "Vector Stasis Unit",
   "item-adaptivereconstitutiongear": "Adaptive Reconstitution Gear",
   "item-divinghelmet": "Diving Helmet",
+  "item-orescanner": "Ore Scanner",
 
   // ingredient items
   "item-temporalcompressionchamber": "Temporal Compression Chamber",
@@ -13,5 +14,6 @@
   "item-temporalstreaminverter": "Temporal Stream Inverter",
 
   // errors
-  "ingameerror-vectorstasisunit-full": "Vector Stasis Unit is already at maximum fuel capacity"
+  "ingameerror-vectorstasisunit-full": "Vector Stasis Unit is already at maximum fuel capacity",
+  "ingameerror-orescanner-full": "Vector Stasis Unit is already at maximum fuel capacity"
 }
