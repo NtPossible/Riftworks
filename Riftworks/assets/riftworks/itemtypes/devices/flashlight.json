@@ -1,0 +1,82 @@
+{
+  "code": "flashlight",
+  "storageFlags": 128,
+  "shape": {
+    "base": "item/devices/flashlight"
+  },
+  "creativeinventory": {
+    "general": [ "*" ],
+    "items": [ "*" ]
+  },
+  "lightHsv": [ 25, 4, 16 ],
+  "fpHandTransform": {
+    "translation": {
+      "x": 0.3,
+      "y": -0.1,
+      "z": 0
+    },
+    "rotation": {
+      "x": 0,
+      "y": -45,
+      "z": 0
+    },
+    "scale": 1.18
+  },
+  "guiTransform": {
+    "translation": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "rotation": {
+      "x": -10,
+      "y": -40,
+      "z": 125
+    },
+    "origin": {
+      "x": 0.1,
+      "y": 0.05,
+      "z": 0.1
+    },
+    "scale": 4
+  },
+  "tpHandTransform": {
+    "translation": {
+      "x": -0.3,
+      "y": 0,
+      "z": 0.05
+    },
+    "rotation": {
+      "x": 0,
+      "y": 0,
+      "z": 160
+    },
+    "origin": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "scale": 0.9
+  },
+  "tpOffHandTransform": {
+    "translation": {
+      "x": -0.6899,
+      "y": -0.89,
+      "z": -0.93
+    },
+    "rotation": {
+      "x": 0,
+      "y": -8,
+      "z": -96
+    },
+    "scale": 0.55
+  },
+  "groundTransform": {
+    "origin": {
+      "x": 0.5,
+      "y": 0,
+      "z": 0.5
+    },
+    "scale": 2
+  }
+}

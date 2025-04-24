@@ -21,7 +21,7 @@ namespace Riftworks.src.BlockEntity
         private bool lastValidDisassemblyState = false;
 
         // Dictionary of preferred wildcard variants
-        private static readonly Dictionary<string, string> PreferredWildcards = new Dictionary<string, string>
+        private static readonly Dictionary<string, string> PreferredWildcards = new()
         {
             { "metalnailsandstrips-", "copper" },
             { "linen-", "normal-down" },
@@ -150,7 +150,7 @@ namespace Riftworks.src.BlockEntity
                         if (slot.Itemstack.StackSize < item.Collectible.MaxStackSize)
                         {
                             slot.Itemstack.StackSize = slot.Itemstack.StackSize + item.StackSize;
-                            item.StackSize = item.StackSize - item.StackSize;
+                            item.StackSize -= item.StackSize;
                             slot.MarkDirty();
                         }
 
@@ -182,17 +182,28 @@ namespace Riftworks.src.BlockEntity
             Api.World.BlockAccessor.MarkBlockEntityDirty(Pos);
         }
 
+        // Not really a disassemble now that it repairs. It does make sense lorewise though.
         private List<ItemStack> Disassemble(ItemStack inputItem)
         {
-            GridRecipe matchingRecipe = Api.World.GridRecipes.FirstOrDefault(recipe =>
-                recipe.Output?.ResolvedItemstack.Equals(Api.World, inputItem, GlobalConstants.IgnoredStackAttributes) == true);
+            // If it's repairable and damaged, repair instead of disassemble
+            if (IsRepairableAndDamaged(inputItem))
+            {
+                inputItem = RepairItem(inputItem);
+                return new List<ItemStack> { inputItem };
+            }
+
+            // Strip attributes for proper matching
+            ItemStack cleanInput = inputItem.Clone();
+            cleanInput.Attributes = new TreeAttribute(); 
+
+            GridRecipe matchingRecipe = Api.World.GridRecipes.FirstOrDefault(recipe => recipe.Output?.ResolvedItemstack.Equals(Api.World, cleanInput, GlobalConstants.IgnoredStackAttributes) == true);
 
             if (matchingRecipe == null)
             {
                 return new List<ItemStack> { inputItem };
             }
 
-            List<ItemStack> resultItems = new List<ItemStack>();
+            List<ItemStack> resultItems = new();
 
             foreach (GridRecipeIngredient ingredient in matchingRecipe.resolvedIngredients)
             {
@@ -218,7 +229,6 @@ namespace Riftworks.src.BlockEntity
                     }
                 }
             }
-
 
             return resultItems;
         }
@@ -257,6 +267,42 @@ namespace Riftworks.src.BlockEntity
 
             // No valid variant found
             return null; 
+        }
+
+        private bool IsRepairableAndDamaged(ItemStack stack)
+        {
+            int maxDurability = stack.Collectible.GetMaxDurability(stack);
+            int currentDurability = stack.Collectible.GetRemainingDurability(stack);
+
+            if (maxDurability > 0 && currentDurability < maxDurability)
+            {
+                return true;
+            }
+
+            float condition = stack.Attributes.GetFloat("condition", -1);
+            if (condition >= 0 && condition < 1f)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private ItemStack RepairItem(ItemStack stack)
+        {
+            ItemStack repaired = stack.Clone();
+
+            if (repaired.Collectible.GetMaxDurability(repaired) > 0)
+            {
+                repaired.Collectible.SetDurability(repaired, repaired.Collectible.GetMaxDurability(repaired));
+            }
+
+            if (repaired.Attributes.HasAttribute("condition"))
+            {
+                repaired.Attributes.SetFloat("condition", 1f);
+            }
+
+            return repaired;
         }
 
         #region Events

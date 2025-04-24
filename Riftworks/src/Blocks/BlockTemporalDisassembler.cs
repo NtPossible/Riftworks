@@ -13,9 +13,8 @@ namespace Riftworks.src.Blocks
                 return false;
             }
 
-            BlockEntityTemporalDisassembler beTemporalDisassembler = world.BlockAccessor.GetBlockEntity(blockSel.Position) as BlockEntityTemporalDisassembler;
 
-            if (beTemporalDisassembler == null) return false;
+            if (world.BlockAccessor.GetBlockEntity(blockSel.Position) is not BlockEntityTemporalDisassembler beTemporalDisassembler) return false;
 
             if (!beTemporalDisassembler.Inventory.openedByPlayerGUIds.Contains(byPlayer.PlayerUID))
             {

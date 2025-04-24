@@ -19,7 +19,7 @@ namespace Riftworks.src.Systems
         ICoreClientAPI capi;
         ICoreServerAPI sapi;
         EntityBehaviorPlayerInventory bh;
-        private Dictionary<string, EntityAdaptiveReconstitutionGear> playerGearEntities = new Dictionary<string, EntityAdaptiveReconstitutionGear>();
+        private Dictionary<string, EntityAdaptiveReconstitutionGear> playerGearEntities = new();
 
         public override bool ShouldLoad(EnumAppSide forSide) => true;
 

@@ -43,8 +43,7 @@ namespace Riftworks.src.Inventory
             set
             {
                 if (slotId < 0 || slotId >= Count) throw new ArgumentOutOfRangeException(nameof(slotId));
-                if (value == null) throw new ArgumentNullException(nameof(value));
-                slots[slotId] = value;
+                slots[slotId] = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 

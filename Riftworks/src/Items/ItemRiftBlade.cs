@@ -7,7 +7,7 @@ namespace Riftworks.src.Items
     {
         public override void OnAttackingWith(IWorldAccessor world, VEntity byEntity, VEntity attackedEntity, ItemSlot itemslot)
         {
-            DamageSource damage = new DamageSource()
+            DamageSource damage = new()
             {
                 Type = EnumDamageType.Heal,
                 SourceEntity = byEntity,

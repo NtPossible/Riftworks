@@ -2,38 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
-using Vintagestory.API.Common.Entities;
 using Vintagestory.API.Config;
-using Vintagestory.API.MathTools;
 using Vintagestory.API.Server;
 using Vintagestory.GameContent;
 
 namespace Riftworks.src.Systems
 {
-    class ModSystemVectorStasisUnit : ModSystem
+    internal class ModSystemGravityBoots : ModSystem
     {
-        ICoreClientAPI capi;
-        ICoreServerAPI sapi;
-        EntityBehaviorPlayerInventory bh;
-        private HashSet<long> frozenEntities = new();
+        private ICoreServerAPI sapi;
 
         public override bool ShouldLoad(EnumAppSide forSide) => true;
 
-        public override void StartClientSide(ICoreClientAPI api)
-        {
-            capi = api;
-            api.Event.LevelFinalize += Event_LevelFinalize;
-        }
-
         public override void StartServerSide(ICoreServerAPI api)
         {
-            base.StartServerSide(api);
             sapi = api;
-            api.Event.RegisterGameTickListener(OnTickServer1s, 1000, 200);
-            api.Event.RegisterGameTickListener(OnProjectileTick, 5, 5); 
-
+            api.Event.RegisterGameTickListener(OnTickServer1s, 1000);
         }
 
         double lastCheckTotalHours;
@@ -49,74 +36,22 @@ namespace Riftworks.src.Systems
                     IInventory inv = plr.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
                     if (inv == null) continue;
 
-                    ItemSlot armSlot = inv[(int)EnumCharacterDressType.Arm];
-                    if (armSlot.Itemstack?.Collectible is ItemVectorStasisUnit stasisUnit)
+                    ItemSlot footSlot = inv[(int)EnumCharacterDressType.Foot];
+                    if (footSlot.Itemstack?.Collectible is ItemGravityBoots gravityBoots)
                     {
-                        stasisUnit.AddFuelHours(armSlot.Itemstack, -hoursPassed);
-                        armSlot.MarkDirty();
+                        gravityBoots.AddFuelHours(footSlot.Itemstack, -hoursPassed);
+                        footSlot.MarkDirty();
+
+                        //allow walking on walls
                     }
                 }
 
                 lastCheckTotalHours = totalHours;
             }
         }
-
-        // theres most likely a better way to do this
-        private void OnProjectileTick(float dt)
-        {
-            frozenEntities.RemoveWhere(entityId => sapi.World.GetEntityById(entityId) == null);
-
-            foreach (IPlayer plr in sapi.World.AllOnlinePlayers)
-            {
-                IInventory inv = plr.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
-                if (inv == null) continue;
-
-                ItemSlot armSlot = inv[(int)EnumCharacterDressType.Arm];
-                ItemStack stack = armSlot?.Itemstack;
-
-                if (stack?.Collectible is ItemVectorStasisUnit itemStasis && itemStasis.GetFuelHours(stack) > 0)
-                {
-                    Vec3d playerPos = plr.Entity.ServerPos.XYZ;
-
-                    IEnumerable<Entity> entities = sapi.World.GetEntitiesAround(playerPos, 29, 29)
-                        .Where(e => e is EntityProjectile proj && !proj.Collided && !frozenEntities.Contains(e.EntityId)
-                            || e.ServerPos.Motion.Length() > 0.05 && !frozenEntities.Contains(e.EntityId));
-
-                    foreach (Entity entity in entities)
-                    {
-                        // Predict next tick position and then freeze if within 4 blocks
-                        Vec3d projectedPos = entity.ServerPos.XYZ + entity.ServerPos.Motion * dt; 
-                        double distanceToPlayer = playerPos.DistanceTo(projectedPos);
-
-                        if (distanceToPlayer <= 4)  
-                        {
-                            FreezeProjectile(entity);
-                        }
-                    }
-                }
-            }
-        }
-
-        private void Event_LevelFinalize()
-        {
-            bh = capi.World.Player.Entity.GetBehavior<EntityBehaviorPlayerInventory>();
-        }
-
-        private void FreezeProjectile(Entity entity)
-        {
-            // Hashset to prevent duplicate processing
-            if (!frozenEntities.Add(entity.EntityId)) return; 
-
-            entity.ServerPos.Motion.Set(0, 0, 0);
-            entity.Pos.SetPos(entity.ServerPos);
-
-            entity.ServerPos.SetPos(entity.Pos);
-            entity.Pos.SetPos(entity.ServerPos);
-        }
-
     }
 
-    public class ItemVectorStasisUnit : ItemWearable
+    public class ItemGravityBoots : ItemWearable
     {
         protected float fuelHoursCapacity = 24;
 
@@ -167,10 +102,11 @@ namespace Riftworks.src.Systems
 
                 if (api.Side == EnumAppSide.Client)
                 {
-                    (api as ICoreClientAPI)?.TriggerIngameError(this, "vectorstasisunitfull", Lang.Get("ingameerror-vectorstasisunit-full"));
+                    (api as ICoreClientAPI)?.TriggerIngameError(this, "gravitybootsfull", Lang.Get("ingameerror-gravityboots-full"));
                 }
             }
         }
+
 
         public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
         {
@@ -183,6 +119,5 @@ namespace Riftworks.src.Systems
                 dsc.AppendLine(Lang.Get("Add temporal gear to refuel"));
             }
         }
-
     }
 }

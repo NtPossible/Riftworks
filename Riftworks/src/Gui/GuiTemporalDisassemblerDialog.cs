@@ -86,7 +86,7 @@ namespace Riftworks.src.GUI
 
             if (capi.ElapsedMilliseconds - lastRedrawMs > 500)
             {
-                if (SingleComposer != null) SingleComposer.GetCustomDraw("symbolDrawer").Redraw();
+                SingleComposer?.GetCustomDraw("symbolDrawer").Redraw();
                 lastRedrawMs = capi.ElapsedMilliseconds;
             }
         }
@@ -107,7 +107,7 @@ namespace Riftworks.src.GUI
             ctx.Rectangle(GuiElement.scaled(5), 0, GuiElement.scaled(125 * dx), GuiElement.scaled(100));
             ctx.Clip();
 
-            LinearGradient gradient = new LinearGradient(0, 0, GuiElement.scaled(200), 0);
+            LinearGradient gradient = new(0, 0, GuiElement.scaled(200), 0);
             gradient.AddColorStop(0, new Color(0, 0.4, 0, 1));  // Dark green at the start.
             gradient.AddColorStop(1, new Color(0.2, 0.6, 0.2, 1));  // Lighter green at the end.
             ctx.SetSource(gradient);

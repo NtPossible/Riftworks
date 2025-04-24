@@ -7,6 +7,7 @@
   "item-adaptivereconstitutiongear": "Adaptive Reconstitution Gear",
   "item-divinghelmet": "Diving Helmet",
   "item-orescanner": "Ore Scanner",
+  "item-flashlight": "Flashlight",
 
   // ingredient items
   "item-temporalcompressionchamber": "Temporal Compression Chamber",
@@ -15,5 +16,6 @@
 
   // errors
   "ingameerror-vectorstasisunit-full": "Vector Stasis Unit is already at maximum fuel capacity",
-  "ingameerror-orescanner-full": "Vector Stasis Unit is already at maximum fuel capacity"
+  "ingameerror-orescanner-full": "Ore Scanner is already at maximum fuel capacity",
+  "ingameerror-gravityboots-full": "Gravity Boots are already at maximum fuel capacity"
 }

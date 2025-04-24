@@ -9,7 +9,7 @@ namespace Riftworks.src.Patches
     {
         static bool Prefix(Entity __instance, ref byte[] __result)
         {
-            if (!(__instance is EntityPlayer entityPlayer)) return true;
+            if (__instance is not EntityPlayer entityPlayer) return true;
 
             // Only override if helmet light flag is enabled
             bool helmetLightEnabled = entityPlayer.WatchedAttributes.GetBool("riftworksHelmetLight");

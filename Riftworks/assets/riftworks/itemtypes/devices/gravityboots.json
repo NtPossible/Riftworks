@@ -1,0 +1,65 @@
+{
+  "code": "gravityboots",
+  "class": "riftworks:ItemGravityBoots",
+  "category": "foot",
+  "shape": {
+    "base": "item/devices/gravityboots",
+    "type": "wearable"
+  },
+  "storageFlags": 128,
+  "attributes": {
+    "wearableAttachment": true,
+    "clothescategory": "foot"
+  },
+  "warmth": 2,
+  "tpHandTransform": {
+    "translation": {
+      "x": -0.71,
+      "y": -0.4,
+      "z": -0.82
+    },
+    "rotation": {
+      "x": 48,
+      "y": 88,
+      "z": 52
+    },
+    "scale": 0.71
+  },
+  "guiTransform": {
+    "rotate": false,
+    "translation": {
+      "x": 2,
+      "y": 0,
+      "z": 18
+    },
+    "rotation": {
+      "x": 152,
+      "y": -118,
+      "z": -3
+    },
+    "origin": {
+      "x": 0.5,
+      "y": 0.29,
+      "z": 0.55
+    },
+    "scale": 2.2
+  },
+  "groundTransform": {
+    "translation": {
+      "x": 0.05,
+      "y": 0.02,
+      "z": 0
+    },
+    "rotation": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "origin": {
+      "x": 0.5,
+      "y": 0,
+      "z": 0.5
+    },
+    "scale": 3.11
+  }
+}

@@ -80,7 +80,7 @@ namespace Riftworks.src.Systems
         public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
         {
             base.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
-            dsc.AppendLine(Lang.Get("Grants 5 minutes of breath underwater."));
+            dsc.AppendLine(Lang.Get("Activates light and increases breath time to 5 minutes when underwater."));
         }
     }
 }
