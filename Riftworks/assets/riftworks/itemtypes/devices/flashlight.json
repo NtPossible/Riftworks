@@ -1,6 +1,7 @@
 {
   "code": "flashlight",
   "storageFlags": 128,
+  "maxstacksize": 16,
   "shape": {
     "base": "item/devices/flashlight"
   },
@@ -72,11 +73,21 @@
     "scale": 0.55
   },
   "groundTransform": {
-    "origin": {
-      "x": 0.5,
+    "translation": {
+      "x": 0,
       "y": 0,
-      "z": 0.5
+      "z": 0
     },
-    "scale": 2
+    "rotation": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "origin": {
+      "x": 0,
+      "y": 0,
+      "z": 0.1
+    },
+    "scale": 6
   }
 }
