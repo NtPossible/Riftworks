@@ -66,7 +66,14 @@ namespace Riftworks.src.Inventory
 
         protected override ItemSlot NewSlot(int i)
         {
-            return new ItemSlotSurvival(this);
+            if (i < 2)
+            {
+                return new ItemSlotSurvival(this);
+            }
+            else
+            {
+                return new ItemSlotPreviewable(this);
+            }
         }
 
         public override float GetSuitability(ItemSlot sourceSlot, ItemSlot targetSlot, bool isMerge)
@@ -82,6 +89,19 @@ namespace Riftworks.src.Inventory
         public override ItemSlot GetAutoPullFromSlot(BlockFacing atBlockFace)
         {
             return slots[3];
+        }
+    }
+
+    class ItemSlotPreviewable : ItemSlot
+    {
+        public bool canTake = false;
+        public ItemSlotPreviewable(InventoryBase inventory) : base(inventory)
+        {
+        }
+
+        public override bool CanTake()
+        {
+            return canTake;
         }
     }
 }

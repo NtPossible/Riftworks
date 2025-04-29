@@ -7,6 +7,7 @@ using Vintagestory.API.Datastructures;
 using Vintagestory.GameContent;
 using Riftworks.src.GUI;
 using Riftworks.src.Inventory;
+using System;
 
 namespace Riftworks.src.BlockEntity
 {
@@ -19,6 +20,9 @@ namespace Riftworks.src.BlockEntity
         private float disassemblyTime = 0;
         private const float maxDisassemblyTime = 60f;
         private bool lastValidDisassemblyState = false;
+
+        private bool isPreviewActive = false;
+        private List<ItemStack> previewItems = new();
 
         // Dictionary of preferred wildcard variants
         private static readonly Dictionary<string, string> PreferredWildcards = new()
@@ -62,7 +66,7 @@ namespace Riftworks.src.BlockEntity
 
             if (Api.Side == EnumAppSide.Server)
             {
-                RegisterGameTickListener(UpdateDisassemblyProgress, 100); 
+                RegisterGameTickListener(UpdateDisassemblyProgress, 100);
             }
         }
 
@@ -80,8 +84,10 @@ namespace Riftworks.src.BlockEntity
             {
                 if (!CanStartDisassembly())
                 {
-                    disassemblyTime = 0.0f; 
+                    disassemblyTime = 0.0f;
                 }
+
+                UpdatePreviewState();
                 MarkDirty();
 
                 if (clientDialog != null && clientDialog.IsOpened())
@@ -91,6 +97,60 @@ namespace Riftworks.src.BlockEntity
             }
         }
 
+        private void UpdatePreviewState()
+        {
+            // Prevent previewing if any output slot has items
+            bool outputOccupied = inventory.Skip(2).Any(slot => !slot.Empty);
+            if (!InputSlot.Empty && GearSlot.Empty && !outputOccupied)
+            {
+                if (!isPreviewActive)
+                {
+                    LockAllOutputSlots();
+                    StartPreview();
+                }
+            }
+            else
+            {
+                if (isPreviewActive)
+                {
+                    CancelPreview();
+                }
+            }
+        }
+
+        private void StartPreview()
+        {
+            previewItems = Disassemble(InputSlot.Itemstack);
+
+            foreach (ItemStack item in previewItems)
+            {
+                InsertItemIntoOutputSlots(item.Clone());
+            }
+
+            isPreviewActive = true;
+            MarkDirty();
+        }
+
+        private void CancelPreview()
+        {
+            for (int i = 2; i < inventory.Count; i++)
+            {
+                if (inventory[i] is ItemSlotPreviewable previewableSlot)
+                {
+                    if (!previewableSlot.canTake) 
+                    {
+                        previewableSlot.Itemstack = null;
+                        previewableSlot.MarkDirty();
+                    }
+
+                    previewableSlot.canTake = false;
+                }
+            }
+
+            previewItems.Clear();
+            isPreviewActive = false;
+            MarkDirty();
+        }
 
         private bool CanStartDisassembly()
         {
@@ -99,15 +159,15 @@ namespace Riftworks.src.BlockEntity
 
             bool isValid = !InputSlot.Empty && !GearSlot.Empty && GearSlot.Itemstack?.Item?.Code.ToString() == "game:gear-temporal";
 
-            lastValidDisassemblyState = isValid; 
+            lastValidDisassemblyState = isValid;
             return isValid;
         }
 
         private void UpdateDisassemblyProgress(float dt)
         {
-            if (!CanStartDisassembly()) 
+            if (!CanStartDisassembly())
             {
-                disassemblyTime = 0; 
+                disassemblyTime = 0;
                 MarkDirty();
                 return;
             }
@@ -130,56 +190,67 @@ namespace Riftworks.src.BlockEntity
             }
 
             MarkDirty();
-
         }
 
         private void PerformDisassembly()
         {
+            if (isPreviewActive)
+            {
+                CancelPreview();
+            }
+
             List<ItemStack> disassembledItems = Disassemble(InputSlot.Itemstack);
 
             foreach (ItemStack item in disassembledItems)
             {
-                if (item == null) continue;
+                InsertItemIntoOutputSlots(item);
+            }
 
-                // Try to merge into existing stacks first
-                foreach (var slot in inventory.Skip(2).Take(9))
+            UnlockAllOutputSlots();
+            InputSlot.TakeOut(1);
+            GearSlot.TakeOut(1);
+
+            MarkDirty();
+            Api.World.BlockAccessor.MarkBlockEntityDirty(Pos);
+        }
+
+        private void InsertItemIntoOutputSlots(ItemStack item)
+        {
+            if (item == null) return;
+
+            // Try to merge into existing stacks first
+            foreach (ItemSlot slot in inventory.Skip(2).Take(9))
+            {
+                if (!slot.Empty && slot.Itemstack.Equals(Api.World, item, GlobalConstants.IgnoredStackAttributes))
                 {
-                    if (!slot.Empty && slot.Itemstack.Equals(Api.World, item, GlobalConstants.IgnoredStackAttributes))
-                    {
                         // if the items match merge the item into the slot only if max stack size isnt reached
-                        if (slot.Itemstack.StackSize < item.Collectible.MaxStackSize)
-                        {
-                            slot.Itemstack.StackSize = slot.Itemstack.StackSize + item.StackSize;
-                            item.StackSize -= item.StackSize;
-                            slot.MarkDirty();
-                        }
-
-                        if (item.StackSize <= 0) break;
-                    }
-                }
-
-                // If item is still not empty, try placing in an empty slot
-                if (item.StackSize > 0)
-                {
-                    ItemSlot emptySlot = inventory.Skip(2).FirstOrDefault(slot => slot.Empty);
-                    if (emptySlot != null)
+                    if (slot.Itemstack.StackSize < item.Collectible.MaxStackSize)
                     {
-                        emptySlot.Itemstack = item.Clone();
-                        emptySlot.MarkDirty();
+                        int transferable = Math.Min(item.StackSize, item.Collectible.MaxStackSize - slot.Itemstack.StackSize);
+                        slot.Itemstack.StackSize += transferable;
+                        item.StackSize -= transferable;
+                        slot.MarkDirty();
                     }
-                    else
-                    {
-                        // drop the item if no space
-                        Api.World.SpawnItemEntity(item, Pos.ToVec3d().Add(0.5, 0.5, 0.5));
-                    }
+
+                    if (item.StackSize <= 0) break;
                 }
             }
 
-            InputSlot.TakeOut(1); 
-            GearSlot.TakeOut(1); 
-        
-            MarkDirty();
-            Api.World.BlockAccessor.MarkBlockEntityDirty(Pos);
+                // If item is still not empty, try placing in an empty slot
+            if (item.StackSize > 0)
+            {
+                ItemSlot emptySlot = inventory.Skip(2).FirstOrDefault(slot => slot.Empty);
+                if (emptySlot != null)
+                {
+                    emptySlot.Itemstack = item.Clone();
+                    emptySlot.MarkDirty();
+                }
+                else
+                {
+                        // drop the item if no space
+                    Api.World.SpawnItemEntity(item, Pos.ToVec3d().Add(0.5, 0.5, 0.5));
+                }
+            }
         }
 
         // Not really a disassemble now that it repairs. It does make sense lorewise though.
@@ -194,7 +265,7 @@ namespace Riftworks.src.BlockEntity
 
             // Strip attributes for proper matching
             ItemStack cleanInput = inputItem.Clone();
-            cleanInput.Attributes = new TreeAttribute(); 
+            cleanInput.Attributes = new TreeAttribute();
 
             GridRecipe matchingRecipe = Api.World.GridRecipes.FirstOrDefault(recipe => recipe.Output?.ResolvedItemstack.Equals(Api.World, cleanInput, GlobalConstants.IgnoredStackAttributes) == true);
 
@@ -266,7 +337,7 @@ namespace Riftworks.src.BlockEntity
             }
 
             // No valid variant found
-            return null; 
+            return null;
         }
 
         private bool IsRepairableAndDamaged(ItemStack stack)
@@ -283,7 +354,7 @@ namespace Riftworks.src.BlockEntity
             if (condition >= 0 && condition < 1f)
             {
                 return true;
-            }
+        }
 
             return false;
         }
@@ -351,12 +422,20 @@ namespace Riftworks.src.BlockEntity
 
         public override void OnBlockRemoved()
         {
+            if (isPreviewActive)
+            {
+                CancelPreview();
+            }
             base.OnBlockRemoved();
             clientDialog?.TryClose();
         }
 
         public override void OnBlockBroken(IPlayer byPlayer = null)
         {
+            if (isPreviewActive)
+            {
+                CancelPreview();
+            }
             base.OnBlockBroken(byPlayer);
         }
 
@@ -372,6 +451,28 @@ namespace Riftworks.src.BlockEntity
         public ItemSlot GearSlot
         {
             get { return inventory[1]; }
+        }
+
+        private void UnlockAllOutputSlots()
+        {
+            for (int i = 2; i < inventory.Count; i++)
+            {
+                if (inventory[i] is ItemSlotPreviewable previewableSlot)
+                {
+                    previewableSlot.canTake = true;
+                }
+            }
+        }
+
+        private void LockAllOutputSlots()
+        {
+            for (int i = 2; i < inventory.Count; i++)
+            {
+                if (inventory[i] is ItemSlotPreviewable previewableSlot)
+                {
+                    previewableSlot.canTake = false;
+                }
+            }
         }
 
         #endregion
