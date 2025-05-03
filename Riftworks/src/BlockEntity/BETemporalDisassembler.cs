@@ -100,35 +100,33 @@ namespace Riftworks.src.BlockEntity
         private void UpdatePreviewState()
         {
             // Prevent previewing if any output slot has items
-            bool outputOccupied = inventory.Skip(2).Any(slot => !slot.Empty);
-            if (!InputSlot.Empty && GearSlot.Empty && !outputOccupied)
+            bool outputsEmpty = inventory.Skip(2).All(slot => slot.Empty);
+            bool shouldPreview = !InputSlot.Empty && !GearSlot.Empty && outputsEmpty;
+
+            if (shouldPreview && !isPreviewActive)
             {
-                if (!isPreviewActive)
-                {
-                    LockAllOutputSlots();
                     StartPreview();
                 }
-            }
-            else
+            else if (!shouldPreview && isPreviewActive)
             {
-                if (isPreviewActive)
-                {
                     CancelPreview();
                 }
             }
-        }
 
         private void StartPreview()
         {
+            LockAllOutputSlots();
+
             previewItems = Disassemble(InputSlot.Itemstack);
 
-            foreach (ItemStack item in previewItems)
+            foreach (ItemStack previewItem in previewItems)
             {
-                InsertItemIntoOutputSlots(item.Clone());
+                InsertItemIntoOutputSlots(previewItem.Clone());
             }
 
             isPreviewActive = true;
             MarkDirty();
+            Api.World.BlockAccessor.MarkBlockEntityDirty(Pos);
         }
 
         private void CancelPreview()
@@ -149,7 +147,9 @@ namespace Riftworks.src.BlockEntity
 
             previewItems.Clear();
             isPreviewActive = false;
+
             MarkDirty();
+            Api.World.BlockAccessor.MarkBlockEntityDirty(Pos);
         }
 
         private bool CanStartDisassembly()
@@ -196,14 +196,19 @@ namespace Riftworks.src.BlockEntity
         {
             if (isPreviewActive)
             {
-                CancelPreview();
+                UnlockAllOutputSlots();
+                isPreviewActive = false;
+                previewItems.Clear();
             }
-
-            List<ItemStack> disassembledItems = Disassemble(InputSlot.Itemstack);
-
-            foreach (ItemStack item in disassembledItems)
+            else
+            {
+                // Fallback incase of no preview
+                List<ItemStack> items = Disassemble(InputSlot.Itemstack);
+                foreach (ItemStack item in items)
             {
                 InsertItemIntoOutputSlots(item);
+            }
+                UnlockAllOutputSlots();
             }
 
             UnlockAllOutputSlots();
