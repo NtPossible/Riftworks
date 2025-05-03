@@ -219,7 +219,7 @@ namespace Riftworks.src.BlockEntity
             {
                 if (!slot.Empty && slot.Itemstack.Equals(Api.World, item, GlobalConstants.IgnoredStackAttributes))
                 {
-                        // if the items match merge the item into the slot only if max stack size isnt reached
+                    // if the items match merge the item into the slot only if max stack size isnt reached
                     if (slot.Itemstack.StackSize < item.Collectible.MaxStackSize)
                     {
                         int transferable = Math.Min(item.StackSize, item.Collectible.MaxStackSize - slot.Itemstack.StackSize);
@@ -232,7 +232,7 @@ namespace Riftworks.src.BlockEntity
                 }
             }
 
-                // If item is still not empty, try placing in an empty slot
+            // If item is still not empty, try placing in an empty slot
             if (item.StackSize > 0)
             {
                 ItemSlot emptySlot = inventory.Skip(2).FirstOrDefault(slot => slot.Empty);
@@ -243,7 +243,7 @@ namespace Riftworks.src.BlockEntity
                 }
                 else
                 {
-                        // drop the item if no space
+                    // drop the item if no space
                     Api.World.SpawnItemEntity(item, Pos.ToVec3d().Add(0.5, 0.5, 0.5));
                 }
             }
