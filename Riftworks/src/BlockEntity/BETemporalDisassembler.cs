@@ -19,10 +19,8 @@ namespace Riftworks.src.BlockEntity
 
         private float disassemblyTime = 0;
         private const float maxDisassemblyTime = 60f;
-        private bool lastValidDisassemblyState = false;
 
         private bool isPreviewActive = false;
-        private List<ItemStack> previewItems = new();
 
         // Dictionary of preferred wildcard variants
         private static readonly Dictionary<string, string> PreferredWildcards = new()
@@ -72,9 +70,6 @@ namespace Riftworks.src.BlockEntity
 
         private void OnSlotModifid(int slotid)
         {
-            // Force re-check
-            lastValidDisassemblyState = false; 
-
             if (Api is ICoreClientAPI)
             {
                 clientDialog.Update(disassemblyTime, maxDisassemblyTime);
@@ -117,7 +112,7 @@ namespace Riftworks.src.BlockEntity
         {
             LockAllOutputSlots();
 
-            previewItems = Disassemble(InputSlot.Itemstack);
+            List<ItemStack> previewItems = Disassemble(InputSlot.Itemstack);
 
             foreach (ItemStack previewItem in previewItems)
             {
@@ -145,7 +140,6 @@ namespace Riftworks.src.BlockEntity
                 }
             }
 
-            previewItems.Clear();
             isPreviewActive = false;
 
             MarkDirty();
@@ -154,13 +148,7 @@ namespace Riftworks.src.BlockEntity
 
         private bool CanStartDisassembly()
         {
-            // If state hasn't changed, no need to check again
-            if (lastValidDisassemblyState) return true;
-
-            bool isValid = !InputSlot.Empty && !GearSlot.Empty && GearSlot.Itemstack?.Item?.Code.ToString() == "game:gear-temporal";
-
-            lastValidDisassemblyState = isValid;
-            return isValid;
+            return !InputSlot.Empty && !GearSlot.Empty && GearSlot.Itemstack?.Item?.Code.ToString() == "game:gear-temporal";
         }
 
         private void UpdateDisassemblyProgress(float dt)
@@ -198,7 +186,6 @@ namespace Riftworks.src.BlockEntity
             {
                 UnlockAllOutputSlots();
                 isPreviewActive = false;
-                previewItems.Clear();
             }
             else
             {

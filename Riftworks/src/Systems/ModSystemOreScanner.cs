@@ -114,7 +114,7 @@ namespace Riftworks.src.Systems
             base.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
 
             double fuelLeft = GetFuelHours(inSlot.Itemstack);
-            dsc.AppendLine(Lang.Get("Scans for ores within 8 blocks"));
+            dsc.AppendLine(Lang.Get("Scans for ores within 10 blocks"));
             dsc.AppendLine(Lang.Get("Has fuel for {0:0.#} hours", fuelLeft));
             if (fuelLeft <= 0)
             {
