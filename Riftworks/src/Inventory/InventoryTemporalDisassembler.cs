@@ -103,5 +103,10 @@ namespace Riftworks.src.Inventory
         {
             return canTake;
         }
+
+        public override bool CanHold(ItemSlot sourceSlot)
+        {
+            return false;
+        }
     }
 }
