@@ -70,25 +70,29 @@ namespace Riftworks.src.BlockEntity
 
         private void OnSlotModifid(int slotid)
         {
-            if (Api is ICoreClientAPI)
-            {
-                clientDialog.Update(disassemblyTime, maxDisassemblyTime);
-            }
-
             if (slotid == 0 || slotid == 1)
             {
-                if (!CanStartDisassembly())
+                disassemblyTime = 0.0f;
+
+                if (isPreviewActive)
                 {
-                    disassemblyTime = 0.0f;
+                    CancelPreview();
                 }
 
                 UpdatePreviewState();
+
                 MarkDirty();
+                Api.World.BlockAccessor.MarkBlockEntityDirty(Pos);
 
                 if (clientDialog != null && clientDialog.IsOpened())
                 {
                     clientDialog.SingleComposer.ReCompose();
+                    clientDialog.Update(disassemblyTime, maxDisassemblyTime);
                 }
+            }
+            else if (Api is ICoreClientAPI)
+            {
+                clientDialog?.Update(disassemblyTime, maxDisassemblyTime);
             }
         }
 
@@ -96,17 +100,17 @@ namespace Riftworks.src.BlockEntity
         {
             // Prevent previewing if any output slot has items
             bool outputsEmpty = inventory.Skip(2).All(slot => slot.Empty);
-            bool shouldPreview = !InputSlot.Empty && !GearSlot.Empty && outputsEmpty;
+            bool shouldPreview = !InputSlot.Empty && GearSlot.Itemstack?.Item?.Code.ToString() == "game:gear-temporal" && outputsEmpty;
 
             if (shouldPreview && !isPreviewActive)
             {
-                    StartPreview();
-                }
+                StartPreview();
+            }
             else if (!shouldPreview && isPreviewActive)
             {
-                    CancelPreview();
-                }
+                CancelPreview();
             }
+        }
 
         private void StartPreview()
         {
