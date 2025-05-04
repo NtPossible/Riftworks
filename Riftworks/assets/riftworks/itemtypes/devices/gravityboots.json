@@ -6,7 +6,6 @@
     "base": "item/devices/gravityboots",
     "type": "wearable"
   },
-  "storageFlags": 128,
   "attributes": {
     "wearableAttachment": true,
     "clothescategory": "foot"

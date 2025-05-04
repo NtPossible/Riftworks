@@ -1,7 +1,6 @@
 {
 	"code": "adaptivereconstitutiongear",
 	"class": "riftworks:ItemAdaptiveReconstitutionGear",
-	"storageFlags": 128,
 	"attributes": {
 		"wearableAttachment": true,
 		"clothescategory": "armorhead"

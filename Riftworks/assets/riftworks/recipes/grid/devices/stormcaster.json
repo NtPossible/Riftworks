@@ -1,0 +1,29 @@
+{
+  "ingredientPattern": "AB,CD",
+  "ingredients": {
+    "A": {
+      "type": "item",
+      "code": "game:gear-temporal"
+    },
+    "B": {
+      "type": "item",
+      "code": "game:rod-tinbronze"
+    },
+    "C": {
+      "type": "item",
+      "code": "game:metalnailsandstrips-*",
+      "quantity": "2"
+    },
+    "D": {
+      "type": "block",
+      "code": "game:metal-parts",
+      "quantity": "2"
+    }
+  },
+  "width": 2,
+  "height": 2,
+  "output": {
+    "type": "item",
+    "code": "stormcaster"
+  }
+}

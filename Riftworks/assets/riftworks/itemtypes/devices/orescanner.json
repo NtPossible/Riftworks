@@ -1,7 +1,6 @@
 ﻿{
 	"code": "orescanner",
 	"class": "riftworks:ItemOreScanner",
-	"storageFlags": 128,
 	"attributes": {
 		"wearableAttachment": true,
 		"clothescategory": "face"

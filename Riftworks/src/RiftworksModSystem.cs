@@ -21,7 +21,7 @@ public class RiftworksModSystem : ModSystem
         api.RegisterItemClass($"{Mod.Info.ModID}:ItemDivingHelmet", typeof(ItemDivingHelmet));
         api.RegisterItemClass($"{Mod.Info.ModID}:ItemOreScanner", typeof(ItemOreScanner));
         api.RegisterItemClass($"{Mod.Info.ModID}:ItemGravityBoots", typeof(ItemGravityBoots));
-        api.RegisterItemClass($"{Mod.Info.ModID}:ItemOreScanner", typeof(ItemOreScanner));
+        api.RegisterItemClass($"{Mod.Info.ModID}:ItemStormCaster", typeof(ItemStormCaster));
 
 
         api.RegisterEntity("EntityAdaptiveReconstitutionGear", typeof(EntityAdaptiveReconstitutionGear));

@@ -1,14 +1,13 @@
 {
-  "code": "flashlight",
-  "maxstacksize": 16,
+  "code": "stormcaster",
+  "class": "riftworks:ItemStormCaster",
   "shape": {
-    "base": "item/devices/flashlight"
+    "base": "item/devices/stormcaster"
   },
   "creativeinventory": {
     "general": [ "*" ],
     "items": [ "*" ]
   },
-  "lightHsv": [ 25, 4, 16 ],
   "fpHandTransform": {
     "translation": {
       "x": 0.3,
