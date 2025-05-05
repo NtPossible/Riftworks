@@ -129,7 +129,6 @@ namespace Riftworks.src.BE
             }
         }
 
-
         public bool OnInteract(BlockSelection blockSel, IPlayer byPlayer)
         {
             ItemSlot slot = byPlayer.InventoryManager.ActiveHotbarSlot;
