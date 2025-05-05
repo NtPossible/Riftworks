@@ -14,7 +14,7 @@ using Vintagestory.API.Util;
 
 namespace Riftworks.src.Systems
 {
-    internal class ModSystemAdaptiveReconstitutionGear : ModSystem
+    public class ModSystemAdaptiveReconstitutionGear : ModSystem
     {
         ICoreClientAPI capi;
         ICoreServerAPI sapi;

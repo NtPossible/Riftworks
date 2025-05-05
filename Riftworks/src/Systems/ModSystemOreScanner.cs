@@ -1,18 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
-using Vintagestory.API.Datastructures;
 using Vintagestory.API.Server;
 using Vintagestory.GameContent;
 
 namespace Riftworks.src.Systems
 {
-    internal class ModSystemOreScanner : ModSystem
+    public class ModSystemOreScanner : ModSystem
     {
         private ICoreServerAPI sapi;
 

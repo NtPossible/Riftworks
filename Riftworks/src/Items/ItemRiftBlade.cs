@@ -3,7 +3,7 @@ using VEntity = Vintagestory.API.Common.Entities.Entity;
 
 namespace Riftworks.src.Items
 {
-    internal class ItemRiftBlade : Item
+    public class ItemRiftBlade : Item
     {
         public override void OnAttackingWith(IWorldAccessor world, VEntity byEntity, VEntity attackedEntity, ItemSlot itemslot)
         {

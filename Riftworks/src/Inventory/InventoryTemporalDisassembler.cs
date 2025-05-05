@@ -8,7 +8,7 @@ namespace Riftworks.src.Inventory
     /// <summary>
     /// Inventory with one normal slot, one gear slot and 9 output slots
     /// </summary>
-    class InventoryTemporalDisassembler : InventoryBase, ISlotProvider
+    public class InventoryTemporalDisassembler : InventoryBase, ISlotProvider
     {
         ItemSlot[] slots;
         public ItemSlot[] Slots { get { return slots; } }

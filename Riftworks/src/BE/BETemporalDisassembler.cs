@@ -11,7 +11,7 @@ using System;
 
 namespace Riftworks.src.BE
 {
-    class BlockEntityTemporalDisassembler : BlockEntityOpenableContainer
+    public class BlockEntityTemporalDisassembler : BlockEntityOpenableContainer
     {
         internal InventoryTemporalDisassembler inventory;
 

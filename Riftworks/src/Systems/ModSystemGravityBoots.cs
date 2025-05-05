@@ -11,7 +11,7 @@ using Vintagestory.GameContent;
 
 namespace Riftworks.src.Systems
 {
-    internal class ModSystemGravityBoots : ModSystem
+    public class ModSystemGravityBoots : ModSystem
     {
         private ICoreServerAPI sapi;
 

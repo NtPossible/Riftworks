@@ -3,7 +3,7 @@ using Riftworks.src.BE;
 
 namespace Riftworks.src.Blocks
 {
-    internal class BlockStormCaster : Block
+    public class BlockStormCaster : Block
     {
         public override bool OnBlockInteractStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)
         {

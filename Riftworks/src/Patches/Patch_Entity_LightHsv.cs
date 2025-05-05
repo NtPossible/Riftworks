@@ -5,7 +5,7 @@ using Vintagestory.API.Common;
 namespace Riftworks.src.Patches
 {
     [HarmonyPatch(typeof(EntityPlayer), "LightHsv", MethodType.Getter)]
-    class Patch_Entity_LightHsv
+    public class Patch_Entity_LightHsv
     {
         static bool Prefix(Entity __instance, ref byte[] __result)
         {

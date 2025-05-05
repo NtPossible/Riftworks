@@ -12,7 +12,7 @@ using Vintagestory.GameContent;
 
 namespace Riftworks.src.Systems
 {
-    class ModSystemVectorStasisUnit : ModSystem
+    public class ModSystemVectorStasisUnit : ModSystem
     {
         ICoreClientAPI capi;
         ICoreServerAPI sapi;

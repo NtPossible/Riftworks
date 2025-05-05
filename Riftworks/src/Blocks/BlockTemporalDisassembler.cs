@@ -3,7 +3,7 @@ using Riftworks.src.BE;
 
 namespace Riftworks.src.Blocks
 {
-    class BlockTemporalDisassembler : Block
+    public class BlockTemporalDisassembler : Block
     {
 
         public override bool OnBlockInteractStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)
