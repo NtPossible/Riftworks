@@ -1,14 +1,16 @@
 {
-  // devices
+  // machines
   "block-temporaldisassembler": "Temporal Disassembler",
   "block-temporaldisassembler-north": "Temporal Disassembler",
+  "block-stormcaster": "Storm Caster",
+
+  // devices
   "item-riftblade": "Riftblade",
   "item-vectorstasisunit": "Vector Stasis Unit",
   "item-adaptivereconstitutiongear": "Adaptive Reconstitution Gear",
   "item-divinghelmet": "Diving Helmet",
   "item-orescanner": "Ore Scanner",
   "item-flashlight": "Flashlight",
-  "item-stormcaster": "Storm Caster",
 
   // ingredient items
   "item-temporalcompressionchamber": "Temporal Compression Chamber",

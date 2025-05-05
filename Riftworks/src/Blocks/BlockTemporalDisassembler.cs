@@ -1,5 +1,5 @@
 ﻿using Vintagestory.API.Common;
-using Riftworks.src.BlockEntity;
+using Riftworks.src.BE;
 
 namespace Riftworks.src.Blocks
 {

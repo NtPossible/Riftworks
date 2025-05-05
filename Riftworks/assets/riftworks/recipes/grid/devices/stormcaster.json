@@ -23,7 +23,7 @@
   "width": 2,
   "height": 2,
   "output": {
-    "type": "item",
+    "type": "block",
     "code": "stormcaster"
   }
 }

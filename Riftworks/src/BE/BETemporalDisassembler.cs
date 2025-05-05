@@ -9,7 +9,7 @@ using Riftworks.src.GUI;
 using Riftworks.src.Inventory;
 using System;
 
-namespace Riftworks.src.BlockEntity
+namespace Riftworks.src.BE
 {
     class BlockEntityTemporalDisassembler : BlockEntityOpenableContainer
     {
