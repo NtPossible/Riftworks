@@ -56,7 +56,7 @@ namespace Riftworks.src.BE
                 {
                     ambientSound = ((IClientWorldAccessor)Api.World).LoadSound(new SoundParams()
                     {
-                        Location = new AssetLocation("sounds/block/riftward.ogg"),
+                        Location = new AssetLocation("sounds/block/stormcaster.ogg"),
                         ShouldLoop = true,
                         Position = Pos.ToVec3f().Add(0.5f, 0.5f, 0.5f),
                         DisposeOnFinish = false,
@@ -106,7 +106,7 @@ namespace Riftworks.src.BE
             On = true;
             lastUpdateTotalDays = Api.World.Calendar.TotalDays;
 
-            animUtil?.StartAnimation(new AnimationMetaData() { Animation = "on-spin", Code = "on-spin", EaseInSpeed = 1, EaseOutSpeed = 2, AnimationSpeed = 1f });
+            animUtil?.StartAnimation(new AnimationMetaData() { Animation = "stormspin", Code = "stormspin", EaseInSpeed = 1, EaseOutSpeed = 2, AnimationSpeed = 1f });
             MarkDirty(true);
             ToggleAmbientSound(true);
 
@@ -118,7 +118,7 @@ namespace Riftworks.src.BE
 
         public void Deactivate()
         {
-            animUtil?.StopAnimation("on-spin");
+            animUtil?.StopAnimation("stormspin");
             On = false;
             ToggleAmbientSound(false);
             MarkDirty(true);
@@ -175,7 +175,7 @@ namespace Riftworks.src.BE
                     < 0.55 => "lightthunder",  // 35%
                     < 0.90 => "heavythunder",  // 35%
                     < 0.95 => "smallhail",     //  5%
-                    _ => "largehail"      //  5%
+                    _ => "largehail"           //  5%
                 };
 
                 // Apply in this block’s region
