@@ -10,7 +10,7 @@ namespace Riftworks.src.Systems
 {
     public class ModSystemOreScanner : ModSystem
     {
-        private ICoreServerAPI sapi;
+        ICoreServerAPI sapi;
 
         public override bool ShouldLoad(EnumAppSide forSide) => true;
 

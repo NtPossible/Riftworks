@@ -13,7 +13,7 @@ namespace Riftworks.src.Systems
 {
     public class ModSystemGravityBoots : ModSystem
     {
-        private ICoreServerAPI sapi;
+        ICoreServerAPI sapi;
 
         public override bool ShouldLoad(EnumAppSide forSide) => true;
 

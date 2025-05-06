@@ -10,7 +10,7 @@ namespace Riftworks.src.Systems
 {
     public class ModSystemDivingHelmet : ModSystem
     {
-        private ICoreServerAPI sapi;
+        ICoreServerAPI sapi;
         private const float maxOxygen = 300000f; // 5 minutes
 
         public override bool ShouldLoad(EnumAppSide forSide) => true;
