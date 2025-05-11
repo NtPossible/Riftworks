@@ -10,7 +10,6 @@ using Vintagestory.API.Server;
 using Vintagestory.GameContent;
 using Vintagestory.API.Datastructures;
 using Vintagestory.Common;
-using Vintagestory.API.Util;
 
 namespace Riftworks.src.Systems
 {
@@ -63,9 +62,16 @@ namespace Riftworks.src.Systems
                         //    playerGearEntities[plr.PlayerUID] = gearEntity;
                         //    sapi.World.SpawnEntity(gearEntity);
                         //}
-                        if (playerEntity.GetBehavior<EntityBehaviorAdaptiveResistance>() == null)
+                        try
                         {
-                            playerEntity.AddBehavior(new EntityBehaviorAdaptiveResistance(playerEntity));
+                            if (!playerEntity.HasBehavior<EntityBehaviorAdaptiveResistance>())
+                            {
+                                playerEntity.AddBehavior(new EntityBehaviorAdaptiveResistance(playerEntity));
+                            }
+                        }
+                        catch (NullReferenceException)
+                        {
+                            sapi.World.Logger.Error("Error creating EntityAdaptiveReconstitutionGear for player: " + plr.PlayerUID);
                         }
                     }
 
@@ -75,10 +81,17 @@ namespace Riftworks.src.Systems
                 {
                     if (playerEntity != null)
                     {
-                        EntityBehaviorAdaptiveResistance behavior = playerEntity.GetBehavior<EntityBehaviorAdaptiveResistance>();
-                        if (behavior != null)
+                        try
                         {
-                            playerEntity.RemoveBehavior(behavior);
+                            if (playerEntity.HasBehavior<EntityBehaviorAdaptiveResistance>())
+                            {
+                                EntityBehaviorAdaptiveResistance behavior = playerEntity.GetBehavior<EntityBehaviorAdaptiveResistance>();
+                                playerEntity.RemoveBehavior(behavior);
+                            }
+                        }
+                        catch (NullReferenceException)
+                        {
+                            sapi.World.Logger.Error("Error removing EntityBehaviorAdaptiveResistance from player: " + plr.PlayerUID);
                         }
 
                         //if (playerGearEntities.TryGetValue(plr.PlayerUID, out EntityAdaptiveReconstitutionGear value))
@@ -120,9 +133,9 @@ namespace Riftworks.src.Systems
                 //    playerGearEntities.Remove(player.PlayerUID);
                 //}
 
-                EntityBehaviorAdaptiveResistance behavior = player.GetBehavior<EntityBehaviorAdaptiveResistance>();
-                if (behavior != null)
+                if (player.HasBehavior<EntityBehaviorAdaptiveResistance>())
                 {
+                    EntityBehaviorAdaptiveResistance behavior = player.GetBehavior<EntityBehaviorAdaptiveResistance>();
                     player.RemoveBehavior(behavior);
                 }
             }

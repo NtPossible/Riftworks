@@ -1,121 +1,39 @@
-﻿using System;
-using System.Text;
+﻿using Riftworks.src.Items.Wearable;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
-using Vintagestory.API.Config;
 using Vintagestory.API.Server;
-using Vintagestory.GameContent;
 
 namespace Riftworks.src.Systems
 {
-    public class ModSystemOreScanner : ModSystem
+    public class ModSystemOreScanner : ModSystemWearableTick<ItemOreScanner>
     {
         ICoreServerAPI sapi;
+        ICoreClientAPI capi;
 
         public override bool ShouldLoad(EnumAppSide forSide) => true;
+
+        public override void StartClientSide(ICoreClientAPI api)
+        {
+            capi = api;
+        }
 
         public override void StartServerSide(ICoreServerAPI api)
         {
             sapi = api;
-            api.Event.RegisterGameTickListener(OnTickServer1s, 1000);
+            base.StartServerSide(api);
         }
 
-        double lastCheckTotalHours;
-        private void OnTickServer1s(float dt)
-        {
-            double totalHours = sapi.World.Calendar.TotalHours;
-            double hoursPassed = totalHours - lastCheckTotalHours;
+        protected override EnumCharacterDressType Slot => EnumCharacterDressType.Face;
 
+        protected override void HandleItem(IPlayer player, ItemOreScanner oreScanner, ItemSlot faceSlot, double hoursPassed, float dt)
+        {
             if (hoursPassed > 0.05)
             {
-                foreach (IPlayer plr in sapi.World.AllOnlinePlayers)
-                {
-                    IInventory inv = plr.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
-                    if (inv == null) continue;
-
-                    ItemSlot faceSlot = inv[(int)EnumCharacterDressType.Face];
-                    if (faceSlot.Itemstack?.Collectible is ItemOreScanner oreScanner)
-                    {
-                        oreScanner.AddFuelHours(faceSlot.Itemstack, -hoursPassed);
-                        faceSlot.MarkDirty();
-
-                        //scan for ores
-                    }
-                }
-
-                lastCheckTotalHours = totalHours;
+                oreScanner.AddFuelHours(faceSlot.Itemstack, -hoursPassed);
+                faceSlot.MarkDirty();
+                // scan for ores
             }
         }
     }
 
-    public class ItemOreScanner : ItemWearable
-    {
-        protected float fuelHoursCapacity = 24;
-
-        public double GetFuelHours(ItemStack stack)
-        {
-            return Math.Max(0, stack.Attributes.GetDecimal("fuelHours"));
-        }
-        public void SetFuelHours(ItemStack stack, double fuelHours)
-        {
-            stack.Attributes.SetDouble("fuelHours", fuelHours);
-        }
-        public void AddFuelHours(ItemStack stack, double fuelHours)
-        {
-            stack.Attributes.SetDouble("fuelHours", Math.Max(0, fuelHours + GetFuelHours(stack)));
-        }
-
-        public float GetStackFuel(ItemStack stack)
-        {
-            return stack.ItemAttributes?["nightVisionFuelHours"].AsFloat(0) ?? 0;
-        }
-
-        public override int GetMergableQuantity(ItemStack sinkStack, ItemStack sourceStack, EnumMergePriority priority)
-        {
-            if (priority == EnumMergePriority.DirectMerge)
-            {
-                float fuel = GetStackFuel(sourceStack);
-                if (fuel == 0) return base.GetMergableQuantity(sinkStack, sourceStack, priority);
-                return 1;
-            }
-
-            return base.GetMergableQuantity(sinkStack, sourceStack, priority);
-        }
-
-        public override void TryMergeStacks(ItemStackMergeOperation op)
-        {
-            if (op.CurrentPriority == EnumMergePriority.DirectMerge)
-            {
-                float fuel = GetStackFuel(op.SourceSlot.Itemstack);
-                double fuelHoursLeft = GetFuelHours(op.SinkSlot.Itemstack);
-                if (fuel > 0 && fuelHoursLeft + fuel / 2 < fuelHoursCapacity)
-                {
-                    SetFuelHours(op.SinkSlot.Itemstack, fuel + fuelHoursLeft);
-                    op.MovedQuantity = 1;
-                    op.SourceSlot.TakeOut(1);
-                    op.SinkSlot.MarkDirty();
-                    return;
-                }
-
-                if (api.Side == EnumAppSide.Client)
-                {
-                    (api as ICoreClientAPI)?.TriggerIngameError(this, "orescannerfull", Lang.Get("ingameerror-orescanner-full"));
-                }
-            }
-        }
-
-
-        public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
-        {
-            base.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
-
-            double fuelLeft = GetFuelHours(inSlot.Itemstack);
-            dsc.AppendLine(Lang.Get("Scans for ores within 10 blocks"));
-            dsc.AppendLine(Lang.Get("Has fuel for {0:0.#} hours", fuelLeft));
-            if (fuelLeft <= 0)
-            {
-                dsc.AppendLine(Lang.Get("Add temporal gear to refuel"));
-            }
-        }
-    }
 }

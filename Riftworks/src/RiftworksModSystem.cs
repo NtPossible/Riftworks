@@ -5,6 +5,7 @@ using Riftworks.src.Blocks;
 using Riftworks.src.BE;
 using Riftworks.src.Items;
 using Riftworks.src.Systems;
+using Riftworks.src.Items.Wearable;
 
 namespace Riftworks.src;
 
@@ -15,6 +16,7 @@ public class RiftworksModSystem : ModSystem
     {
         api.RegisterBlockClass($"{Mod.Info.ModID}:BlockTemporalDisassembler", typeof(BlockTemporalDisassembler));
         api.RegisterBlockEntityClass($"{Mod.Info.ModID}:BETemporalDisassembler", typeof(BlockEntityTemporalDisassembler));
+
         api.RegisterBlockClass($"{Mod.Info.ModID}:BlockStormCaster", typeof(BlockStormCaster));
         api.RegisterBlockEntityClass($"{Mod.Info.ModID}:BEStormCaster", typeof(BlockEntityStormCaster));
 

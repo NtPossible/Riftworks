@@ -1,6 +1,7 @@
 {
   "code": "vectorstasisunit",
   "class": "riftworks:ItemVectorStasisUnit",
+  "storageFlags": 128,
   "attributes": {
     "clothescategory": "arm",
     "wearableAttachment": true
