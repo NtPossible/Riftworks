@@ -11,7 +11,7 @@ namespace Riftworks.src.Systems
         protected abstract EnumCharacterDressType Slot { get; }
 
         private ICoreServerAPI sapi;
-        private double lastTotalHours;
+        private double lastCheckTotalHours;
 
         public override void StartServerSide(ICoreServerAPI api)
         {
@@ -21,8 +21,9 @@ namespace Riftworks.src.Systems
 
         private void OnTickServer1s(float dt)
         {
-            double now = sapi.World.Calendar.TotalHours;
-            double hoursPassed = now - lastTotalHours;
+            double totalHours = sapi.World.Calendar.TotalHours;
+            double hoursPassed = totalHours - lastCheckTotalHours;
+
             if (hoursPassed <= 0) return;
 
             foreach (IPlayer player in sapi.World.AllOnlinePlayers)
@@ -41,7 +42,7 @@ namespace Riftworks.src.Systems
                 }
             }
 
-            lastTotalHours = now;
+            lastCheckTotalHours = totalHours;
         }
 
         protected abstract void HandleItem(IPlayer player, TItem item, ItemSlot slot, double hoursPassed, float dt);

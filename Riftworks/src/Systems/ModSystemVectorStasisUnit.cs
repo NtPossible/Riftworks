@@ -30,11 +30,10 @@ namespace Riftworks.src.Systems
         {
             sapi = api;
             base.StartServerSide(api);
-            api.Event.RegisterGameTickListener(OnProjectileTick, 5, 5);
+            api.Event.RegisterGameTickListener(OnProjectileTick, 5);
         }
 
-        protected override EnumCharacterDressType Slot
-            => EnumCharacterDressType.Arm;
+        protected override EnumCharacterDressType Slot => EnumCharacterDressType.Arm;
 
         protected override void HandleItem(IPlayer plr, ItemVectorStasisUnit stasisUnit, ItemSlot armSlot, double hoursPassed, float dt)
         {

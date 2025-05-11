@@ -6,6 +6,7 @@ using Riftworks.src.BE;
 using Riftworks.src.Items;
 using Riftworks.src.Systems;
 using Riftworks.src.Items.Wearable;
+using Riftworks.src.Entities;
 
 namespace Riftworks.src;
 
