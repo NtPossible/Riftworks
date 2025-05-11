@@ -10,5 +10,7 @@ namespace Riftworks.src.Items.Wearable
     {
         protected override float FuelHoursCapacity => 24f;
 
+        protected override string MergeErrorItemName => "vectorstasisunit";
+
     }
 }

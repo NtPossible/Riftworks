@@ -11,6 +11,8 @@ namespace Riftworks.src.Items.Wearable
     {
         protected abstract float FuelHoursCapacity { get; }
 
+        protected abstract string MergeErrorItemName { get; }
+
         public double GetFuelHours(ItemStack stack)
         {
             return Math.Max(0, stack.Attributes.GetDecimal("fuelHours"));
@@ -47,6 +49,7 @@ namespace Riftworks.src.Items.Wearable
             {
                 float fuel = GetStackFuel(op.SourceSlot.Itemstack);
                 double fuelHoursLeft = GetFuelHours(op.SinkSlot.Itemstack);
+
                 if (fuel > 0 && fuelHoursLeft + fuel / 2 < FuelHoursCapacity)
                 {
                     SetFuelHours(op.SinkSlot.Itemstack, fuel + fuelHoursLeft);
@@ -58,8 +61,8 @@ namespace Riftworks.src.Items.Wearable
 
                 if (api.Side == EnumAppSide.Client)
                 {
-                    // TODO: Show proper error message
-                    (api as ICoreClientAPI)?.TriggerIngameError(this, "orescannerfull", Lang.Get("ingameerror-orescanner-full"));
+                    (api as ICoreClientAPI)?.TriggerIngameError(this, ($"{MergeErrorItemName}full"), Lang.Get($"ingameerror-{MergeErrorItemName}-full"));
+
                 }
             }
         }
@@ -76,5 +79,4 @@ namespace Riftworks.src.Items.Wearable
             }
         }
     }
-
 }
