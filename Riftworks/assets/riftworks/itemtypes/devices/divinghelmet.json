@@ -1,6 +1,7 @@
 ﻿{
 	"code": "divinghelmet",
 	"class": "riftworks:ItemDivingHelmet",
+	"storageFlags": 128,
 	"attributes": {
 		"wearableAttachment": true,
 		"clothescategory": "armorhead",
