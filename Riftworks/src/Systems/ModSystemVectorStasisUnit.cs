@@ -51,7 +51,10 @@ namespace Riftworks.src.Systems
             foreach (IPlayer player in sapi.World.AllOnlinePlayers)
             {
                 IInventory inv = player.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
-                if (inv == null) continue;
+                if (inv == null)
+                {
+                    continue;
+                }
 
                 ItemSlot armSlot = inv[(int)EnumCharacterDressType.Arm];
                 ItemStack stack = armSlot?.Itemstack;
@@ -75,19 +78,24 @@ namespace Riftworks.src.Systems
             }
         }
 
-        private void Event_LevelFinalize()
-        {
-            bh = capi.World.Player.Entity.GetBehavior<EntityBehaviorPlayerInventory>();
-        }
         private void FreezeProjectile(Entity entity)
         {
             // Hashset to prevent duplicate processing
-            if (!frozenEntities.Add(entity.EntityId)) return;
+            if (!frozenEntities.Add(entity.EntityId))
+            {
+                return;
+            }
+
             entity.ServerPos.Motion.Set(0, 0, 0);
             entity.Pos.SetPos(entity.ServerPos);
 
             entity.ServerPos.SetPos(entity.Pos);
             entity.Pos.SetPos(entity.ServerPos);
+        }
+
+        private void Event_LevelFinalize()
+        {
+            bh = capi.World.Player.Entity.GetBehavior<EntityBehaviorPlayerInventory>();
         }
     }
 }

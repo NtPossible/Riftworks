@@ -25,10 +25,18 @@ namespace Riftworks.src.Systems
         {
             EntityPlayer entity = player.Entity;
             EntityBehaviorBreathe breathe = entity.GetBehavior<EntityBehaviorBreathe>();
-            if (breathe == null) return;
+
+            if (breathe == null)
+            {
+                return;
+            }
 
             ITreeAttribute oxygenTree = entity.WatchedAttributes.GetTreeAttribute("oxygen");
-            if (oxygenTree == null) return;
+
+            if (oxygenTree == null)
+            {
+                return;
+            }
 
             // Store default oxygen max so I can default to it later
             if (!oxygenTree.HasAttribute("DefaultMaxOxygen"))
@@ -44,10 +52,18 @@ namespace Riftworks.src.Systems
         {
             EntityPlayer entity = player.Entity;
             EntityBehaviorBreathe breathe = entity.GetBehavior<EntityBehaviorBreathe>();
-            if (breathe == null) return;
+
+            if (breathe == null)
+            {
+                return;
+            }
 
             ITreeAttribute oxygenTree = entity.WatchedAttributes.GetTreeAttribute("oxygen");
-            if (oxygenTree == null) return;
+
+            if (oxygenTree == null)
+            {
+                return;
+            }
 
             float defaultMax = oxygenTree.GetFloat("DefaultMaxOxygen");
             breathe.MaxOxygen = defaultMax;

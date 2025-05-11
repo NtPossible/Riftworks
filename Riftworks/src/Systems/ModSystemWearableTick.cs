@@ -8,10 +8,9 @@ namespace Riftworks.src.Systems
     public abstract class ModSystemWearableTick<TItem> : ModSystem
         where TItem : ItemWearable
     {
-        protected abstract EnumCharacterDressType Slot { get; }
-
         private ICoreServerAPI sapi;
         private double lastCheckTotalHours;
+        protected abstract EnumCharacterDressType Slot { get; }
 
         public override void StartServerSide(ICoreServerAPI api)
         {
@@ -24,25 +23,27 @@ namespace Riftworks.src.Systems
             double totalHours = sapi.World.Calendar.TotalHours;
             double hoursPassed = totalHours - lastCheckTotalHours;
 
-            if (hoursPassed <= 0) return;
-
-            foreach (IPlayer player in sapi.World.AllOnlinePlayers)
+            if (hoursPassed > 0.05)
             {
-                IInventory inv = player.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
-                if (inv == null) continue;
+                foreach (IPlayer player in sapi.World.AllOnlinePlayers)
+                {
+                    IInventory inv = player.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
+                    if (inv == null) continue;
 
-                ItemSlot slot = inv[(int)Slot];
-                if (slot.Itemstack?.Collectible is TItem item)
-                {
-                    HandleItem(player, item, slot, hoursPassed, dt);
+                    ItemSlot slot = inv[(int)Slot];
+
+                    if (slot.Itemstack?.Collectible is TItem item)
+                    {
+                        HandleItem(player, item, slot, hoursPassed, dt);
+                    }
+                    else
+                    {
+                        HandleMissing(player, Slot);
+                    }
                 }
-                else
-                {
-                    HandleMissing(player, Slot);
-                }
+
+                lastCheckTotalHours = totalHours;
             }
-
-            lastCheckTotalHours = totalHours;
         }
 
         protected abstract void HandleItem(IPlayer player, TItem item, ItemSlot slot, double hoursPassed, float dt);
