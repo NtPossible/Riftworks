@@ -20,6 +20,9 @@
 		"base": "block/temporaldisassembler"
 	},
 	"resistance": 3.5,
+	"sideopaque": {
+		"all": false
+	},
 	"sounds": {
 		"place": "game:block/anvil",
 		"walk": "game:walk/stone"
