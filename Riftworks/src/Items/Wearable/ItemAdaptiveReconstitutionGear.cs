@@ -46,9 +46,9 @@ namespace Riftworks.src.Items.Wearable
         public void UpdateAdaptation(float dt, ItemSlot inSlot)
         {
             ITreeAttribute attributes = inSlot.Itemstack.Attributes;
-            string damageTypeKey = attributes.GetString("adaptType", null);
+            string currentDamageTypeKey = attributes.GetString("adaptType", null);
 
-            if (damageTypeKey == null || !Enum.TryParse(damageTypeKey, out EnumDamageType damageType))
+            if (currentDamageTypeKey == null || !Enum.TryParse(currentDamageTypeKey, out EnumDamageType damageType))
             {
                 attributes.RemoveAttribute("adaptType");
                 return;

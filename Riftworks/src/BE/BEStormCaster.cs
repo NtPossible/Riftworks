@@ -21,7 +21,7 @@ namespace Riftworks.src.BE
 
         public bool On { get; set; }
 
-        BlockEntityAnimationUtil animUtil
+        BlockEntityAnimationUtil AnimUtil
         {
             get { return GetBehavior<BEBehaviorAnimatable>().animUtil; }
         }
@@ -38,7 +38,7 @@ namespace Riftworks.src.BE
 
             lastUpdateTotalDays = api.World.Calendar.TotalDays;
 
-            if (sapi == null) animUtil?.InitializeAnimator("stormcaster");
+            if (sapi == null) AnimUtil?.InitializeAnimator("stormcaster");
 
             if (sapi == null && On)
             {
@@ -106,7 +106,7 @@ namespace Riftworks.src.BE
             On = true;
             lastUpdateTotalDays = Api.World.Calendar.TotalDays;
 
-            animUtil?.StartAnimation(new AnimationMetaData() { Animation = "stormspin", Code = "stormspin", EaseInSpeed = 1, EaseOutSpeed = 2, AnimationSpeed = 1f });
+            AnimUtil?.StartAnimation(new AnimationMetaData() { Animation = "stormspin", Code = "stormspin", EaseInSpeed = 1, EaseOutSpeed = 2, AnimationSpeed = 1f });
             MarkDirty(true);
             ToggleAmbientSound(true);
 
@@ -118,7 +118,7 @@ namespace Riftworks.src.BE
 
         public void Deactivate()
         {
-            animUtil?.StopAnimation("stormspin");
+            AnimUtil?.StopAnimation("stormspin");
             On = false;
             ToggleAmbientSound(false);
             MarkDirty(true);
