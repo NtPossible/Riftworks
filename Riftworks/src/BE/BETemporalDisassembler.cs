@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
@@ -7,7 +8,6 @@ using Vintagestory.API.Datastructures;
 using Vintagestory.GameContent;
 using Riftworks.src.GUI;
 using Riftworks.src.Inventory;
-using System;
 
 namespace Riftworks.src.BE
 {
@@ -212,7 +212,10 @@ namespace Riftworks.src.BE
 
         private void InsertItemIntoOutputSlots(ItemStack item)
         {
-            if (item == null) return;
+            if (item == null)
+            {
+                return;
+            }
 
             // Try to merge into existing stacks first
             foreach (ItemSlot slot in inventory.Skip(2).Take(9))
@@ -228,7 +231,10 @@ namespace Riftworks.src.BE
                         slot.MarkDirty();
                     }
 
-                    if (item.StackSize <= 0) break;
+                    if (item.StackSize <= 0)
+                    {
+                        break;
+                    }
                 }
             }
 

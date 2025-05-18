@@ -1,86 +1,82 @@
 ﻿using HarmonyLib;
-using System.Text;
+using System.Collections.Generic;
 using Vintagestory.API.Common;
-using Vintagestory.API.Config;
-using Vintagestory.API.Datastructures;
 using Vintagestory.API.Server;
 using Vintagestory.GameContent;
+using Riftworks.src.Items.Wearable;
 
 namespace Riftworks.src.Systems
 {
-    public class ModSystemDivingHelmet : ModSystem
+    public class DivingHelmetSystem : ModSystemWearableTick<ItemDivingHelmet>
     {
-        ICoreServerAPI sapi;
         private const float maxOxygen = 300000f; // 5 minutes
+        // dictionary incase for some reason a player has as different max oxygen as compared to others
+        private readonly Dictionary<string, float> defaultOxygenByPlayer = new();
 
         public override bool ShouldLoad(EnumAppSide forSide) => true;
 
         public override void StartServerSide(ICoreServerAPI api)
         {
-            sapi = api;
             new Harmony("riftworks.divinghelmet").PatchAll();
-            api.Event.RegisterGameTickListener(OnTickServer1s, 1000);
+            base.StartServerSide(api);
         }
 
-        private void OnTickServer1s(float dt)
+        protected override void HandleItem(IPlayer player, ItemDivingHelmet divingHelmet, ItemSlot slot, double hoursPassed, float dt)
         {
-            foreach (IPlayer player in sapi.World.AllOnlinePlayers)
+            EntityPlayer entity = player.Entity;
+            EntityBehaviorBreathe breathe = entity.GetBehavior<EntityBehaviorBreathe>();
+
+            if (breathe == null)
             {
-                IInventory inv = player.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
-                if (inv == null) continue;
+                return;
+            }
 
-                ItemSlot headSlot = inv[(int)EnumCharacterDressType.ArmorHead];
-                EntityPlayer entity = player.Entity;
-                EntityBehaviorBreathe breathe = entity.GetBehavior<EntityBehaviorBreathe>();
-                if (breathe == null) continue;
+            string uid = player.PlayerUID;
 
-                ITreeAttribute oxygenTree = entity.WatchedAttributes.GetTreeAttribute("oxygen");
-                if (oxygenTree == null) continue;
+            // Cache the players default max-oxygen once
+            if (!defaultOxygenByPlayer.ContainsKey(uid))
+            {
+                defaultOxygenByPlayer[uid] = breathe.MaxOxygen;
+            }
 
-                // Store default oxygen max so I can default to it later
-                if (!oxygenTree.HasAttribute("DefaultMaxOxygen"))
-                {
-                    oxygenTree.SetFloat("DefaultMaxOxygen", breathe.MaxOxygen);
-                }
+            if (breathe.MaxOxygen != maxOxygen)
+            {
+                breathe.MaxOxygen = maxOxygen;
+            }
 
-                if (headSlot?.Itemstack?.Collectible is ItemDivingHelmet)
-                {
-                    breathe.MaxOxygen = maxOxygen;
-
-                    if (entity.Swimming)
-                    {
-                        entity.WatchedAttributes.SetBool("riftworksHelmetLight", true);
-                    }
-                    else
-                    {
-                        entity.WatchedAttributes.SetBool("riftworksHelmetLight", false);
-                    }
-
-                }
-                else
-                {
-                    float defaultMax = oxygenTree.GetFloat("DefaultMaxOxygen");
-                    breathe.MaxOxygen = defaultMax;
-
-                    if (breathe.Oxygen > defaultMax)
-                    {
-                        breathe.Oxygen = defaultMax;
-                    }
-
-                    entity.WatchedAttributes.SetBool("riftworksHelmetLight", false);
-
-                }
+            if (entity.WatchedAttributes.GetBool("riftworksHelmetLight") != entity.Swimming)
+            {
+                entity.WatchedAttributes.SetBool("riftworksHelmetLight", entity.Swimming);
             }
         }
 
-    }
-
-    public class ItemDivingHelmet : ItemWearable
-    {
-        public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
+        protected override void HandleMissing(IPlayer player)
         {
-            base.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
-            dsc.AppendLine(Lang.Get("Activates light and increases breath time to 5 minutes when underwater."));
+            EntityPlayer entity = player.Entity;
+            EntityBehaviorBreathe breathe = entity.GetBehavior<EntityBehaviorBreathe>();
+
+            if (breathe == null)
+            {
+                return;
+            }
+
+            string uid = player.PlayerUID;
+
+            if (defaultOxygenByPlayer.TryGetValue(uid, out float originalMax))
+            {
+                breathe.MaxOxygen = originalMax;
+
+                if (breathe.Oxygen > originalMax)
+                {
+                    breathe.Oxygen = originalMax;
+                }
+                defaultOxygenByPlayer.Remove(uid);
+            }
+
+            if (entity.WatchedAttributes.GetBool("riftworksHelmetLight"))
+            {
+                entity.WatchedAttributes.SetBool("riftworksHelmetLight", false);
+            }
         }
     }
 }

@@ -1,11 +1,11 @@
 ﻿using Vintagestory.API.Common;
-using VEntity = Vintagestory.API.Common.Entities.Entity;
+using Vintagestory.API.Common.Entities;
 
 namespace Riftworks.src.Items
 {
     public class ItemRiftBlade : Item
     {
-        public override void OnAttackingWith(IWorldAccessor world, VEntity byEntity, VEntity attackedEntity, ItemSlot itemslot)
+        public override void OnAttackingWith(IWorldAccessor world, Entity byEntity, Entity attackedEntity, ItemSlot itemslot)
         {
             DamageSource damage = new()
             {

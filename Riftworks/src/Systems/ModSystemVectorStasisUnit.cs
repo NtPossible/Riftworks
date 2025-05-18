@@ -1,111 +1,81 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Vintagestory.API.Client;
 using Vintagestory.API.Common;
-using Vintagestory.API.Common.Entities;
-using Vintagestory.API.Config;
-using Vintagestory.API.MathTools;
 using Vintagestory.API.Server;
+using Vintagestory.API.MathTools;
+using Vintagestory.API.Common.Entities;
 using Vintagestory.GameContent;
+using Riftworks.src.Items.Wearable;
 
 namespace Riftworks.src.Systems
 {
-    public class ModSystemVectorStasisUnit : ModSystem
+    public class ModSystemVectorStasisUnit : ModSystemWearableTick<ItemVectorStasisUnit>
     {
-        ICoreClientAPI capi;
         ICoreServerAPI sapi;
-        EntityBehaviorPlayerInventory bh;
+        private int projectileTickListenerId = -1;
+        private HashSet<IPlayer> activeWearers = new();
         private HashSet<long> frozenEntities = new();
-
-        public override bool ShouldLoad(EnumAppSide forSide) => true;
-
-        public override void StartClientSide(ICoreClientAPI api)
-        {
-            capi = api;
-            api.Event.LevelFinalize += Event_LevelFinalize;
-        }
 
         public override void StartServerSide(ICoreServerAPI api)
         {
-            base.StartServerSide(api);
             sapi = api;
-            api.Event.RegisterGameTickListener(OnTickServer1s, 1000, 200);
-            api.Event.RegisterGameTickListener(OnProjectileTick, 5, 5); 
-
+            base.StartServerSide(api);
         }
 
-        double lastCheckTotalHours;
-        private void OnTickServer1s(float dt)
+        protected override void HandleItem(IPlayer player, ItemVectorStasisUnit stasisUnit, ItemSlot slot, double hoursPassed, float dt)
         {
-            double totalHours = sapi.World.Calendar.TotalHours;
-            double hoursPassed = totalHours - lastCheckTotalHours;
+            // If this is the first time this player got handled, start listening
+            if (activeWearers.Add(player) && projectileTickListenerId < 0)
+            {
+                projectileTickListenerId = (int)sapi.Event.RegisterGameTickListener(OnProjectileTick, 5);
+            }
 
             if (hoursPassed > 0.05)
             {
-                foreach (IPlayer plr in sapi.World.AllOnlinePlayers)
-                {
-                    IInventory inv = plr.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
-                    if (inv == null) continue;
-
-                    ItemSlot armSlot = inv[(int)EnumCharacterDressType.Arm];
-                    if (armSlot.Itemstack?.Collectible is ItemVectorStasisUnit stasisUnit)
-                    {
-                        stasisUnit.AddFuelHours(armSlot.Itemstack, -hoursPassed);
-                        armSlot.MarkDirty();
-                    }
-                }
-
-                lastCheckTotalHours = totalHours;
+                stasisUnit.AddFuelHours(slot.Itemstack, -hoursPassed);
+                slot.MarkDirty();
             }
         }
 
-        // theres most likely a better way to do this
+        protected override void HandleMissing(IPlayer player)
+        {
+            if (activeWearers.Remove(player) && activeWearers.Count == 0 && projectileTickListenerId >= 0)
+            {
+                sapi.Event.UnregisterGameTickListener(projectileTickListenerId);
+                projectileTickListenerId = -1;
+                frozenEntities.Clear();
+            }
+        }
+
         private void OnProjectileTick(float dt)
         {
             frozenEntities.RemoveWhere(entityId => sapi.World.GetEntityById(entityId) == null);
 
-            foreach (IPlayer plr in sapi.World.AllOnlinePlayers)
+            foreach (IPlayer player in activeWearers)
             {
-                IInventory inv = plr.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
-                if (inv == null) continue;
+                Vec3d playerPos = player.Entity.ServerPos.XYZ;
 
-                ItemSlot armSlot = inv[(int)EnumCharacterDressType.Arm];
-                ItemStack stack = armSlot?.Itemstack;
+                IEnumerable<EntityProjectile> projectiles = sapi.World.GetEntitiesAround(playerPos, 29, 29).OfType<EntityProjectile>()
+                        .Where(projectile => !projectile.Collided && !frozenEntities.Contains(projectile.EntityId));
 
-                if (stack?.Collectible is ItemVectorStasisUnit itemStasis && itemStasis.GetFuelHours(stack) > 0)
+                foreach (EntityProjectile projectile in projectiles)
                 {
-                    Vec3d playerPos = plr.Entity.ServerPos.XYZ;
-
-                    IEnumerable<Entity> entities = sapi.World.GetEntitiesAround(playerPos, 29, 29)
-                        .Where(e => e is EntityProjectile proj && !proj.Collided && !frozenEntities.Contains(e.EntityId)
-                            || e.ServerPos.Motion.Length() > 0.05 && !frozenEntities.Contains(e.EntityId));
-
-                    foreach (Entity entity in entities)
+                    Vec3d projectedPos = projectile.ServerPos.XYZ + projectile.ServerPos.Motion * dt;
+                    if (playerPos.DistanceTo(projectedPos) <= 4)
                     {
-                        // Predict next tick position and then freeze if within 4 blocks
-                        Vec3d projectedPos = entity.ServerPos.XYZ + entity.ServerPos.Motion * dt; 
-                        double distanceToPlayer = playerPos.DistanceTo(projectedPos);
-
-                        if (distanceToPlayer <= 4)  
-                        {
-                            FreezeProjectile(entity);
-                        }
+                        FreezeProjectile(projectile);
                     }
                 }
             }
-        }
-
-        private void Event_LevelFinalize()
-        {
-            bh = capi.World.Player.Entity.GetBehavior<EntityBehaviorPlayerInventory>();
         }
 
         private void FreezeProjectile(Entity entity)
         {
             // Hashset to prevent duplicate processing
-            if (!frozenEntities.Add(entity.EntityId)) return; 
+            if (!frozenEntities.Add(entity.EntityId))
+            {
+                return;
+            }
 
             entity.ServerPos.Motion.Set(0, 0, 0);
             entity.Pos.SetPos(entity.ServerPos);
@@ -113,76 +83,5 @@ namespace Riftworks.src.Systems
             entity.ServerPos.SetPos(entity.Pos);
             entity.Pos.SetPos(entity.ServerPos);
         }
-
-    }
-
-    public class ItemVectorStasisUnit : ItemWearable
-    {
-        protected float fuelHoursCapacity = 24;
-
-        public double GetFuelHours(ItemStack stack)
-        {
-            return Math.Max(0, stack.Attributes.GetDecimal("fuelHours"));
-        }
-        public void SetFuelHours(ItemStack stack, double fuelHours)
-        {
-            stack.Attributes.SetDouble("fuelHours", fuelHours);
-        }
-        public void AddFuelHours(ItemStack stack, double fuelHours)
-        {
-            stack.Attributes.SetDouble("fuelHours", Math.Max(0, fuelHours + GetFuelHours(stack)));
-        }
-
-        public float GetStackFuel(ItemStack stack)
-        {
-            return stack.ItemAttributes?["nightVisionFuelHours"].AsFloat(0) ?? 0;
-        }
-
-        public override int GetMergableQuantity(ItemStack sinkStack, ItemStack sourceStack, EnumMergePriority priority)
-        {
-            if (priority == EnumMergePriority.DirectMerge)
-            {
-                float fuel = GetStackFuel(sourceStack);
-                if (fuel == 0) return base.GetMergableQuantity(sinkStack, sourceStack, priority);
-                return 1;
-            }
-
-            return base.GetMergableQuantity(sinkStack, sourceStack, priority);
-        }
-
-        public override void TryMergeStacks(ItemStackMergeOperation op)
-        {
-            if (op.CurrentPriority == EnumMergePriority.DirectMerge)
-            {
-                float fuel = GetStackFuel(op.SourceSlot.Itemstack);
-                double fuelHoursLeft = GetFuelHours(op.SinkSlot.Itemstack);
-                if (fuel > 0 && fuelHoursLeft + fuel / 2 < fuelHoursCapacity)
-                {
-                    SetFuelHours(op.SinkSlot.Itemstack, fuel + fuelHoursLeft);
-                    op.MovedQuantity = 1;
-                    op.SourceSlot.TakeOut(1);
-                    op.SinkSlot.MarkDirty();
-                    return;
-                }
-
-                if (api.Side == EnumAppSide.Client)
-                {
-                    (api as ICoreClientAPI)?.TriggerIngameError(this, "vectorstasisunitfull", Lang.Get("ingameerror-vectorstasisunit-full"));
-                }
-            }
-        }
-
-        public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
-        {
-            base.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
-
-            double fuelLeft = GetFuelHours(inSlot.Itemstack);
-            dsc.AppendLine(Lang.Get("Has fuel for {0:0.#} hours", fuelLeft));
-            if (fuelLeft <= 0)
-            {
-                dsc.AppendLine(Lang.Get("Add temporal gear to refuel"));
-            }
-        }
-
     }
 }

@@ -76,11 +76,6 @@ namespace Riftworks.src.Inventory
             }
         }
 
-        public override float GetSuitability(ItemSlot sourceSlot, ItemSlot targetSlot, bool isMerge)
-        {
-            return base.GetSuitability(sourceSlot, targetSlot, isMerge);
-        }
-
         public override ItemSlot GetAutoPushIntoSlot(BlockFacing atBlockFace, ItemSlot fromSlot)
         {
             return slots[0];
