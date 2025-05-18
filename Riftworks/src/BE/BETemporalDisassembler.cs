@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
@@ -7,7 +8,6 @@ using Vintagestory.API.Datastructures;
 using Vintagestory.GameContent;
 using Riftworks.src.GUI;
 using Riftworks.src.Inventory;
-using System;
 
 namespace Riftworks.src.BE
 {

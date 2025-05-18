@@ -16,7 +16,7 @@ namespace Riftworks.src.Systems
             base.StartServerSide(api);
         }
 
-        protected override void HandleItem(IPlayer plr, ItemGravityBoots gravityBoots, ItemSlot slot, double hoursPassed, float dt)
+        protected override void HandleItem(IPlayer player, ItemGravityBoots gravityBoots, ItemSlot slot, double hoursPassed, float dt)
         {
             if (hoursPassed > 0.05)
             {

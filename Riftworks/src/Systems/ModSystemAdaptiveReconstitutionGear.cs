@@ -34,9 +34,9 @@ namespace Riftworks.src.Systems
             api.Event.OnEntityDeath += OnEntityDeath;
         }
 
-        protected override void HandleItem(IPlayer plr, ItemAdaptiveReconstitutionGear reconstitutionGear, ItemSlot slot, double hoursPassed, float dt)
+        protected override void HandleItem(IPlayer player, ItemAdaptiveReconstitutionGear reconstitutionGear, ItemSlot slot, double hoursPassed, float dt)
         {
-            EntityPlayer playerEntity = plr.Entity;
+            EntityPlayer playerEntity = player.Entity;
             reconstitutionGear.UpdateAdaptation(dt, slot);
             if (playerEntity != null)
             {
@@ -59,7 +59,7 @@ namespace Riftworks.src.Systems
                 }
                 catch (NullReferenceException)
                 {
-                    sapi.World.Logger.Error("Error creating EntityAdaptiveReconstitutionGear for player: " + plr.PlayerUID);
+                    sapi.World.Logger.Error("Error creating EntityAdaptiveReconstitutionGear for player: " + player.PlayerUID);
                 }
             }
             slot.MarkDirty();
