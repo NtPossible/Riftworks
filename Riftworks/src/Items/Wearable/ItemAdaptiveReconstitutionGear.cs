@@ -61,7 +61,7 @@ namespace Riftworks.src.Items.Wearable
                 return;
             }
 
-            float speed = attributes.GetFloat("adaptSpeed", BASE_ADAPTATION_RATE);
+            float adaptationSpeed = attributes.GetFloat("adaptSpeed", BASE_ADAPTATION_RATE);
             float currentResistance = GetResistance(inSlot, damageType);
 
             if (currentResistance >= 1f)
@@ -70,7 +70,7 @@ namespace Riftworks.src.Items.Wearable
                 return;
             }
 
-            float newResist = Math.Min(currentResistance + speed * dt, 1f);
+            float newResist = Math.Min(currentResistance + adaptationSpeed * dt, 1f);
             SetResistance(inSlot, damageType, newResist);
 
             int oldPercentage = (int)(currentResistance * 10) * 10;

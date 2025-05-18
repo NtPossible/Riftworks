@@ -1,6 +1,6 @@
-﻿using Riftworks.src.Items.Wearable;
-using Vintagestory.API.Common;
+﻿using Vintagestory.API.Common;
 using Vintagestory.API.Server;
+using Riftworks.src.Items.Wearable;
 
 namespace Riftworks.src.Systems
 {
@@ -16,14 +16,12 @@ namespace Riftworks.src.Systems
             base.StartServerSide(api);
         }
 
-        protected override EnumCharacterDressType Slot => EnumCharacterDressType.Foot;
-
-        protected override void HandleItem(IPlayer plr, ItemGravityBoots gravityBoots, ItemSlot footSlot, double hoursPassed, float dt)
+        protected override void HandleItem(IPlayer plr, ItemGravityBoots gravityBoots, ItemSlot slot, double hoursPassed, float dt)
         {
             if (hoursPassed > 0.05)
             {
-                gravityBoots.AddFuelHours(footSlot.Itemstack, -hoursPassed);
-                footSlot.MarkDirty();
+                gravityBoots.AddFuelHours(slot.Itemstack, -hoursPassed);
+                slot.MarkDirty();
                 // allow walking on walls
             }
         }

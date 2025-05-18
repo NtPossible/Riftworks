@@ -212,7 +212,10 @@ namespace Riftworks.src.BE
 
         private void InsertItemIntoOutputSlots(ItemStack item)
         {
-            if (item == null) return;
+            if (item == null)
+            {
+                return;
+            }
 
             // Try to merge into existing stacks first
             foreach (ItemSlot slot in inventory.Skip(2).Take(9))
@@ -228,7 +231,10 @@ namespace Riftworks.src.BE
                         slot.MarkDirty();
                     }
 
-                    if (item.StackSize <= 0) break;
+                    if (item.StackSize <= 0)
+                    {
+                        break;
+                    }
                 }
             }
 

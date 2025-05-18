@@ -1,46 +1,49 @@
-﻿using Vintagestory.API.Common;
-using Vintagestory.API.Server;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Riftworks.src.Items.Wearable;
-using Vintagestory.API.Client;
-using Vintagestory.API.Common.Entities;
-using Vintagestory.API.Config;
-using Vintagestory.GameContent;
+using Vintagestory.API.Common;
+using Vintagestory.API.Server;
 using Vintagestory.API.MathTools;
+using Vintagestory.API.Common.Entities;
+using Vintagestory.GameContent;
+using Riftworks.src.Items.Wearable;
 
 namespace Riftworks.src.Systems
 {
     public class ModSystemVectorStasisUnit : ModSystemWearableTick<ItemVectorStasisUnit>
     {
-        ICoreClientAPI capi;
         ICoreServerAPI sapi;
-        EntityBehaviorPlayerInventory bh;
+        private int projectileTickListenerId = -1;
+        private HashSet<IPlayer> activeWearers = new();
         private HashSet<long> frozenEntities = new();
-
-        public override bool ShouldLoad(EnumAppSide forSide) => true;
-
-        public override void StartClientSide(ICoreClientAPI api)
-        {
-            capi = api;
-            api.Event.LevelFinalize += Event_LevelFinalize;
-        }
 
         public override void StartServerSide(ICoreServerAPI api)
         {
             sapi = api;
             base.StartServerSide(api);
-            api.Event.RegisterGameTickListener(OnProjectileTick, 5);
         }
 
-        protected override EnumCharacterDressType Slot => EnumCharacterDressType.Arm;
-
-        protected override void HandleItem(IPlayer plr, ItemVectorStasisUnit stasisUnit, ItemSlot armSlot, double hoursPassed, float dt)
+        protected override void HandleItem(IPlayer player, ItemVectorStasisUnit stasisUnit, ItemSlot slot, double hoursPassed, float dt)
         {
+            // If this is the first time this player got handled, start listening
+            if (activeWearers.Add(player) && projectileTickListenerId < 0)
+            {
+                projectileTickListenerId = (int)sapi.Event.RegisterGameTickListener(OnProjectileTick, 5);
+            }
+
             if (hoursPassed > 0.05)
             {
-                stasisUnit.AddFuelHours(armSlot.Itemstack, -hoursPassed);
-                armSlot.MarkDirty();
+                stasisUnit.AddFuelHours(slot.Itemstack, -hoursPassed);
+                slot.MarkDirty();
+            }
+        }
+
+        protected override void HandleMissing(IPlayer player)
+        {
+            if (activeWearers.Remove(player) && activeWearers.Count == 0 && projectileTickListenerId >= 0)
+            {
+                sapi.Event.UnregisterGameTickListener(projectileTickListenerId);
+                projectileTickListenerId = -1;
+                frozenEntities.Clear();
             }
         }
 
@@ -48,31 +51,19 @@ namespace Riftworks.src.Systems
         {
             frozenEntities.RemoveWhere(entityId => sapi.World.GetEntityById(entityId) == null);
 
-            foreach (IPlayer player in sapi.World.AllOnlinePlayers)
+            foreach (IPlayer player in activeWearers)
             {
-                IInventory inv = player.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
-                if (inv == null)
-                {
-                    continue;
-                }
+                Vec3d playerPos = player.Entity.ServerPos.XYZ;
 
-                ItemSlot armSlot = inv[(int)EnumCharacterDressType.Arm];
-                ItemStack stack = armSlot?.Itemstack;
-                
-                if (stack?.Collectible is ItemVectorStasisUnit itemStasis && itemStasis.GetFuelHours(stack) > 0)
-                {
-                    Vec3d playerPos = player.Entity.ServerPos.XYZ;
-                    IEnumerable<Entity> entities = sapi.World.GetEntitiesAround(playerPos, 29, 29)
-                        .Where(e => (e is EntityProjectile proj && !proj.Collided && !frozenEntities.Contains(e.EntityId)) 
-                        || (e.ServerPos.Motion.Length() > 0.05 && !frozenEntities.Contains(e.EntityId)));
+                IEnumerable<EntityProjectile> projectiles = sapi.World.GetEntitiesAround(playerPos, 29, 29).OfType<EntityProjectile>()
+                        .Where(projectile => !projectile.Collided && !frozenEntities.Contains(projectile.EntityId));
 
-                    foreach (Entity entity in entities)
+                foreach (EntityProjectile projectile in projectiles)
+                {
+                    Vec3d projectedPos = projectile.ServerPos.XYZ + projectile.ServerPos.Motion * dt;
+                    if (playerPos.DistanceTo(projectedPos) <= 4)
                     {
-                        Vec3d projectedPos = entity.ServerPos.XYZ + entity.ServerPos.Motion * dt;
-                        if (playerPos.DistanceTo(projectedPos) <= 4)
-                        {
-                            FreezeProjectile(entity);
-                        }
+                        FreezeProjectile(projectile);
                     }
                 }
             }
@@ -91,11 +82,6 @@ namespace Riftworks.src.Systems
 
             entity.ServerPos.SetPos(entity.Pos);
             entity.Pos.SetPos(entity.ServerPos);
-        }
-
-        private void Event_LevelFinalize()
-        {
-            bh = capi.World.Player.Entity.GetBehavior<EntityBehaviorPlayerInventory>();
         }
     }
 }

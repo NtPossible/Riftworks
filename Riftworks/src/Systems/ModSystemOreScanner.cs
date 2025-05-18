@@ -1,7 +1,7 @@
-﻿using Riftworks.src.Items.Wearable;
-using Vintagestory.API.Client;
+﻿using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Server;
+using Riftworks.src.Items.Wearable;
 
 namespace Riftworks.src.Systems
 {
@@ -23,14 +23,12 @@ namespace Riftworks.src.Systems
             base.StartServerSide(api);
         }
 
-        protected override EnumCharacterDressType Slot => EnumCharacterDressType.Face;
-
-        protected override void HandleItem(IPlayer player, ItemOreScanner oreScanner, ItemSlot faceSlot, double hoursPassed, float dt)
+        protected override void HandleItem(IPlayer player, ItemOreScanner oreScanner, ItemSlot slot, double hoursPassed, float dt)
         {
             if (hoursPassed > 0.05)
             {
-                oreScanner.AddFuelHours(faceSlot.Itemstack, -hoursPassed);
-                faceSlot.MarkDirty();
+                oreScanner.AddFuelHours(slot.Itemstack, -hoursPassed);
+                slot.MarkDirty();
                 // scan for ores
             }
         }

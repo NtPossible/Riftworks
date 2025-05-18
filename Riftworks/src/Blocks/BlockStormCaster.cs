@@ -7,8 +7,12 @@ namespace Riftworks.src.Blocks
     {
         public override bool OnBlockInteractStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)
         {
-            var be = GetBlockEntity<BlockEntityStormCaster>(blockSel);
-            if (be != null && be.OnInteract(blockSel, byPlayer))
+            if (world.BlockAccessor.GetBlockEntity(blockSel.Position) is not BlockEntityStormCaster beStormCaster)
+            {
+                return false;
+            }
+
+            if (beStormCaster != null && beStormCaster.OnInteract(blockSel, byPlayer))
             {
                 return true;
             }

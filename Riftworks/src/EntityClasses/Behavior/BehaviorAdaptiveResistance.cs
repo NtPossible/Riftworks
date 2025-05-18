@@ -28,8 +28,8 @@ namespace Riftworks.src.EntityClasses.Behavior
 
             if (entity is EntityPlayer player)
             {
-                IInventory inv = player.Player.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
-                ItemStack stack = inv?[(int)EnumCharacterDressType.ArmorHead]?.Itemstack;
+                IInventory inventory = player.Player.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
+                ItemStack stack = inventory?[(int)EnumCharacterDressType.ArmorHead]?.Itemstack;
 
                 if (stack?.Collectible is ItemAdaptiveReconstitutionGear gear)
                 {
@@ -44,7 +44,7 @@ namespace Riftworks.src.EntityClasses.Behavior
 
                     }
 
-                    gear.HandleDamageTaken(damageSource.Type, inv[(int)EnumCharacterDressType.ArmorHead]);
+                    gear.HandleDamageTaken(damageSource.Type, inventory[(int)EnumCharacterDressType.ArmorHead]);
                 }
             }
             return damage;

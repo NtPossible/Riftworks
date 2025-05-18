@@ -1,4 +1,5 @@
-﻿using Vintagestory.API.Common;
+﻿using System.Linq;
+using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Server;
 using Vintagestory.GameContent;
@@ -10,7 +11,6 @@ namespace Riftworks.src.Systems
     {
         private ICoreServerAPI sapi;
         private double lastCheckTotalHours;
-        protected abstract EnumCharacterDressType Slot { get; }
 
         public override void StartServerSide(ICoreServerAPI api)
         {
@@ -27,18 +27,20 @@ namespace Riftworks.src.Systems
             {
                 foreach (IPlayer player in sapi.World.AllOnlinePlayers)
                 {
-                    IInventory inv = player.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
-                    if (inv == null) continue;
+                    IInventory inventory = player.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
+                    if (inventory == null)
+                    {
+                        continue;
+                    }
 
-                    ItemSlot slot = inv[(int)Slot];
-
-                    if (slot.Itemstack?.Collectible is TItem item)
+                    ItemSlot slot = inventory.FirstOrDefault(itemSlot => itemSlot.Itemstack?.Collectible is TItem);
+                    if (slot != null && slot.Itemstack.Collectible is TItem item)
                     {
                         HandleItem(player, item, slot, hoursPassed, dt);
                     }
                     else
                     {
-                        HandleMissing(player, Slot);
+                        HandleMissing(player);
                     }
                 }
 
@@ -48,6 +50,6 @@ namespace Riftworks.src.Systems
 
         protected abstract void HandleItem(IPlayer player, TItem item, ItemSlot slot, double hoursPassed, float dt);
 
-        protected virtual void HandleMissing(IPlayer player, EnumCharacterDressType slot) { }
+        protected virtual void HandleMissing(IPlayer player) { }
     }
 }
