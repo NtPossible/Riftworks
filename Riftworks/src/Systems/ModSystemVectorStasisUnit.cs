@@ -13,8 +13,8 @@ namespace Riftworks.src.Systems
     {
         ICoreServerAPI sapi;
         private int projectileTickListenerId = -1;
-        private HashSet<IPlayer> activeWearers = new();
-        private HashSet<long> frozenEntities = new();
+        private readonly HashSet<IPlayer> activeWearers = new();
+        private readonly HashSet<long> frozenEntities = new();
 
         public override void StartServerSide(ICoreServerAPI api)
         {

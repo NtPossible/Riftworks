@@ -30,14 +30,4 @@ public class RiftworksModSystem : ModSystem
 
         api.RegisterEntity("EntityAdaptiveReconstitutionGear", typeof(EntityAdaptiveReconstitutionGear));
     }
-
-    public override void StartServerSide(ICoreServerAPI api)
-    {
-    }
-
-    public override void StartClientSide(ICoreClientAPI api)
-    {
-        base.StartClientSide(api);
-    }
-
 }

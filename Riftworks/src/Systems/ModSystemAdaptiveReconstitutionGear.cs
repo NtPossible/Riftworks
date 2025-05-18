@@ -17,7 +17,7 @@ namespace Riftworks.src.Systems
         ICoreClientAPI capi;
         ICoreServerAPI sapi;
         EntityBehaviorPlayerInventory bh;
-        private Dictionary<string, EntityAdaptiveReconstitutionGear> playerGearEntities = new();
+        private readonly Dictionary<string, EntityAdaptiveReconstitutionGear> playerGearEntities = new();
 
         public override bool ShouldLoad(EnumAppSide forSide) => true;
 
@@ -38,7 +38,7 @@ namespace Riftworks.src.Systems
         {
             EntityPlayer playerEntity = player.Entity;
             reconstitutionGear.UpdateAdaptation(dt, slot);
-            if (playerEntity != null)
+            if (playerEntity != null && playerEntity.Api != null && !playerEntity.HasBehavior<EntityBehaviorAdaptiveResistance>())
             {
                 //if (!playerGearEntities.ContainsKey(player.PlayerUID))
                 //{
@@ -50,17 +50,8 @@ namespace Riftworks.src.Systems
                         //    sapi.World.SpawnEntity(gearEntity);
                 //}
 
-                try
-                {
-                    if (!playerEntity.HasBehavior<EntityBehaviorAdaptiveResistance>())
-                    {
-                        playerEntity.AddBehavior(new EntityBehaviorAdaptiveResistance(playerEntity));
-                    }
-                }
-                catch (NullReferenceException)
-                {
-                    sapi.World.Logger.Error("Error creating EntityAdaptiveReconstitutionGear for player: " + player.PlayerUID);
-                }
+            playerEntity.AddBehavior(new EntityBehaviorAdaptiveResistance(playerEntity));
+                
             }
             slot.MarkDirty();
         }
@@ -68,19 +59,10 @@ namespace Riftworks.src.Systems
         protected override void HandleMissing(IPlayer player)
         {
             EntityPlayer playerEntity = player.Entity;
-            if (playerEntity != null)
+            if (playerEntity != null && playerEntity.Api != null && playerEntity.HasBehavior<EntityBehaviorAdaptiveResistance>())
             {
-                try
-                {
-                    if (playerEntity.HasBehavior<EntityBehaviorAdaptiveResistance>())
-                    {
-                        playerEntity.RemoveBehavior(playerEntity.GetBehavior<EntityBehaviorAdaptiveResistance>());
-                    }
-                }
-                catch (NullReferenceException)
-                {
-                    sapi.World.Logger.Error("Error removing EntityBehaviorAdaptiveResistance from player: " + player.PlayerUID);
-                }
+                playerEntity.RemoveBehavior(playerEntity.GetBehavior<EntityBehaviorAdaptiveResistance>());
+             
 
                 //if (playerGearEntities.TryGetValue(player.PlayerUID, out EntityAdaptiveReconstitutionGear value))
                 //{
