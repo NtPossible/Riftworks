@@ -7,7 +7,7 @@
 		"clothescategory": "face"
 	},
 	"shape": {
-		"base": "item/devices/orescanner",
+		"base": "item/wearable/orescanner",
 		"type": "wearable"
 	},
 	"textures": {

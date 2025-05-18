@@ -7,7 +7,7 @@
     "wearableAttachment": true
   },
   "shape": {
-    "base": "item/devices/vectorstasisunit"
+    "base": "item/wearable/vectorstasisunit"
   },
   "textures": {
     "seraph": {

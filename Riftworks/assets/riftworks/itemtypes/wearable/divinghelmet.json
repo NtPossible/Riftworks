@@ -8,7 +8,7 @@
 		"disableElements": [ "hidehat", "Hood", "hoodupperover", "Hair tile upper part", "ponytailhigh", "ponytaillow", "Hair", "hair-uncovered", "sidehigh", "sidelow", "bangs" ]
 	},
 	"shape": {
-		"base": "item/devices/divinghelmet",
+		"base": "item/wearable/divinghelmet",
 		"type": "wearable"
 	},
 	"textures": {

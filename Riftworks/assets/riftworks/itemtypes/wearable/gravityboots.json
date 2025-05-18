@@ -4,7 +4,7 @@
   "storageFlags": 128,
   "category": "foot",
   "shape": {
-    "base": "item/devices/gravityboots",
+    "base": "item/wearable/gravityboots",
     "type": "wearable"
   },
   "attributes": {
