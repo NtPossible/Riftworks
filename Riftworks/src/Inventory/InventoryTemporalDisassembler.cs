@@ -19,14 +19,11 @@ namespace Riftworks.src.Inventory
             // slot 1 = gear slot
             // slot 2-11 = output slots
             slots = GenEmptySlots(11);
-            ConfigureSlotLimits(); 
-
         }
 
         public InventoryTemporalDisassembler(string className, string instanceID, ICoreAPI api) : base(className, instanceID, api)
         {
             slots = GenEmptySlots(11);
-            ConfigureSlotLimits(); 
         }
 
         public override int Count
@@ -45,13 +42,6 @@ namespace Riftworks.src.Inventory
                 if (slotId < 0 || slotId >= Count) throw new ArgumentOutOfRangeException(nameof(slotId));
                 slots[slotId] = value ?? throw new ArgumentNullException(nameof(value));
             }
-        }
-
-        private void ConfigureSlotLimits()
-        {
-            // Allow only 1 item per slot for input and gear slot
-            slots[0].MaxSlotStackSize = 1;
-            slots[1].MaxSlotStackSize = 1;
         }
 
         public override void FromTreeAttributes(ITreeAttribute tree)

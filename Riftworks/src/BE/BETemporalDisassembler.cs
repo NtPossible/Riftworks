@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Riftworks.src.GUI;
+using Riftworks.src.Inventory;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Vintagestory.API.Client;
@@ -6,8 +8,6 @@ using Vintagestory.API.Common;
 using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 using Vintagestory.GameContent;
-using Riftworks.src.GUI;
-using Riftworks.src.Inventory;
 
 namespace Riftworks.src.BE
 {
@@ -134,7 +134,7 @@ namespace Riftworks.src.BE
             {
                 if (inventory[i] is ItemSlotPreviewable previewableSlot)
                 {
-                    if (!previewableSlot.canTake) 
+                    if (!previewableSlot.canTake)
                     {
                         previewableSlot.Itemstack = null;
                         previewableSlot.MarkDirty();
@@ -186,74 +186,130 @@ namespace Riftworks.src.BE
 
         private void PerformDisassembly()
         {
-            if (isPreviewActive)
-            {
-                UnlockAllOutputSlots();
-                isPreviewActive = false;
-            }
-            else
-            {
-                // Fallback incase of no preview
-                List<ItemStack> items = Disassemble(InputSlot.Itemstack);
-                foreach (ItemStack item in items)
-            {
-                InsertItemIntoOutputSlots(item);
-            }
-                UnlockAllOutputSlots();
-            }
+            ItemSlot inputSlot = InputSlot;
+            ItemStack inputStack = inputSlot.Itemstack;
 
-            UnlockAllOutputSlots();
-            InputSlot.TakeOut(1);
-            GearSlot.TakeOut(1);
-
-            MarkDirty();
-            Api.World.BlockAccessor.MarkBlockEntityDirty(Pos);
-        }
-
-        private void InsertItemIntoOutputSlots(ItemStack item)
-        {
-            if (item == null)
+            if (inputStack == null)
             {
                 return;
             }
 
-            // Try to merge into existing stacks first
-            foreach (ItemSlot slot in inventory.Skip(2).Take(9))
+            int itemsToConsume = CalculateItemsToConsume(inputStack);
+            if (itemsToConsume <= 0)
             {
-                if (!slot.Empty && slot.Itemstack.Equals(Api.World, item, GlobalConstants.IgnoredStackAttributes))
-                {
-                    // if the items match merge the item into the slot only if max stack size isnt reached
-                    if (slot.Itemstack.StackSize < item.Collectible.MaxStackSize)
-                    {
-                        int transferable = Math.Min(item.StackSize, item.Collectible.MaxStackSize - slot.Itemstack.StackSize);
-                        slot.Itemstack.StackSize += transferable;
-                        item.StackSize -= transferable;
-                        slot.MarkDirty();
-                    }
+                return;
+            }
 
-                    if (item.StackSize <= 0)
-                    {
-                        break;
-                    }
+            // Remove the inputs first then disassemble the removed stack
+            ItemStack stackToProcess = inputSlot.TakeOut(itemsToConsume);
+            GearSlot.TakeOut(1);
+            List<ItemStack> outputs = Disassemble(stackToProcess);
+
+            foreach (ItemStack itemStack in outputs)
+            {
+                InsertItemIntoOutputSlots(itemStack);
+            }
+
+            UnlockAllOutputSlots();
+            Api.World.BlockAccessor.MarkBlockEntityDirty(Pos);
+        }
+
+        private GridRecipe GetGridRecipe(ItemStack inputStack)
+        {
+            // Strip attributes so we match purely on stack type
+            ItemStack strippedInput = StripAttributes(inputStack);
+
+            // Filter all grid‐recipes whose output type matches and whose batch size cleanly divides into our input stack size
+            IEnumerable<GridRecipe> filteredRecipes = Api.World.GridRecipes
+                .Where(recipe =>
+                {
+                    ItemStack outputStack = recipe.Output?.ResolvedItemstack;
+                    return outputStack != null
+                        && outputStack.Collectible == strippedInput.Collectible
+                        && inputStack.StackSize >= outputStack.StackSize
+                        && inputStack.StackSize % outputStack.StackSize == 0;
+                });
+
+            // Pick the recipe with the largest output stack
+            GridRecipe matchingRecipe = filteredRecipes.OrderByDescending(recipe => recipe.Output?.ResolvedItemstack.StackSize).FirstOrDefault();
+
+            return matchingRecipe;
+        }
+
+        private int CalculateItemsToConsume(ItemStack inputStack)
+        {
+            // Find a recipe whose output type matches and whose output stack size and cleanly divides into the input stack size.
+            GridRecipe matchingRecipe = GetGridRecipe(inputStack);
+
+            if (matchingRecipe != null)
+            {
+                int batchSize = matchingRecipe.Output.ResolvedItemstack.StackSize;
+                int batchCount = inputStack.StackSize / batchSize;
+                return batchCount * batchSize;
+            }
+
+            // If there is no recipe consume the whole stack
+            return inputStack.StackSize;
+        }
+
+        private void InsertItemIntoOutputSlots(ItemStack itemStack)
+        {
+            if (itemStack == null)
+            {
+                return;
+            }
+
+            int remaining = itemStack.StackSize;
+            CollectibleObject collectible = itemStack.Collectible;
+            // Clone any attributes so each split stack keeps its data
+            TreeAttribute treeAttributes = (TreeAttribute)itemStack.Attributes.Clone();
+
+            List<ItemSlot> outputSlots = inventory.Skip(2).Take(9).ToList();
+            foreach (ItemSlot slot in outputSlots)
+            {
+                if (slot.Empty || !slot.Itemstack.Equals(Api.World, itemStack, GlobalConstants.IgnoredStackAttributes))
+                {
+                    continue;
+                }
+
+                int canAdd = collectible.MaxStackSize - slot.Itemstack.StackSize;
+                if (canAdd <= 0)
+                {
+                    continue;
+                }
+
+                int add = Math.Min(remaining, canAdd);
+                slot.Itemstack.StackSize += add;
+                remaining -= add;
+                slot.MarkDirty();
+
+                if (remaining <= 0)
+                {
+                    break;
                 }
             }
 
-            // If item is still not empty, try placing in an empty slot
-            if (item.StackSize > 0)
+            // Place any leftover into empty slots or drop them
+            while (remaining > 0)
             {
-                ItemSlot emptySlot = inventory.Skip(2).FirstOrDefault(slot => slot.Empty);
+                int amountToPlace = Math.Min(remaining, collectible.MaxStackSize);
+                remaining -= amountToPlace;
+
+                ItemStack splitStack = new(collectible.Id, collectible.ItemClass, amountToPlace, treeAttributes, Api.World);
+
+                ItemSlot emptySlot = outputSlots.FirstOrDefault(slot => slot.Empty);
                 if (emptySlot != null)
                 {
-                    emptySlot.Itemstack = item.Clone();
+                    emptySlot.Itemstack = splitStack;
                     emptySlot.MarkDirty();
                 }
                 else
                 {
-                    // drop the item if no space
-                    Api.World.SpawnItemEntity(item, Pos.ToVec3d().Add(0.5, 0.5, 0.5));
+                    Api.World.SpawnItemEntity(splitStack, Pos.ToVec3d().Add(0.5, 0.5, 0.5));
                 }
             }
         }
+
 
         // Not really a disassemble now that it repairs. It does make sense lorewise though.
         private List<ItemStack> Disassemble(ItemStack inputItem)
@@ -261,15 +317,11 @@ namespace Riftworks.src.BE
             // If it's repairable and damaged, repair instead of disassemble
             if (IsRepairableAndDamaged(inputItem))
             {
-                inputItem = RepairItem(inputItem);
-                return new List<ItemStack> { inputItem };
+                return new List<ItemStack> { RepairItem(inputItem) };
             }
 
-            // Strip attributes for proper matching
-            ItemStack cleanInput = inputItem.Clone();
-            cleanInput.Attributes = new TreeAttribute();
-
-            GridRecipe matchingRecipe = Api.World.GridRecipes.FirstOrDefault(recipe => recipe.Output?.ResolvedItemstack.Equals(Api.World, cleanInput, GlobalConstants.IgnoredStackAttributes) == true);
+            ItemStack strippedInput = StripAttributes(inputItem);
+            GridRecipe matchingRecipe = GetGridRecipe(strippedInput);
 
             if (matchingRecipe == null)
             {
@@ -277,14 +329,21 @@ namespace Riftworks.src.BE
             }
 
             List<ItemStack> resultItems = new();
+            int batchSize = matchingRecipe.Output.ResolvedItemstack.StackSize;
+            int batchCount = strippedInput.StackSize / batchSize;
 
             foreach (GridRecipeIngredient ingredient in matchingRecipe.resolvedIngredients)
             {
-                if (ingredient == null || ingredient.IsTool) continue;
+                if (ingredient == null || ingredient.IsTool)
+                {
+                    continue;
+                }
 
                 if (ingredient.ResolvedItemstack != null)
                 {
-                    resultItems.Add(ingredient.ResolvedItemstack.Clone());
+                    ItemStack clone = ingredient.ResolvedItemstack.Clone();
+                    clone.StackSize *= batchCount;
+                    resultItems.Add(clone);
                 }
                 else if (ingredient.IsWildCard)
                 {
@@ -297,7 +356,9 @@ namespace Riftworks.src.BE
 
                         if (resolvedIngredient.Resolve(Api.World, "TemporalDisassembler") && resolvedIngredient.ResolvedItemstack != null)
                         {
-                            resultItems.Add(resolvedIngredient.ResolvedItemstack.Clone());
+                            ItemStack clone = resolvedIngredient.ResolvedItemstack.Clone();
+                            clone.StackSize *= batchCount;
+                            resultItems.Add(clone);
                         }
                     }
                 }
@@ -356,7 +417,7 @@ namespace Riftworks.src.BE
             if (condition >= 0 && condition < 1f)
             {
                 return true;
-        }
+            }
 
             return false;
         }
@@ -384,7 +445,8 @@ namespace Riftworks.src.BE
         {
             if (Api.Side == EnumAppSide.Client)
             {
-                toggleInventoryDialogClient(byPlayer, () => {
+                toggleInventoryDialogClient(byPlayer, () =>
+                {
                     clientDialog = new GuiDialogBlockEntityTemporalDisassembler(DialogTitle, Inventory, Pos, Api as ICoreClientAPI);
                     clientDialog.Update(disassemblyTime, maxDisassemblyTime);
                     return clientDialog;
@@ -477,6 +539,12 @@ namespace Riftworks.src.BE
             }
         }
 
+        private ItemStack StripAttributes(ItemStack stack)
+        {
+            ItemStack itemClone = stack.Clone();
+            itemClone.Attributes = new TreeAttribute();
+            return itemClone;
+        }
         #endregion
     }
 }
