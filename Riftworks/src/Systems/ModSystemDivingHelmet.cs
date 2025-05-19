@@ -1,9 +1,9 @@
 ﻿using HarmonyLib;
+using Riftworks.src.Items.Wearable;
 using System.Collections.Generic;
 using Vintagestory.API.Common;
 using Vintagestory.API.Server;
 using Vintagestory.GameContent;
-using Riftworks.src.Items.Wearable;
 
 namespace Riftworks.src.Systems
 {

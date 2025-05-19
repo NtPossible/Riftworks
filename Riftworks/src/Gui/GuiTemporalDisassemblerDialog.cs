@@ -57,13 +57,13 @@ namespace Riftworks.src.GUI
             ClearComposers();
             SingleComposer = capi.Gui
                 .CreateCompo("blockentitytemporaldisassembler" + BlockEntityPosition, dialogBounds)
-                .AddShadedDialogBG(bgBounds) 
-                .AddDialogTitleBar(DialogTitle, OnTitleBarClose) 
+                .AddShadedDialogBG(bgBounds)
+                .AddDialogTitleBar(DialogTitle, OnTitleBarClose)
                 .BeginChildElements(bgBounds)
-                    .AddDynamicCustomDraw(temporalDisassemblerBounds, OnBgDraw, "symbolDrawer") 
+                    .AddDynamicCustomDraw(temporalDisassemblerBounds, OnBgDraw, "symbolDrawer")
                     .AddItemSlotGrid(Inventory, SendInvPacket, 1, new int[] { 0 }, inputSlotBounds, "inputSlot")
                     .AddItemSlotGrid(Inventory, SendInvPacket, 1, new int[] { 1 }, gearSlotBounds, "gearSlot")
-                    .AddItemSlotGrid(Inventory, SendInvPacket, 9, new int[] { 2,3,4,5,6,7,8,9,10 }, outputSlotBounds, "outputSlot") 
+                    .AddItemSlotGrid(Inventory, SendInvPacket, 9, new int[] { 2, 3, 4, 5, 6, 7, 8, 9, 10 }, outputSlotBounds, "outputSlot")
                 .EndChildElements()
                 .Compose();
 
@@ -102,7 +102,7 @@ namespace Riftworks.src.GUI
             ctx.Matrix = m;
             capi.Gui.Icons.DrawArrowRight(ctx, 2);
 
-            double dx = disassemblyTime/ maxDisassemblyTime;
+            double dx = disassemblyTime / maxDisassemblyTime;
 
             ctx.Rectangle(GuiElement.scaled(5), 0, GuiElement.scaled(125 * dx), GuiElement.scaled(100));
             ctx.Clip();

@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Riftworks.src.Items.Wearable;
+using System;
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
 using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
 using Vintagestory.GameContent;
-using Riftworks.src.Items.Wearable;
 
 namespace Riftworks.src.EntityClasses.Behavior
 {

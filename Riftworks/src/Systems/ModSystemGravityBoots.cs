@@ -1,6 +1,6 @@
-﻿using Vintagestory.API.Common;
+﻿using Riftworks.src.Items.Wearable;
+using Vintagestory.API.Common;
 using Vintagestory.API.Server;
-using Riftworks.src.Items.Wearable;
 
 namespace Riftworks.src.Systems
 {

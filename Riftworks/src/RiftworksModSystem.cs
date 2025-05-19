@@ -1,12 +1,9 @@
-﻿using Vintagestory.API.Client;
-using Vintagestory.API.Server;
-using Vintagestory.API.Common;
+﻿using Riftworks.src.BE;
 using Riftworks.src.Blocks;
-using Riftworks.src.BE;
-using Riftworks.src.Items;
-using Riftworks.src.Systems;
-using Riftworks.src.Items.Wearable;
 using Riftworks.src.Entities;
+using Riftworks.src.Items;
+using Riftworks.src.Items.Wearable;
+using Vintagestory.API.Common;
 
 namespace Riftworks.src;
 

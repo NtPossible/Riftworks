@@ -16,7 +16,7 @@ namespace Riftworks.src.Patches
             if (!helmetLightEnabled) return true;
 
             // Emit light
-            __result = new byte[] { 25, 5, 5 }; 
+            __result = new byte[] { 25, 5, 5 };
             return false; // Skip original getter
         }
     }

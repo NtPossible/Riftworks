@@ -1,5 +1,5 @@
-﻿using Vintagestory.API.Common;
-using Riftworks.src.BE;
+﻿using Riftworks.src.BE;
+using Vintagestory.API.Common;
 
 namespace Riftworks.src.Blocks
 {
@@ -19,7 +19,7 @@ namespace Riftworks.src.Blocks
 
             if (!beTemporalDisassembler.Inventory.openedByPlayerGUIds.Contains(byPlayer.PlayerUID))
             {
-                return beTemporalDisassembler.OnPlayerRightClick(byPlayer, blockSel); 
+                return beTemporalDisassembler.OnPlayerRightClick(byPlayer, blockSel);
             }
 
             return true;
