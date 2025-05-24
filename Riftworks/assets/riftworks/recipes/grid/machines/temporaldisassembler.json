@@ -1,9 +1,10 @@
 {
-	"ingredientPattern": "ABC,DEF,GHI",
+	"ingredientPattern": "ABA,CDE,AFA",
 	"ingredients": {
 		"A": {
 			"type": "item",
 			"code": "game:metalnailsandstrips-*",
+			"allowedVariants": [ "tinbronze", "bismuthbronze", "blackbronze", "iron", "meteoriciron", "steel" ],
 			"quantity": 4
 		},
 		"B": {
@@ -13,34 +14,19 @@
 		},
 		"C": {
 			"type": "item",
-			"code": "game:metalnailsandstrips-*",
-			"quantity": 4
+			"code": "temporalstreaminverter"
 		},
 		"D": {
 			"type": "item",
-			"code": "temporalstreaminverter"
+			"code": "temporalcompressionchamber"
 		},
 		"E": {
 			"type": "item",
-			"code": "temporalcompressionchamber"
+			"code": "reactivefielddisruptor"
 		},
 		"F": {
 			"type": "item",
-			"code": "reactivefielddisruptor"
-		},
-		"G": {
-			"type": "block",
-			"code": "game:metal-parts",
-			"quantity": 4
-		},
-		"H": {
-			"type": "item",
 			"code": "game:metalplate-steel"
-		},
-		"I": {
-			"type": "block",
-			"code": "game:metal-parts",
-			"quantity": 4
 		}
 	},
 	"width": 3,

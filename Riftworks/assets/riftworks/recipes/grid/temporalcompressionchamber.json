@@ -1,5 +1,5 @@
 {
-	"ingredientPattern": "ABC,DEF,GHI",
+	"ingredientPattern": "ABA,CDE,ABA",
 	"ingredients": {
 		"A": {
 			"type": "block",
@@ -11,37 +11,18 @@
 			"code": "game:metalplate-steel"
 		},
 		"C": {
-			"type": "block",
-			"code": "game:metal-parts",
-			"quantity": 4
-		},
-		"D": {
 			"type": "item",
 			"code": "game:rod-cupronickel",
 			"quantity": 4
 		},
-		"E": {
+		"D": {
 			"type": "item",
 			"code": "game:gear-temporal"
 		},
-		"F": {
+		"E": {
 			"type": "item",
 			"code": "game:rod-electrum",
 			"quantity": 2
-		},
-		"G": {
-			"type": "block",
-			"code": "game:metal-parts",
-			"quantity": 4
-		},
-		"H": {
-			"type": "item",
-			"code": "game:metalplate-steel"
-		},
-		"I": {
-			"type": "block",
-			"code": "game:metal-parts",
-			"quantity": 4
 		}
 	},
 	"width": 3,

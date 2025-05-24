@@ -1,49 +1,22 @@
 {
-	"ingredientPattern": "ABC,DEF,GHI",
+	"ingredientPattern": "AB,C_",
 	"ingredients": {
 		"A": {
 			"type": "block",
 			"code": "game:metal-parts",
-			"quantity": 4
+			"quantity": 8
 		},
 		"B": {
 			"type": "item",
 			"code": "game:gear-temporal"
 		},
 		"C": {
-			"type": "block",
-			"code": "game:metal-parts",
-			"quantity": 4
-		},
-		"D": {
 			"type": "item",
 			"code": "game:rod-cupronickel"
-		},
-		"E": {
-			"type": "item",
-			"code": "game:gear-temporal"
-		},
-		"F": {
-			"type": "item",
-			"code": "game:rod-cupronickel"
-		},
-		"G": {
-			"type": "block",
-			"code": "game:metal-parts",
-			"quantity": 4
-		},
-		"H": {
-			"type": "item",
-			"code": "game:gear-temporal"
-		},
-		"I": {
-			"type": "block",
-			"code": "game:metal-parts",
-			"quantity": 4
 		}
 	},
-	"width": 3,
-	"height": 3,
+	"width": 2,
+	"height": 2,
 	"output": {
 		"type": "item",
 		"code": "temporalstreaminverter"

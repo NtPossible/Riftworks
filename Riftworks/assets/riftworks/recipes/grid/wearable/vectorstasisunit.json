@@ -1,41 +1,27 @@
 {
-	"ingredientPattern": "ABC,DEF,GHI",
+	"ingredientPattern": "ABA,DDD,GHG",
 	"ingredients": {
 		"A": {
 			"type": "item",
-			"code": "game:metalnailsandstrips-*"
+			"code": "game:metalnailsandstrips-*",
+			"quantity": "2"
 		},
 		"B": {
 			"type": "item",
 			"code": "game:rod-cupronickel"
 		},
-		"C": {
-			"type": "item",
-			"code": "game:metalnailsandstrips-*"
-		},
 		"D": {
-			"type": "item",
-			"code": "game:gear-temporal"
-		},
-		"E": {
-			"type": "item",
-			"code": "game:gear-temporal"
-		},
-		"F": {
 			"type": "item",
 			"code": "game:gear-temporal"
 		},
 		"G": {
 			"type": "block",
-			"code": "game:metal-parts"
+			"code": "game:metal-parts",
+      "quantity": "2"
 		},
 		"H": {
 			"type": "item",
 			"code": "game:rod-iron"
-		},
-		"I": {
-			"type": "block",
-			"code": "game:metal-parts"
 		}
 	},
 	"width": 3,

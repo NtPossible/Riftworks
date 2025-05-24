@@ -1,5 +1,5 @@
 {
-  "ingredientPattern": "ABC,DEF,GHI",
+  "ingredientPattern": "ABC,DED,GHI",
   "ingredients": {
     "A": {
       "type": "item",
@@ -22,11 +22,6 @@
       "type": "item",
       "code": "game:rod-iron",
       "quantity": 4
-    },
-    "F": {
-      "type": "item",
-      "code": "game:rod-electrum",
-      "quantity": 2
     },
     "G": {
       "type": "block",

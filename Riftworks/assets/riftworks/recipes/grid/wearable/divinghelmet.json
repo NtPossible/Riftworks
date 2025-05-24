@@ -1,5 +1,5 @@
 {
-	"ingredientPattern": "ABC,DEF,GHI",
+	"ingredientPattern": "ABC,DED,GHG",
 	"ingredients": {
 		"A": {
 			"type": "item",
@@ -24,10 +24,6 @@
 			"type": "item",
 			"code": "flashlight"
 		},
-		"F": {
-			"type": "item",
-			"code": "game:metalplate-brass"
-		},
 		"G": {
 			"type": "item",
 			"code": "game:leather-normal-plain",
@@ -36,11 +32,6 @@
 		"H": {
 			"type": "block",
 			"code": "game:linen-*"
-		},
-		"I": {
-			"type": "item",
-			"code": "game:leather-normal-plain",
-			"quantity": 8
 		}
 	},
 	"width": 3,

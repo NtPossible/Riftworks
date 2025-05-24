@@ -1,5 +1,5 @@
 {
-	"ingredientPattern": "ABC,DEF,GHI",
+	"ingredientPattern": "AB,CD",
 	"ingredients": {
 		"A": {
 			"type": "item",
@@ -7,39 +7,21 @@
 		},
 		"B": {
 			"type": "item",
-			"code": "game:rod-cupronickel"
+			"code": "game:rod-cupronickel",
+			"quantity": "2"
 		},
 		"C": {
 			"type": "item",
-			"code": "game:gear-temporal"
-		},
-		"D": {
-			"type": "item",
-			"code": "game:rod-cupronickel"
-		},
-		"E": {
-			"type": "item",
 			"code": "game:rod-electrum"
 		},
-		"F": {
-			"type": "item",
-			"code": "game:rod-cupronickel"
-		},
-		"G": {
-			"type": "item",
-			"code": "game:gear-temporal"
-		},
-		"H": {
-			"type": "item",
-			"code": "game:rod-cupronickel"
-		},
-		"I": {
-			"type": "item",
-			"code": "game:gear-temporal"
+		"D": {
+			"type": "block",
+			"code": "game:metal-parts",
+			"quantity": "4"
 		}
 	},
-	"width": 3,
-	"height": 3,
+	"width": 2,
+	"height": 2,
 	"output": {
 		"type": "item",
 		"code": "reactivefielddisruptor"
