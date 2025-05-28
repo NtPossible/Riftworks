@@ -29,12 +29,9 @@ namespace Riftworks.src.Systems
             {
                 projectileTickListenerId = (int)sapi.Event.RegisterGameTickListener(OnProjectileTick, 5);
             }
-
-            if (hoursPassed > 0.05)
-            {
-                stasisUnit.AddFuelHours(slot.Itemstack, -hoursPassed);
-                slot.MarkDirty();
-            }
+            stasisUnit.AddFuelHours(slot.Itemstack, -hoursPassed);
+            slot.MarkDirty();
+            
         }
 
         protected override void HandleMissing(IPlayer player)

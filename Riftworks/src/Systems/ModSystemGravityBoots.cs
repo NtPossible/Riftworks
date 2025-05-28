@@ -18,12 +18,11 @@ namespace Riftworks.src.Systems
 
         protected override void HandleItem(IPlayer player, ItemGravityBoots gravityBoots, ItemSlot slot, double hoursPassed, float dt)
         {
-            if (hoursPassed > 0.05)
-            {
-                gravityBoots.AddFuelHours(slot.Itemstack, -hoursPassed);
-                slot.MarkDirty();
-                // allow walking on walls
-            }
+            
+            gravityBoots.AddFuelHours(slot.Itemstack, -hoursPassed);
+            slot.MarkDirty();
+            // allow walking on walls
+            
         }
     }
 }

@@ -10,7 +10,6 @@ namespace Riftworks.src.Systems
         where TItem : ItemWearable
     {
         private ICoreServerAPI sapi;
-        private double lastCheckTotalHours;
 
         public override void StartServerSide(ICoreServerAPI api)
         {
@@ -20,31 +19,25 @@ namespace Riftworks.src.Systems
 
         private void OnTickServer1s(float dt)
         {
-            double totalHours = sapi.World.Calendar.TotalHours;
-            double hoursPassed = totalHours - lastCheckTotalHours;
+            double hoursPassed = dt / 3600.0;
 
-            if (hoursPassed > 0.05)
+            foreach (IPlayer player in sapi.World.AllOnlinePlayers)
             {
-                foreach (IPlayer player in sapi.World.AllOnlinePlayers)
+                IInventory inventory = player.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
+                if (inventory == null)
                 {
-                    IInventory inventory = player.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
-                    if (inventory == null)
-                    {
-                        continue;
-                    }
-
-                    ItemSlot slot = inventory.FirstOrDefault(itemSlot => itemSlot.Itemstack?.Collectible is TItem);
-                    if (slot != null && slot.Itemstack.Collectible is TItem item)
-                    {
-                        HandleItem(player, item, slot, hoursPassed, dt);
-                    }
-                    else
-                    {
-                        HandleMissing(player);
-                    }
+                    continue;
                 }
 
-                lastCheckTotalHours = totalHours;
+                ItemSlot slot = inventory.FirstOrDefault(itemSlot => itemSlot.Itemstack?.Collectible is TItem);
+                if (slot != null && slot.Itemstack.Collectible is TItem item)
+                {
+                    HandleItem(player, item, slot, hoursPassed, dt);
+                }
+                else
+                {
+                    HandleMissing(player);
+                }
             }
         }
 

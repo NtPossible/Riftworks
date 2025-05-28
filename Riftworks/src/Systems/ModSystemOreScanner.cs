@@ -25,12 +25,11 @@ namespace Riftworks.src.Systems
 
         protected override void HandleItem(IPlayer player, ItemOreScanner oreScanner, ItemSlot slot, double hoursPassed, float dt)
         {
-            if (hoursPassed > 0.05)
-            {
-                oreScanner.AddFuelHours(slot.Itemstack, -hoursPassed);
-                slot.MarkDirty();
-                // scan for ores
-            }
+            
+            oreScanner.AddFuelHours(slot.Itemstack, -hoursPassed);
+            slot.MarkDirty();
+            // scan for ores
+            
         }
     }
 

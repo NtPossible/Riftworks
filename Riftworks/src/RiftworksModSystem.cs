@@ -48,7 +48,7 @@ public class RiftworksModSystem : ModSystem
         }
     }
 
-    // After all JSON assets have been loaded, remove any configurated recipes
+    // After all JSON assets have been loaded, remove any configured recipes
     public override void AssetsFinalize(ICoreAPI api)
     {
         if (api.Side != EnumAppSide.Server) return;
