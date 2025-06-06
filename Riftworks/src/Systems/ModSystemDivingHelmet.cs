@@ -53,6 +53,12 @@ namespace Riftworks.src.Systems
         protected override void HandleMissing(IPlayer player)
         {
             EntityPlayer entity = player.Entity;
+
+            if (entity == null)
+            {
+                return;
+            }
+
             EntityBehaviorBreathe breathe = entity.GetBehavior<EntityBehaviorBreathe>();
 
             if (breathe == null)

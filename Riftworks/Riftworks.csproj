@@ -4,6 +4,8 @@
     <TargetFramework>net7.0</TargetFramework>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <OutputPath>bin\$(Configuration)\Mods\mod</OutputPath>
+    <DebugType>portable</DebugType>
+    <PathMap>$(MSBuildProjectDirectory)=.</PathMap>
   </PropertyGroup>
 
   <ItemGroup>
@@ -53,10 +55,6 @@
   <Content Include="assets\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
   </Content>
-  <Compile Remove="assets\riftworks\shapes\item\tst\**" />
-  <Content Remove="assets\riftworks\shapes\item\tst\**" />
-  <EmbeddedResource Remove="assets\riftworks\shapes\item\tst\**" />
-  <None Remove="assets\riftworks\shapes\item\tst\**" />
   <Content Include="modinfo.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
   </Content>

@@ -14,7 +14,7 @@ namespace Riftworks.src.Systems
         public override void StartServerSide(ICoreServerAPI api)
         {
             sapi = api;
-            api.Event.RegisterGameTickListener(OnTickServer1s, 1000);
+            api.Event.RegisterGameTickListener(OnTickServer1s, 1000, 200);
         }
 
         private void OnTickServer1s(float dt)
