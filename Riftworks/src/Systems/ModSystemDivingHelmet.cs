@@ -59,9 +59,19 @@ namespace Riftworks.src.Systems
                 return;
             }
 
+            if (entity.SidedProperties?.Behaviors == null)
+            {
+                return;
+            }
+
             EntityBehaviorBreathe breathe = entity.GetBehavior<EntityBehaviorBreathe>();
 
             if (breathe == null)
+            {
+                return;
+            }
+
+            if (entity.WatchedAttributes == null)
             {
                 return;
             }
