@@ -11,7 +11,7 @@
     },
     "C": {
       "type": "item",
-      "code": "solderingiron",
+      "code": "game:solderingiron",
       "isTool": true,
       "toolDurabilityCost": 1
     },
@@ -26,15 +26,16 @@
     },
     "F": {
       "type": "item",
-      "code": "solderbar-*",
+      "code": "game:solderbar-*",
       "name": "mat",
-      "allowedVariants": [ "tin", "silver" ]
+      "allowedVariants": [ "tin", "silver" ],
+      "quantity": 2
     }
   },
   "width": 3,
   "height": 2,
   "output": {
     "type": "item",
-    "code": "orescanner" 
+    "code": "orescanner"
   }
 }
