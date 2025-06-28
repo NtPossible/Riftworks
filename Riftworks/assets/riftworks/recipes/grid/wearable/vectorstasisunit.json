@@ -4,7 +4,7 @@
 		"A": {
 			"type": "item",
 			"code": "game:metalnailsandstrips-*",
-			"quantity": "2"
+			"quantity": 2
 		},
 		"B": {
 			"type": "item",
@@ -17,7 +17,7 @@
 		"G": {
 			"type": "block",
 			"code": "game:metal-parts",
-      "quantity": "2"
+      "quantity": 2
 		},
 		"H": {
 			"type": "item",

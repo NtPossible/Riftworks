@@ -8,7 +8,7 @@
 		"B": {
 			"type": "item",
 			"code": "game:rod-cupronickel",
-			"quantity": "2"
+			"quantity": 2
 		},
 		"C": {
 			"type": "item",
@@ -17,7 +17,7 @@
 		"D": {
 			"type": "block",
 			"code": "game:metal-parts",
-			"quantity": "4"
+			"quantity": 4
 		}
 	},
 	"width": 2,

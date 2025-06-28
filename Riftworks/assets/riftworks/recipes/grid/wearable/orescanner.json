@@ -1,0 +1,40 @@
+{
+  "ingredientPattern": "ABC,DEF",
+  "ingredients": {
+    "A": {
+      "type": "item",
+      "code": "game:gear-temporal"
+    },
+    "B": {
+      "type": "item",
+      "code": "game:rod-cupronickel"
+    },
+    "C": {
+      "type": "item",
+      "code": "solderingiron",
+      "isTool": true,
+      "toolDurabilityCost": 1
+    },
+    "D": {
+      "type": "item",
+      "code": "game:rod-electrum"
+    },
+    "E": {
+      "type": "block",
+      "code": "game:metal-parts",
+      "quantity": 4
+    },
+    "F": {
+      "type": "item",
+      "code": "solderbar-*",
+      "name": "mat",
+      "allowedVariants": [ "tin", "silver" ]
+    }
+  },
+  "width": 3,
+  "height": 2,
+  "output": {
+    "type": "item",
+    "code": "orescanner" 
+  }
+}

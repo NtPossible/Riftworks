@@ -12,12 +12,12 @@
     "C": {
       "type": "item",
       "code": "game:metalnailsandstrips-*",
-      "quantity": "2"
+      "quantity": 2
     },
     "D": {
       "type": "block",
       "code": "game:metal-parts",
-      "quantity": "2"
+      "quantity": 2
     }
   },
   "width": 2,

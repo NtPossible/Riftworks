@@ -24,6 +24,17 @@ namespace Riftworks.src.Systems
         protected override void HandleItem(IPlayer player, ItemDivingHelmet divingHelmet, ItemSlot slot, double hoursPassed, float dt)
         {
             EntityPlayer entity = player.Entity;
+
+            if (entity == null)
+            {
+                return;
+            }
+
+            if (entity.SidedProperties?.Behaviors == null)
+            {
+                return;
+            }
+
             EntityBehaviorBreathe breathe = entity.GetBehavior<EntityBehaviorBreathe>();
 
             if (breathe == null)

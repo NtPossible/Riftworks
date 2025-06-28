@@ -17,11 +17,12 @@ namespace Riftworks.src.Config
 
         public bool DisableDivingHelmet { get; set; } = false;
 
+        public bool DisableOreScanner { get; set; } = false;
+
+
         //public bool DisableRiftBlade { get; set; } = false;
         //public bool DisableAdaptiveReconstitutionGear { get; set; } = false;
-        //public bool DisableOreScanner { get; set; } = false;
         //public bool DisableGravityBoots { get; set; } = false;
-        //public bool DisableAdaptiveReconstitutionGearEntity { get; set; } = false;
 
     }
 }

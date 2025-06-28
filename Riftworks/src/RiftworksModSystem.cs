@@ -70,6 +70,10 @@ public class RiftworksModSystem : ModSystem
         {
             recipes.RemoveAll(r => r.Output.Code.PathStartsWith("temporaldisassembler"));
         }
+        if (RiftworksConfig.Loaded.DisableOreScanner)
+        {
+            recipes.RemoveAll(r => r.Output.Code.PathStartsWith("orescanner"));
+        }
     }
 
 }
