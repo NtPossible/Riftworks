@@ -341,6 +341,11 @@ namespace Riftworks.src.BE
 
                 if (ingredient.ResolvedItemstack != null)
                 {
+                    if (ingredient.ResolvedItemstack.Collectible.Code.Path.Contains("schematic"))
+                    {
+                        continue;
+                    }
+
                     ItemStack clone = ingredient.ResolvedItemstack.Clone();
                     clone.StackSize *= batchCount;
                     resultItems.Add(clone);
