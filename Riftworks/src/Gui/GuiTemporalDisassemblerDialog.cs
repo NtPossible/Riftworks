@@ -1,7 +1,13 @@
 ﻿using Cairo;
+using Riftworks.src.Inventory;
+using Riftworks.src.BE;
+using System;
+using System.Collections.Generic;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
+using Vintagestory.API.Config;
 using Vintagestory.API.MathTools;
+using Vintagestory.GameContent;
 
 namespace Riftworks.src.GUI
 {
@@ -39,11 +45,13 @@ namespace Riftworks.src.GUI
                 hoveredSlot = null;
             }
 
-            ElementBounds temporalDisassemblerBounds = ElementBounds.Fixed(0, 0, 610, 90);
+            ElementBounds temporalDisassemblerBounds = ElementBounds.Fixed(0, 0, 610, 200);
 
             ElementBounds inputSlotBounds = ElementStdBounds.SlotGrid(EnumDialogArea.None, 0, 30, 1, 1);
             ElementBounds gearSlotBounds = ElementStdBounds.SlotGrid(EnumDialogArea.None, 50, 30, 1, 1);
             ElementBounds outputSlotBounds = ElementStdBounds.SlotGrid(EnumDialogArea.None, 203, 30, 9, 1);
+            ElementBounds previewInputTextBounds = ElementBounds.Fixed(0, 90, 190, 120);
+            ElementBounds previewOutputTextBounds = ElementBounds.Fixed(203, 90, 360, 180);
 
             // 2. Around all that is 10 pixel padding
             ElementBounds bgBounds = ElementBounds.Fill.WithFixedPadding(GuiStyle.ElementToDialogPadding);
@@ -64,6 +72,8 @@ namespace Riftworks.src.GUI
                     .AddItemSlotGrid(Inventory, SendInvPacket, 1, new int[] { 0 }, inputSlotBounds, "inputSlot")
                     .AddItemSlotGrid(Inventory, SendInvPacket, 1, new int[] { 1 }, gearSlotBounds, "gearSlot")
                     .AddItemSlotGrid(Inventory, SendInvPacket, 9, new int[] { 2, 3, 4, 5, 6, 7, 8, 9, 10 }, outputSlotBounds, "outputSlot")
+                    .AddDynamicText(getInputContentsText(), CairoFont.WhiteDetailText(), previewInputTextBounds, "previewInputText")
+                    .AddDynamicText(getOutputContentsText(), CairoFont.WhiteDetailText(), previewOutputTextBounds, "previewOutputText")
                 .EndChildElements()
                 .Compose();
 
@@ -73,6 +83,99 @@ namespace Riftworks.src.GUI
             {
                 SingleComposer.OnMouseMove(new MouseEvent(capi.Input.MouseX, capi.Input.MouseY));
             }
+        }
+
+        public void UpdateContents()
+        {
+            SingleComposer.GetDynamicText("previewInputText").SetNewText(getInputContentsText());
+            SingleComposer.GetDynamicText("previewOutputText").SetNewText(getOutputContentsText());
+
+        }
+
+        string getInputContentsText()
+        {
+            string contents = Lang.Get("Contents:");
+
+            ItemSlot input = Inventory[0];
+            ItemSlot gear = Inventory[1];
+
+            // Nothing in the machine
+            if (input.Empty && gear.Empty)
+            {
+                contents += "\n" + Lang.Get("nobarrelcontents");
+                return contents;
+            }
+
+            // Input first (nice for quick glance)
+            if (!input.Empty)
+            {
+                contents += "\n" + Lang.Get("barrelcontents-items", input.Itemstack.StackSize, input.Itemstack.GetName());
+            }
+
+            // Gear requirement
+            if (!gear.Empty)
+            {
+                contents += "\n" + Lang.Get("barrelcontents-items", gear.Itemstack.StackSize, gear.Itemstack.GetName());
+            }
+            else
+            {
+                contents += "\n" + Lang.Get("Requires Temporal Gear");
+            }
+
+            return contents;
+        }
+
+        string getOutputContentsText()
+        {
+            // First: if we already have real items in output slots (2..10), show them
+            Dictionary<string, int> totals = new();
+            for (int i = 2; i < Inventory.Count; i++)
+            {
+                ItemSlot slot = Inventory[i];
+                if (slot.Empty) continue;
+
+                string name = slot.Itemstack.GetName();
+                int size = slot.Itemstack.StackSize;
+                totals[name] = (totals.TryGetValue(name, out var have) ? have : 0) + size;
+            }
+
+            if (totals.Count > 0)
+            {
+                string contents = Lang.Get("Outputs:");
+                foreach (var kvp in totals)
+                {
+                    contents += "\n" + Lang.Get("barrelcontents-items", kvp.Value, kvp.Key);
+                }
+                return contents;
+            }
+
+            // Otherwise: show a text-only prediction whenever the input slot is filled (no gear required)
+            ItemSlot input = Inventory[0];
+            if (!input.Empty)
+            {
+                var be = capi.World.BlockAccessor.GetBlockEntity(BlockEntityPosition) as BlockEntityTemporalDisassembler;
+                var predicted = be?.GetPredictedOutputs(); // non-destructive preview from the client-side BE
+
+                if (predicted != null && predicted.Count > 0)
+                {
+                    var pTotals = new Dictionary<string, int>();
+                    foreach (var st in predicted)
+                    {
+                        string name = st.GetName();
+                        pTotals[name] = (pTotals.TryGetValue(name, out var have) ? have : 0) + st.StackSize;
+                    }
+
+                    string contents = Lang.Get("Will output:");
+                    foreach (var kvp in pTotals)
+                    {
+                        contents += "\n" + Lang.Get("barrelcontents-items", kvp.Value, kvp.Key);
+                    }
+                    return contents;
+                }
+            }
+
+            // Fallback
+            return Lang.Get("Outputs:");
         }
 
         float disassemblyTime;

@@ -79,14 +79,8 @@ namespace Riftworks.src.Inventory
 
     class ItemSlotPreviewable : ItemSlot
     {
-        public bool canTake = false;
         public ItemSlotPreviewable(InventoryBase inventory) : base(inventory)
         {
-        }
-
-        public override bool CanTake()
-        {
-            return canTake;
         }
 
         public override bool CanHold(ItemSlot sourceSlot)

@@ -1,10 +1,10 @@
 {
-  // machines
+  // Machines
   "block-temporaldisassembler": "Temporal Disassembler",
   "block-temporaldisassembler-north": "Temporal Disassembler",
   "block-stormcaster": "Storm Caster",
 
-  // devices
+  // Devices
   "item-riftblade": "Riftblade",
   "item-vectorstasisunit": "Vector Stasis Unit",
   "item-adaptivereconstitutiongear": "Adaptive Reconstitution Gear",
@@ -12,12 +12,12 @@
   "item-orescanner": "Ore Scanner",
   "item-flashlight": "Flashlight",
 
-  // ingredient items
+  // Ingredient items
   "item-temporalcompressionchamber": "Temporal Compression Chamber",
   "item-reactivefielddisruptor": "Reactive Field Disruptor",
   "item-temporalstreaminverter": "Temporal Stream Inverter",
 
-  // errors
+  // Errors
   "ingameerror-vectorstasisunit-full": "Vector Stasis Unit is already at maximum fuel capacity",
   "ingameerror-orescanner-full": "Ore Scanner is already at maximum fuel capacity",
   "ingameerror-gravityboots-full": "Gravity Boots are already at maximum fuel capacity"

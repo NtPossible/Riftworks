@@ -20,8 +20,6 @@ namespace Riftworks.src.BE
         private float disassemblyTime = 0;
         private const float maxDisassemblyTime = 60f;
 
-        private bool isPreviewActive = false;
-
         // Dictionary of preferred wildcard variants
         private static readonly Dictionary<string, string> PreferredWildcards = new()
         {
@@ -73,14 +71,6 @@ namespace Riftworks.src.BE
             if (slotid == 0 || slotid == 1)
             {
                 disassemblyTime = 0.0f;
-
-                if (isPreviewActive)
-                {
-                    CancelPreview();
-                }
-
-                UpdatePreviewState();
-
                 MarkDirty();
                 Api.World.BlockAccessor.MarkBlockEntityDirty(Pos);
 
@@ -92,62 +82,9 @@ namespace Riftworks.src.BE
             }
             else if (Api is ICoreClientAPI)
             {
+                clientDialog?.UpdateContents();
                 clientDialog?.Update(disassemblyTime, maxDisassemblyTime);
             }
-        }
-
-        private void UpdatePreviewState()
-        {
-            // Prevent previewing if any output slot has items
-            bool outputsEmpty = inventory.Skip(2).All(slot => slot.Empty);
-            bool shouldPreview = !InputSlot.Empty && GearSlot.Itemstack?.Item?.Code.ToString() == "game:gear-temporal" && outputsEmpty;
-
-            if (shouldPreview && !isPreviewActive)
-            {
-                StartPreview();
-            }
-            else if (!shouldPreview && isPreviewActive)
-            {
-                CancelPreview();
-            }
-        }
-
-        private void StartPreview()
-        {
-            LockAllOutputSlots();
-
-            List<ItemStack> previewItems = Disassemble(InputSlot.Itemstack);
-
-            foreach (ItemStack previewItem in previewItems)
-            {
-                InsertItemIntoOutputSlots(previewItem.Clone());
-            }
-
-            isPreviewActive = true;
-            MarkDirty();
-            Api.World.BlockAccessor.MarkBlockEntityDirty(Pos);
-        }
-
-        private void CancelPreview()
-        {
-            for (int i = 2; i < inventory.Count; i++)
-            {
-                if (inventory[i] is ItemSlotPreviewable previewableSlot)
-                {
-                    if (!previewableSlot.canTake)
-                    {
-                        previewableSlot.Itemstack = null;
-                        previewableSlot.MarkDirty();
-                    }
-
-                    previewableSlot.canTake = false;
-                }
-            }
-
-            isPreviewActive = false;
-
-            MarkDirty();
-            Api.World.BlockAccessor.MarkBlockEntityDirty(Pos);
         }
 
         private bool CanStartDisassembly()
@@ -210,7 +147,6 @@ namespace Riftworks.src.BE
                 InsertItemIntoOutputSlots(itemStack);
             }
 
-            UnlockAllOutputSlots();
             Api.World.BlockAccessor.MarkBlockEntityDirty(Pos);
         }
 
@@ -444,6 +380,26 @@ namespace Riftworks.src.BE
             return repaired;
         }
 
+        public List<ItemStack> GetPredictedOutputs()
+        {
+            if (InputSlot.Empty)
+            {
+                return new List<ItemStack>();
+            }
+
+            int toConsume = CalculateItemsToConsume(InputSlot.Itemstack);
+            if (toConsume <= 0)
+            {
+                return new List<ItemStack>();
+            }
+
+            ItemStack temp = InputSlot.Itemstack.Clone();
+            temp.StackSize = toConsume;
+
+            return Disassemble(temp);
+        }
+
+
         #region Events
 
         public override bool OnPlayerRightClick(IPlayer byPlayer, BlockSelection blockSel)
@@ -491,20 +447,12 @@ namespace Riftworks.src.BE
 
         public override void OnBlockRemoved()
         {
-            if (isPreviewActive)
-            {
-                CancelPreview();
-            }
             base.OnBlockRemoved();
             clientDialog?.TryClose();
         }
 
         public override void OnBlockBroken(IPlayer byPlayer = null)
         {
-            if (isPreviewActive)
-            {
-                CancelPreview();
-            }
             base.OnBlockBroken(byPlayer);
         }
 
@@ -520,28 +468,6 @@ namespace Riftworks.src.BE
         public ItemSlot GearSlot
         {
             get { return inventory[1]; }
-        }
-
-        private void UnlockAllOutputSlots()
-        {
-            for (int i = 2; i < inventory.Count; i++)
-            {
-                if (inventory[i] is ItemSlotPreviewable previewableSlot)
-                {
-                    previewableSlot.canTake = true;
-                }
-            }
-        }
-
-        private void LockAllOutputSlots()
-        {
-            for (int i = 2; i < inventory.Count; i++)
-            {
-                if (inventory[i] is ItemSlotPreviewable previewableSlot)
-                {
-                    previewableSlot.canTake = false;
-                }
-            }
         }
 
         private ItemStack StripAttributes(ItemStack stack)
