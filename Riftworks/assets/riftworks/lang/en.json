@@ -1,15 +1,21 @@
 {
   // Machines
-  "block-temporaldisassembler": "Temporal Disassembler",
-  "block-temporaldisassembler-north": "Temporal Disassembler",
+  "block-temporaldisassembler-*": "Temporal Disassembler",
+  "blockdesc-temporaldisassembler-*": "<font color=\"#99c9f9\"><i>To reverse time on a macroscopic scale is impossible. However...</i></font><br>",
   "block-stormcaster": "Storm Caster",
+  "blockdesc-stormcaster": "<font color=\"#99c9f9\"><i>He sought to prevent seafarers from coming across his work. So he created a machine to commandeer an endless storm.</i></font><br>",
 
   // Devices
   "item-riftblade": "Riftblade",
+  "itemdesc-riftblade": "<font color=\"#99c9f9\"><i>A marvel of engineering, even so it was of little use against what was coming for them.</i></font><br>",
   "item-vectorstasisunit": "Vector Stasis Unit",
+  "itemdesc-vectorstasisunit": "<font color=\"#99c9f9\"><i>No arrow shall ever reach you.</i></font><br>",
   "item-adaptivereconstitutiongear": "Adaptive Reconstitution Gear",
+  "itemdesc-adaptivereconstitutiongear": "<font color=\"#99c9f9\"><i>Even when I retrace all my steps perfectly, I cannot replicate it. How did I do it?</i></font><br>",
   "item-divinghelmet": "Diving Helmet",
+  "itemdesc-divinghelmet": "<font color=\"#99c9f9\"><i>The oceans are not our domain.</i></font><br>",
   "item-orescanner": "Ore Scanner",
+  "itemdesc-orescanner": "<font color=\"#99c9f9\"><i>How could we even find that much ore?</i></font><br>",
   "item-flashlight": "Flashlight",
 
   // Ingredient items
