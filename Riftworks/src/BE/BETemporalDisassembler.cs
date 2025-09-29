@@ -152,21 +152,18 @@ namespace Riftworks.src.BE
 
         private GridRecipe GetGridRecipe(ItemStack inputStack)
         {
-            // Strip attributes so we match purely on stack type
-            ItemStack strippedInput = StripAttributes(inputStack);
-
-            // Filter all grid‐recipes whose output type matches and whose batch size cleanly divides into our input stack size
+            // Filter all grid‐recipes whose output type matches and exact variant and whose batch size cleanly divides into our input stack size
             IEnumerable<GridRecipe> filteredRecipes = Api.World.GridRecipes
                 .Where(recipe =>
                 {
                     ItemStack outputStack = recipe.Output?.ResolvedItemstack;
                     return outputStack != null
-                        && outputStack.Collectible == strippedInput.Collectible
+                        && MatchesExactVariant(outputStack, inputStack)
                         && inputStack.StackSize >= outputStack.StackSize
                         && inputStack.StackSize % outputStack.StackSize == 0;
                 });
 
-            // Pick the recipe with the largest output stack
+            // If multiple recipes exist, prefer the one with the largest output stack
             GridRecipe matchingRecipe = filteredRecipes.OrderByDescending(recipe => recipe.Output?.ResolvedItemstack.StackSize).FirstOrDefault();
 
             return matchingRecipe;
@@ -256,8 +253,7 @@ namespace Riftworks.src.BE
                 return new List<ItemStack> { RepairItem(inputItem) };
             }
 
-            ItemStack strippedInput = StripAttributes(inputItem);
-            GridRecipe matchingRecipe = GetGridRecipe(strippedInput);
+            GridRecipe matchingRecipe = GetGridRecipe(inputItem);
 
             if (matchingRecipe == null)
             {
@@ -266,7 +262,7 @@ namespace Riftworks.src.BE
 
             List<ItemStack> resultItems = new();
             int batchSize = matchingRecipe.Output.ResolvedItemstack.StackSize;
-            int batchCount = strippedInput.StackSize / batchSize;
+            int batchCount = inputItem.StackSize / batchSize;
 
             foreach (GridRecipeIngredient ingredient in matchingRecipe.resolvedIngredients)
             {
@@ -399,6 +395,44 @@ namespace Riftworks.src.BE
             return Disassemble(temp);
         }
 
+        // Checks whether an input stack matches the recipe’s output by requiring the same collectible and the same variant-defining attributes(ignores any extra attributes on the input).
+        private static bool MatchesExactVariant(ItemStack recipeOutputStack, ItemStack inputStack)
+        {
+            if (recipeOutputStack?.Collectible != inputStack?.Collectible)
+            {
+                return false;
+            }
+
+            // If the recipe output has no attributes it matches
+            if (recipeOutputStack.Attributes is not TreeAttribute recipeAttributes || recipeAttributes.Count == 0)
+            {
+                return true;
+            }
+
+            // If the input has no attributes but the recipe does, no match
+            if (inputStack.Attributes is not TreeAttribute inputAttributes)
+            {
+                return false;
+            }
+            // If there are attributes then compare the attribute keys that exist on the recipe output
+            foreach (string attributeKey in recipeAttributes.Keys)
+            {
+                IAttribute recipeValue = recipeAttributes[attributeKey];
+                IAttribute inputValue = inputAttributes[attributeKey];
+
+                if (inputValue == null)
+                {
+                    return false;
+                }
+
+                // Compare via JSON token to handle numbers/strings/arrays/trees uniformly
+                if (!recipeValue.ToJsonToken().Equals(inputValue.ToJsonToken())) { 
+                    return false;
+                }
+            }
+
+            return true;
+        }
 
         #region Events
 
@@ -470,12 +504,6 @@ namespace Riftworks.src.BE
             get { return inventory[1]; }
         }
 
-        private ItemStack StripAttributes(ItemStack stack)
-        {
-            ItemStack itemClone = stack.Clone();
-            itemClone.Attributes = new TreeAttribute();
-            return itemClone;
-        }
         #endregion
     }
 }
