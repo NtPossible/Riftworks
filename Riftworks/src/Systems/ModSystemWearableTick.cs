@@ -11,6 +11,8 @@ namespace Riftworks.src.Systems
     {
         private ICoreServerAPI sapi;
 
+        private double lastCheckTotalHours;
+
         public override void StartServerSide(ICoreServerAPI api)
         {
             sapi = api;
@@ -19,18 +21,29 @@ namespace Riftworks.src.Systems
 
         private void OnTickServer1s(float dt)
         {
-            double hoursPassed = dt / 3600.0;
+            if (sapi?.World == null)
+            {
+                return;
+            }
+
+            double totalHours = sapi.World.Calendar.TotalHours;
+            double hoursPassed = totalHours - lastCheckTotalHours;
+
+            if (hoursPassed < 0.05)
+            {
+                return;
+            }
 
             foreach (IPlayer player in sapi.World.AllOnlinePlayers)
             {
                 IInventory inventory = player.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
-                if (inventory == null)
-                {
-                    continue;
+                if (inventory == null) { 
+                    HandleMissing(player); 
+                    continue; 
                 }
 
-                ItemSlot slot = inventory.FirstOrDefault(itemSlot => itemSlot.Itemstack?.Collectible is TItem);
-                if (slot != null && slot.Itemstack.Collectible is TItem item)
+                ItemSlot slot = inventory.FirstOrDefault(itemSlot => itemSlot?.Itemstack?.Collectible is TItem);
+                if (slot?.Itemstack?.Collectible is TItem item)
                 {
                     HandleItem(player, item, slot, hoursPassed, dt);
                 }
@@ -39,6 +52,7 @@ namespace Riftworks.src.Systems
                     HandleMissing(player);
                 }
             }
+            lastCheckTotalHours = totalHours;
         }
 
         protected abstract void HandleItem(IPlayer player, TItem item, ItemSlot slot, double hoursPassed, float dt);
