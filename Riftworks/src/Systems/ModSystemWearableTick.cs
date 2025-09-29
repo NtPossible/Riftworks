@@ -29,7 +29,7 @@ namespace Riftworks.src.Systems
             double totalHours = sapi.World.Calendar.TotalHours;
             double hoursPassed = totalHours - lastCheckTotalHours;
 
-            if (hoursPassed < 0.05)
+            if (hoursPassed <= 0)
             {
                 return;
             }

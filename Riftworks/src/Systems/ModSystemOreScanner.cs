@@ -30,8 +30,19 @@ namespace Riftworks.src.Systems
         // I wanted to detect ore visually but I suck
         protected override void HandleItem(IPlayer player, ItemOreScanner oreScanner, ItemSlot slot, double hoursPassed, float dt)
         {
-            oreScanner.AddFuelHours(slot.Itemstack, -hoursPassed);
-            slot.MarkDirty();
+            double fuelBefore = oreScanner.GetFuelHours(slot.Itemstack);
+
+            if (hoursPassed > 0)
+            {
+                oreScanner.AddFuelHours(slot.Itemstack, -hoursPassed);
+
+                double fuelAfter = oreScanner.GetFuelHours(slot.Itemstack);
+
+                if (System.Math.Abs(fuelAfter - fuelBefore) >= 0.02)
+                {
+                    slot.MarkDirty();
+                }
+            }
 
             BlockPos centerPos = player.Entity.Pos.AsBlockPos;
             int scanRadius = 10;

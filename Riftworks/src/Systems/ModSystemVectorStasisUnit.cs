@@ -29,9 +29,21 @@ namespace Riftworks.src.Systems
             {
                 projectileTickListenerId = (int)sapi.Event.RegisterGameTickListener(OnProjectileTick, 5);
             }
-            stasisUnit.AddFuelHours(slot.Itemstack, -hoursPassed);
-            slot.MarkDirty();
-            
+
+            double fuelBefore = stasisUnit.GetFuelHours(slot.Itemstack);
+
+            if (hoursPassed > 0)
+            {
+                stasisUnit.AddFuelHours(slot.Itemstack, -hoursPassed);
+
+                double fuelAfter = stasisUnit.GetFuelHours(slot.Itemstack);
+
+                if (System.Math.Abs(fuelAfter - fuelBefore) >= 0.02)
+                {
+                    slot.MarkDirty();
+                }
+            }
+
         }
 
         protected override void HandleMissing(IPlayer player)
