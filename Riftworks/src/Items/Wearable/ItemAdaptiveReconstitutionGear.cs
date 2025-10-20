@@ -125,7 +125,7 @@ namespace Riftworks.src.Items.Wearable
                     .Select(r => $"{Lang.Get(r.Key)}: {((FloatAttribute)r.Value).value * 100}%")
                     .ToList();
 
-                if (adaptedResistances.Any())
+                if (adaptedResistances.Count != 0)
                 {
                     dsc.AppendLine("Adaptations:");
                     dsc.AppendLine(string.Join("\n", adaptedResistances));

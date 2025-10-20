@@ -38,8 +38,10 @@ namespace Riftworks.src.BE
 
             lastUpdateTotalDays = api.World.Calendar.TotalDays;
 
-            if (sapi == null) AnimUtil?.InitializeAnimator("stormcaster");
-
+            if (sapi == null)
+            {
+                AnimUtil?.InitializeAnimator("stormcaster");
+            }
             if (sapi == null && On)
             {
                 Activate();
@@ -48,8 +50,10 @@ namespace Riftworks.src.BE
 
         public void ToggleAmbientSound(bool on)
         {
-            if (Api?.Side != EnumAppSide.Client) return;
-
+            if (Api?.Side != EnumAppSide.Client)
+            {
+                return;
+            }
             if (on)
             {
                 if (ambientSound == null || !ambientSound.IsPlaying)
@@ -74,7 +78,10 @@ namespace Riftworks.src.BE
                 }
                 else
                 {
-                    if (ambientSound.IsPlaying) ambientSound.FadeTo(0.5f, 1f, (s) => { });
+                    if (ambientSound.IsPlaying)
+                    {
+                        ambientSound.FadeTo(0.5f, 1f, (s) => { });
+                    }
                 }
             }
             else
@@ -101,8 +108,10 @@ namespace Riftworks.src.BE
 
         public void Activate()
         {
-            if (!HasFuel || Api == null) return;
-
+            if (!HasFuel || Api == null)
+            {
+                return;
+            }
             On = true;
             lastUpdateTotalDays = Api.World.Calendar.TotalDays;
 
@@ -136,9 +145,14 @@ namespace Riftworks.src.BE
             {
                 Api.World.PlaySoundAt(new AssetLocation("sounds/toggleswitch"), Pos, 0, byPlayer, false, 16);
 
-                if (On) Deactivate();
-                else Activate();
-
+                if (On)
+                {
+                    Deactivate();
+                }
+                else
+                {
+                    Activate();
+                }
                 return true;
             }
 
@@ -241,8 +255,14 @@ namespace Riftworks.src.BE
             lastUpdateTotalDays = tree.GetDouble("lastUpdateTotalDays");
             On = tree.GetBool("on");
 
-            if (On) Activate();
-            else Deactivate();
+            if (On)
+            {
+                Activate();
+            }
+            else
+            {
+                Deactivate();
+            } 
         }
 
         public override void ToTreeAttributes(ITreeAttribute tree)

@@ -36,7 +36,10 @@ namespace Riftworks.src.Items.Wearable
             if (priority == EnumMergePriority.DirectMerge)
             {
                 float fuel = GetStackFuel(sourceStack);
-                if (fuel == 0) return base.GetMergableQuantity(sinkStack, sourceStack, priority);
+                if (fuel == 0)
+                {
+                    return base.GetMergableQuantity(sinkStack, sourceStack, priority);
+                }
                 return 1;
             }
 
