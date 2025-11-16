@@ -33,6 +33,6 @@
 	"height": 3,
 	"output": {
 		"type": "block",
-		"code": "temporaldisassembler-north"
+		"code": "riftworks:temporaldisassembler-north"
 	}
 }

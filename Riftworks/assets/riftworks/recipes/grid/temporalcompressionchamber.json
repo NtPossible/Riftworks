@@ -29,6 +29,6 @@
 	"height": 3,
 	"output": {
 		"type": "item",
-		"code": "temporalcompressionchamber"
+		"code": "riftworks:temporalcompressionchamber"
 	}
 }

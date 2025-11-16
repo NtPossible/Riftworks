@@ -19,6 +19,6 @@
 	"height": 2,
 	"output": {
 		"type": "item",
-		"code": "temporalstreaminverter"
+		"code": "riftworks:temporalstreaminverter"
 	}
 }
