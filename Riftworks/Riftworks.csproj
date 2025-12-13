@@ -6,6 +6,7 @@
     <OutputPath>bin\$(Configuration)\Mods\mod</OutputPath>
     <DebugType>portable</DebugType>
     <PathMap>$(MSBuildProjectDirectory)=.</PathMap>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
