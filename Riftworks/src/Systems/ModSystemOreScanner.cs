@@ -11,8 +11,8 @@ namespace Riftworks.src.Systems
 {
     public class ModSystemOreScanner : ModSystemWearableTick<ItemOreScanner>
     {
-        ICoreServerAPI sapi;
-        ICoreClientAPI capi;
+        ICoreServerAPI? sapi;
+        ICoreClientAPI? capi;
 
         public override bool ShouldLoad(EnumAppSide forSide) => true;
 
@@ -30,13 +30,13 @@ namespace Riftworks.src.Systems
         // I wanted to detect ore visually but I suck
         protected override void HandleItem(IPlayer player, ItemOreScanner oreScanner, ItemSlot slot, double hoursPassed, float dt)
         {
-            double fuelBefore = oreScanner.GetFuelHours(slot.Itemstack);
+            double fuelBefore = FuelWearable.GetFuelHours(slot.Itemstack);
 
             if (hoursPassed > 0)
             {
-                oreScanner.AddFuelHours(slot.Itemstack, -hoursPassed);
+                FuelWearable.AddFuelHours(slot.Itemstack, -hoursPassed);
 
-                double fuelAfter = oreScanner.GetFuelHours(slot.Itemstack);
+                double fuelAfter = FuelWearable.GetFuelHours(slot.Itemstack);
 
                 if (System.Math.Abs(fuelAfter - fuelBefore) >= 0.02)
                 {
@@ -56,7 +56,7 @@ namespace Riftworks.src.Systems
                     for (int offsetZ = -scanRadius; offsetZ <= scanRadius; offsetZ++)
                     {
                         BlockPos scanPos = new(centerPos.X + offsetX, centerPos.Y + offsetY, centerPos.Z + offsetZ);
-                        Block scannedBlock = sapi.World.BlockAccessor.GetBlock(scanPos);
+                        Block? scannedBlock = sapi?.World.BlockAccessor.GetBlock(scanPos);
 
                         if (scannedBlock == null)
                         {

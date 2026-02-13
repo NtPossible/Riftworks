@@ -12,6 +12,11 @@ namespace Riftworks.src.Blocks
                 return false;
             }
 
+            if (blockSel == null)
+            {
+                return false;
+            }
+
             if (world.BlockAccessor.GetBlockEntity(blockSel.Position) is not BlockEntityTemporalDisassembler beTemporalDisassembler)
             {
                 return false;

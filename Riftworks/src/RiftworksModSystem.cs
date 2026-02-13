@@ -1,7 +1,6 @@
 ﻿using Riftworks.src.BE;
 using Riftworks.src.Blocks;
 using Riftworks.src.Config;
-using Riftworks.src.Entities;
 using Riftworks.src.Items;
 using Riftworks.src.Items.Wearable;
 using System;
@@ -12,7 +11,7 @@ namespace Riftworks.src;
 
 public class RiftworksModSystem : ModSystem
 {
-    const string CONFIG_FILE = "riftworks.json";
+    public static RiftworksConfig Config { get; private set; } = new();
 
     public override void Start(ICoreAPI api)
     {
@@ -27,52 +26,53 @@ public class RiftworksModSystem : ModSystem
         api.RegisterItemClass($"{Mod.Info.ModID}:ItemRiftBlade", typeof(ItemRiftBlade));
         api.RegisterItemClass($"{Mod.Info.ModID}:ItemVectorStasisUnit", typeof(ItemVectorStasisUnit));
         api.RegisterItemClass($"{Mod.Info.ModID}:ItemAdaptiveReconstitutionGear", typeof(ItemAdaptiveReconstitutionGear));
-        api.RegisterItemClass($"{Mod.Info.ModID}:ItemDivingHelmet", typeof(ItemDivingHelmet));
         api.RegisterItemClass($"{Mod.Info.ModID}:ItemOreScanner", typeof(ItemOreScanner));
         api.RegisterItemClass($"{Mod.Info.ModID}:ItemGravityBoots", typeof(ItemGravityBoots));
 
-        api.RegisterEntity("EntityAdaptiveReconstitutionGear", typeof(EntityAdaptiveReconstitutionGear));
     }
 
-    void TryLoadConfig(ICoreAPI api)
+    public static void TryLoadConfig(ICoreAPI api)
     {
         try
         {
-            RiftworksConfig.Loaded = api.LoadModConfig<RiftworksConfig>(CONFIG_FILE) ?? new RiftworksConfig();
-            api.StoreModConfig<RiftworksConfig>(RiftworksConfig.Loaded, CONFIG_FILE);
+            Config = api.LoadModConfig<RiftworksConfig>("riftworks.json") ?? new RiftworksConfig();
+            api.StoreModConfig(Config, "riftworks.json");
         }
-        catch (Exception e)
+        catch (Exception exception)
         {
-            api.Logger.Error("Could not load Riftworks config, using defaults.", e);
-            RiftworksConfig.Loaded = new RiftworksConfig();
+            api.Logger.Error("Riftworks: Failed to load config, using defaults.", exception);
+            Config = new RiftworksConfig();
         }
     }
 
     // After all JSON assets have been loaded, remove any configured recipes
     public override void AssetsFinalize(ICoreAPI api)
     {
-        if (api.Side != EnumAppSide.Server) return;
+        if (api.Side != EnumAppSide.Server)
+        {
+            return;
+        }
 
         List<GridRecipe> recipes = api.World.GridRecipes;
 
         if (RiftworksConfig.Loaded.DisableDivingHelmet)
         {
-            recipes.RemoveAll(r => r.Output.Code.PathStartsWith("divinghelmet"));
+            recipes.RemoveAll(recipe => recipe.Output.Code.PathStartsWith("divinghelmet"));
         }
         if (RiftworksConfig.Loaded.DisableVectorStasisUnit)
         {
-            recipes.RemoveAll(r => r.Output.Code.PathStartsWith("vectorstasisunit"));
+            recipes.RemoveAll(recipe => recipe.Output.Code.PathStartsWith("vectorstasisunit"));
         }
         if (RiftworksConfig.Loaded.DisableStormCaster) { 
-            recipes.RemoveAll(r => r.Output.Code.PathStartsWith("stormcaster"));
+            recipes.RemoveAll(recipe => recipe.Output.Code.PathStartsWith("stormcaster"));
         }
         if (RiftworksConfig.Loaded.DisableTemporalDisassembler)
         {
-            recipes.RemoveAll(r => r.Output.Code.PathStartsWith("temporaldisassembler"));
+            recipes.RemoveAll(recipe => recipe.Output.Code.PathStartsWith("temporaldisassembler"));
         }
         if (RiftworksConfig.Loaded.DisableOreScanner)
         {
-            recipes.RemoveAll(r => r.Output.Code.PathStartsWith("orescanner"));
+            recipes.RemoveAll(recipe => recipe.Output.Code.PathStartsWith("orescanner"));
         }
     }
 

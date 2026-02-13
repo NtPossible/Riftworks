@@ -15,7 +15,7 @@ namespace Riftworks.src.BE
     {
         internal InventoryTemporalDisassembler inventory;
 
-        GuiDialogBlockEntityTemporalDisassembler clientDialog;
+        GuiDialogBlockEntityTemporalDisassembler? clientDialog;
 
         private float disassemblyTime = 0;
         private const float maxDisassemblyTime = 60f;
@@ -150,13 +150,13 @@ namespace Riftworks.src.BE
             Api.World.BlockAccessor.MarkBlockEntityDirty(Pos);
         }
 
-        private GridRecipe GetGridRecipe(ItemStack inputStack)
+        private GridRecipe? GetGridRecipe(ItemStack inputStack)
         {
             // Filter all grid‐recipes whose output type matches and exact variant and whose batch size cleanly divides into our input stack size
             IEnumerable<GridRecipe> filteredRecipes = Api.World.GridRecipes
                 .Where(recipe =>
                 {
-                    ItemStack outputStack = recipe.Output?.ResolvedItemstack;
+                    ItemStack? outputStack = recipe.Output?.ResolvedItemstack;
                     return outputStack != null
                         && MatchesExactVariant(outputStack, inputStack)
                         && inputStack.StackSize >= outputStack.StackSize
@@ -164,7 +164,7 @@ namespace Riftworks.src.BE
                 });
 
             // If multiple recipes exist, prefer the one with the largest output stack
-            GridRecipe matchingRecipe = filteredRecipes.OrderByDescending(recipe => recipe.Output?.ResolvedItemstack.StackSize).FirstOrDefault();
+            GridRecipe? matchingRecipe = filteredRecipes?.OrderByDescending(recipe => recipe.Output?.ResolvedItemstack.StackSize).FirstOrDefault();
 
             return matchingRecipe;
         }
@@ -172,7 +172,7 @@ namespace Riftworks.src.BE
         private int CalculateItemsToConsume(ItemStack inputStack)
         {
             // Find a recipe whose output type matches and whose output stack size and cleanly divides into the input stack size.
-            GridRecipe matchingRecipe = GetGridRecipe(inputStack);
+            GridRecipe? matchingRecipe = GetGridRecipe(inputStack);
 
             if (matchingRecipe != null)
             {
@@ -230,7 +230,7 @@ namespace Riftworks.src.BE
 
                 ItemStack splitStack = new(collectible.Id, collectible.ItemClass, amountToPlace, treeAttributes, Api.World);
 
-                ItemSlot emptySlot = outputSlots.FirstOrDefault(slot => slot.Empty);
+                ItemSlot? emptySlot = outputSlots?.FirstOrDefault(slot => slot.Empty);
                 if (emptySlot != null)
                 {
                     emptySlot.Itemstack = splitStack;
@@ -253,7 +253,7 @@ namespace Riftworks.src.BE
                 return new List<ItemStack> { RepairItem(inputItem) };
             }
 
-            GridRecipe matchingRecipe = GetGridRecipe(inputItem);
+            GridRecipe? matchingRecipe = GetGridRecipe(inputItem);
 
             if (matchingRecipe == null)
             {
@@ -284,7 +284,7 @@ namespace Riftworks.src.BE
                 }
                 else if (ingredient.IsWildCard)
                 {
-                    string resolvedVariant = GetPreferredOrFirstWildcard(ingredient);
+                    string? resolvedVariant = GetPreferredOrFirstWildcard(ingredient);
 
                     if (!string.IsNullOrEmpty(resolvedVariant))
                     {
@@ -304,12 +304,12 @@ namespace Riftworks.src.BE
             return resultItems;
         }
 
-        private string GetPreferredOrFirstWildcard(CraftingRecipeIngredient ingredient)
+        private string? GetPreferredOrFirstWildcard(CraftingRecipeIngredient ingredient)
         {
             string basePath = ingredient.Code.Path.Replace("*", "");
 
             // First check the preferred variant dictionary
-            if (PreferredWildcards.TryGetValue(basePath, out string preferredVariant))
+            if (PreferredWildcards.TryGetValue(basePath, out string? preferredVariant))
             {
                 return preferredVariant;
             }
@@ -340,7 +340,7 @@ namespace Riftworks.src.BE
             return null;
         }
 
-        private bool IsRepairableAndDamaged(ItemStack stack)
+        private static bool IsRepairableAndDamaged(ItemStack stack)
         {
             int maxDurability = stack.Collectible.GetMaxDurability(stack);
             int currentDurability = stack.Collectible.GetRemainingDurability(stack);
@@ -359,7 +359,7 @@ namespace Riftworks.src.BE
             return false;
         }
 
-        private ItemStack RepairItem(ItemStack stack)
+        private static ItemStack RepairItem(ItemStack stack)
         {
             ItemStack repaired = stack.Clone();
 
@@ -404,13 +404,13 @@ namespace Riftworks.src.BE
             }
 
             // If the recipe output has no attributes it matches
-            if (recipeOutputStack.Attributes is not TreeAttribute recipeAttributes || recipeAttributes.Count == 0)
+            if (recipeOutputStack?.Attributes is not TreeAttribute recipeAttributes || recipeAttributes.Count == 0)
             {
                 return true;
             }
 
             // If the input has no attributes but the recipe does, no match
-            if (inputStack.Attributes is not TreeAttribute inputAttributes)
+            if (inputStack?.Attributes is not TreeAttribute inputAttributes)
             {
                 return false;
             }
@@ -438,11 +438,11 @@ namespace Riftworks.src.BE
 
         public override bool OnPlayerRightClick(IPlayer byPlayer, BlockSelection blockSel)
         {
-            if (Api.Side == EnumAppSide.Client)
+            if (Api is ICoreClientAPI capi)
             {
                 toggleInventoryDialogClient(byPlayer, () =>
                 {
-                    clientDialog = new GuiDialogBlockEntityTemporalDisassembler(DialogTitle, Inventory, Pos, Api as ICoreClientAPI);
+                    clientDialog = new GuiDialogBlockEntityTemporalDisassembler(DialogTitle, Inventory, Pos, capi);
                     clientDialog.Update(disassemblyTime, maxDisassemblyTime);
                     return clientDialog;
                 });
@@ -485,7 +485,7 @@ namespace Riftworks.src.BE
             clientDialog?.TryClose();
         }
 
-        public override void OnBlockBroken(IPlayer byPlayer = null)
+        public override void OnBlockBroken(IPlayer? byPlayer = null)
         {
             base.OnBlockBroken(byPlayer);
         }

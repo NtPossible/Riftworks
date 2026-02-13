@@ -1,7 +1,6 @@
-﻿using Riftworks.src.Entities;
-using Riftworks.src.EntityClasses.Behavior;
+﻿using Riftworks.src.EntityClasses.Behavior;
 using Riftworks.src.Items.Wearable;
-using System.Collections.Generic;
+using System.Linq;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
@@ -13,10 +12,9 @@ namespace Riftworks.src.Systems
 {
     public class AdaptiveReconstitutionSystem : ModSystemWearableTick<ItemAdaptiveReconstitutionGear>
     {
-        ICoreClientAPI capi;
-        ICoreServerAPI sapi;
-        EntityBehaviorPlayerInventory bh;
-        private readonly Dictionary<string, EntityAdaptiveReconstitutionGear> playerGearEntities = new();
+        ICoreClientAPI? capi;
+        ICoreServerAPI? sapi;
+        EntityBehaviorPlayerInventory? bh;
 
         public override bool ShouldLoad(EnumAppSide forSide) => true;
 
@@ -39,16 +37,6 @@ namespace Riftworks.src.Systems
             reconstitutionGear.UpdateAdaptation(dt, slot);
             if (playerEntity != null && playerEntity.Api != null && !playerEntity.HasBehavior<EntityBehaviorAdaptiveResistance>())
             {
-                //if (!playerGearEntities.ContainsKey(player.PlayerUID))
-                //{
-                //    EntityProperties entityType = sapi.World.GetEntityType(new AssetLocation("riftworks:entityadaptivereconstitutiongear"));
-                //    EntityAdaptiveReconstitutionGear gearEntity = sapi.World.ClassRegistry.CreateEntity(entityType) as EntityAdaptiveReconstitutionGear;
-
-                //    gearEntity.owner = playerEntity;
-                //    playerGearEntities[player.PlayerUID] = gearEntity;
-                //    sapi.World.SpawnEntity(gearEntity);
-                //}
-
                 playerEntity.AddBehavior(new EntityBehaviorAdaptiveResistance(playerEntity));
 
             }
@@ -61,14 +49,6 @@ namespace Riftworks.src.Systems
             if (playerEntity != null && playerEntity.Api != null && playerEntity.HasBehavior<EntityBehaviorAdaptiveResistance>())
             {
                 playerEntity.RemoveBehavior(playerEntity.GetBehavior<EntityBehaviorAdaptiveResistance>());
-
-
-                //if (playerGearEntities.TryGetValue(player.PlayerUID, out EntityAdaptiveReconstitutionGear value))
-                //{
-                //    Entity gearEntity = value;
-                //    gearEntity.Die();
-                //    playerGearEntities.Remove(player.PlayerUID);
-                //}
             }
         }
 
@@ -79,36 +59,29 @@ namespace Riftworks.src.Systems
                 return;
             }
 
-            EntityPlayer player = entity as EntityPlayer;
-            IInventory inventory = player.Player.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
+            EntityPlayer? player = entity as EntityPlayer;
+            IInventory? inventory = player?.Player?.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
 
             if (inventory == null)
             {
                 return;
             }
 
-            ItemSlot headSlot = inventory[(int)EnumCharacterDressType.ArmorHead];
-            if (headSlot?.Itemstack?.Collectible is ItemAdaptiveReconstitutionGear gear)
+            ItemSlot? gearSlot = inventory.FirstOrDefault(s => s?.Itemstack?.Collectible is ItemAdaptiveReconstitutionGear);
+            if (gearSlot?.Itemstack?.Collectible is ItemAdaptiveReconstitutionGear)
             {
-                gear.ResetResistances(headSlot);
-                ItemStack stackToDrop = headSlot.TakeOut(1);
+                ItemAdaptiveReconstitutionGear.ResetResistances(gearSlot);
+                ItemStack stackToDrop = gearSlot.TakeOut(1);
 
                 if (stackToDrop != null)
                 {
-                    sapi.World.SpawnItemEntity(stackToDrop, player.Pos.XYZ);
+                    sapi?.World?.SpawnItemEntity(stackToDrop, player?.Pos?.XYZ);
                 }
-                headSlot.MarkDirty();
+                gearSlot.MarkDirty();
 
-                //if (playerGearEntities.TryGetValue(player.PlayerUID, out EntityAdaptiveReconstitutionGear value))
-                //{
-                //    Entity gearEntity = value;
-                //    gearEntity.Die();
-                //    playerGearEntities.Remove(player.PlayerUID);
-                //}
-
-                if (player.HasBehavior<EntityBehaviorAdaptiveResistance>())
+                if (player != null && player.HasBehavior<EntityBehaviorAdaptiveResistance>())
                 {
-                    EntityBehaviorAdaptiveResistance behavior = player.GetBehavior<EntityBehaviorAdaptiveResistance>();
+                    EntityBehaviorAdaptiveResistance? behavior = player.GetBehavior<EntityBehaviorAdaptiveResistance>();
                     player.RemoveBehavior(behavior);
                 }
             }
@@ -116,7 +89,7 @@ namespace Riftworks.src.Systems
 
         private void Event_LevelFinalize()
         {
-            EntityBehaviorPlayerInventory behavior = capi.World.Player.Entity.GetBehavior<EntityBehaviorPlayerInventory>();
+            EntityBehaviorPlayerInventory? behavior = capi?.World.Player.Entity.GetBehavior<EntityBehaviorPlayerInventory>();
             bh = behavior;
         }
     }

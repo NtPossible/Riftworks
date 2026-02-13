@@ -12,8 +12,8 @@ namespace Riftworks.src.BE
 {
     public class BlockEntityStormCaster : BlockEntity
     {
-        protected ICoreServerAPI sapi;
-        protected ILoadedSound ambientSound;
+        protected ICoreServerAPI? sapi;
+        protected ILoadedSound? ambientSound;
         protected double fuelDays = 0;
         protected double lastUpdateTotalDays = 0;
 
@@ -138,7 +138,7 @@ namespace Riftworks.src.BE
             }
         }
 
-        public bool OnInteract(BlockSelection blockSel, IPlayer byPlayer)
+        public bool OnInteract(BlockSelection _, IPlayer byPlayer)
         {
             ItemSlot slot = byPlayer.InventoryManager.ActiveHotbarSlot;
             if (slot.Empty)
@@ -169,7 +169,7 @@ namespace Riftworks.src.BE
 
         private void ApplyWeather(bool on)
         {
-            WeatherSystemServer weatherSystem = sapi.ModLoader.GetModSystem<WeatherSystemServer>(true);
+            WeatherSystemServer? weatherSystem = sapi?.ModLoader.GetModSystem<WeatherSystemServer>(true);
 
             if (on)
             {
@@ -198,7 +198,7 @@ namespace Riftworks.src.BE
                 int regionZ = pos.Z / sapi.World.BlockAccessor.RegionSize;
                 long idx2d = weatherSystem.MapRegionIndex2D(regionX, regionZ);
 
-                if (weatherSystem.weatherSimByMapRegion.TryGetValue(idx2d, out WeatherSimulationRegion weatherSim) && weatherSim != null)
+                if (weatherSystem.weatherSimByMapRegion.TryGetValue(idx2d, out WeatherSimulationRegion? weatherSim) && weatherSim != null)
                 {
                     weatherSim.SetWeatherEvent(chosenEvent, true);
                     weatherSim.CurWeatherEvent.AllowStop = true;
@@ -223,7 +223,7 @@ namespace Riftworks.src.BE
                 int regionZ = pos.Z / sapi.World.BlockAccessor.RegionSize;
                 long idx2d = weatherSystem.MapRegionIndex2D(regionX, regionZ);
 
-                if (weatherSystem.weatherSimByMapRegion.TryGetValue(idx2d, out WeatherSimulationRegion weatherSim) && weatherSim != null)
+                if (weatherSystem.weatherSimByMapRegion.TryGetValue(idx2d, out WeatherSimulationRegion? weatherSim) && weatherSim != null)
                 {
                     weatherSim.SetWeatherEvent("noevent", true);
                     weatherSim.CurWeatherEvent.AllowStop = true;

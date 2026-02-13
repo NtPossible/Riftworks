@@ -1,5 +1,6 @@
 ﻿using Riftworks.src.Items.Wearable;
 using System;
+using System.Linq;
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
 using Vintagestory.API.Config;
@@ -12,7 +13,7 @@ namespace Riftworks.src.EntityClasses.Behavior
     {
         public EntityBehaviorAdaptiveResistance(Entity entity) : base(entity)
         {
-            EntityBehaviorHealth healthBehavior = entity.GetBehavior<EntityBehaviorHealth>();
+            EntityBehaviorHealth? healthBehavior = entity.GetBehavior<EntityBehaviorHealth>();
             if (healthBehavior != null)
             {
                 healthBehavior.onDamaged += ReduceDamage;
@@ -28,12 +29,12 @@ namespace Riftworks.src.EntityClasses.Behavior
 
             if (entity is EntityPlayer player)
             {
-                IInventory inventory = player.Player.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
-                ItemStack stack = inventory?[(int)EnumCharacterDressType.ArmorHead]?.Itemstack;
-
-                if (stack?.Collectible is ItemAdaptiveReconstitutionGear gear)
+                IInventory? inventory = player.Player.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
+                ItemSlot? slot = inventory?.FirstOrDefault(slot => slot?.Itemstack?.Collectible is ItemAdaptiveReconstitutionGear);
+                ItemStack? stack = slot?.Itemstack;
+                if (stack?.Collectible is ItemAdaptiveReconstitutionGear)
                 {
-                    ITreeAttribute resistanceLevels = stack.Attributes.GetTreeAttribute("resistances");
+                    ITreeAttribute? resistanceLevels = stack.Attributes.GetTreeAttribute("resistances");
 
                     if (resistanceLevels != null)
                     {
@@ -41,10 +42,9 @@ namespace Riftworks.src.EntityClasses.Behavior
 
                         float reducedDamage = damage * (1f - resistance);
                         damage = Math.Max(0, reducedDamage);
-
                     }
 
-                    gear.HandleDamageTaken(damageSource.Type, inventory[(int)EnumCharacterDressType.ArmorHead]);
+                    ItemAdaptiveReconstitutionGear.HandleDamageTaken(damageSource.Type, slot);
                 }
             }
             return damage;

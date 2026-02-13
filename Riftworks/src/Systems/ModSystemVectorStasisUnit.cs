@@ -11,7 +11,7 @@ namespace Riftworks.src.Systems
 {
     public class ModSystemVectorStasisUnit : ModSystemWearableTick<ItemVectorStasisUnit>
     {
-        ICoreServerAPI sapi;
+        ICoreServerAPI? sapi;
         private int projectileTickListenerId = -1;
         private readonly HashSet<IPlayer> activeWearers = new();
         private readonly HashSet<long> frozenEntities = new();
@@ -25,32 +25,31 @@ namespace Riftworks.src.Systems
         protected override void HandleItem(IPlayer player, ItemVectorStasisUnit stasisUnit, ItemSlot slot, double hoursPassed, float dt)
         {
             // If this is the first time this player got handled, start listening
-            if (activeWearers.Add(player) && projectileTickListenerId < 0)
+            if (activeWearers.Add(player) && projectileTickListenerId < 0 && sapi != null)
             {
                 projectileTickListenerId = (int)sapi.Event.RegisterGameTickListener(OnProjectileTick, 5);
             }
 
-            double fuelBefore = stasisUnit.GetFuelHours(slot.Itemstack);
+            double fuelBefore = FuelWearable.GetFuelHours(slot.Itemstack);
 
             if (hoursPassed > 0)
             {
-                stasisUnit.AddFuelHours(slot.Itemstack, -hoursPassed);
+                FuelWearable.AddFuelHours(slot.Itemstack, -hoursPassed);
 
-                double fuelAfter = stasisUnit.GetFuelHours(slot.Itemstack);
+                double fuelAfter = FuelWearable.GetFuelHours(slot.Itemstack);
 
                 if (System.Math.Abs(fuelAfter - fuelBefore) >= 0.02)
                 {
                     slot.MarkDirty();
                 }
             }
-
         }
 
         protected override void HandleMissing(IPlayer player)
         {
             if (activeWearers.Remove(player) && activeWearers.Count == 0 && projectileTickListenerId >= 0)
             {
-                sapi.Event.UnregisterGameTickListener(projectileTickListenerId);
+                sapi?.Event.UnregisterGameTickListener(projectileTickListenerId);
                 projectileTickListenerId = -1;
                 frozenEntities.Clear();
             }
@@ -58,13 +57,13 @@ namespace Riftworks.src.Systems
 
         private void OnProjectileTick(float dt)
         {
-            frozenEntities.RemoveWhere(entityId => sapi.World.GetEntityById(entityId) == null);
+            frozenEntities.RemoveWhere(entityId => sapi?.World.GetEntityById(entityId) == null);
 
             foreach (IPlayer player in activeWearers)
             {
                 Vec3d playerPos = player.Entity.ServerPos.XYZ;
 
-                IEnumerable<EntityProjectile> projectiles = sapi.World.GetEntitiesAround(playerPos, 29, 29).OfType<EntityProjectile>()
+                IEnumerable<EntityProjectile>? projectiles = sapi?.World.GetEntitiesAround(playerPos, 29, 29).OfType<EntityProjectile>()
                         .Where(projectile => !projectile.Collided && !frozenEntities.Contains(projectile.EntityId));
 
                 foreach (EntityProjectile projectile in projectiles)

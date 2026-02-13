@@ -13,20 +13,20 @@ namespace Riftworks.src.Items.Wearable
 
         protected abstract string MergeErrorItemName { get; }
 
-        public double GetFuelHours(ItemStack stack)
+        public static double GetFuelHours(ItemStack stack)
         {
             return Math.Max(0, stack.Attributes.GetDecimal("fuelHours"));
         }
-        public void SetFuelHours(ItemStack stack, double fuelHours)
+        public static void SetFuelHours(ItemStack stack, double fuelHours)
         {
             stack.Attributes.SetDouble("fuelHours", fuelHours);
         }
-        public void AddFuelHours(ItemStack stack, double fuelHours)
+        public static void AddFuelHours(ItemStack stack, double fuelHours)
         {
             stack.Attributes.SetDouble("fuelHours", Math.Max(0, fuelHours + GetFuelHours(stack)));
         }
 
-        public float GetStackFuel(ItemStack stack)
+        public static float GetStackFuel(ItemStack stack)
         {
             return stack.ItemAttributes?["nightVisionFuelHours"].AsFloat(0) ?? 0;
         }

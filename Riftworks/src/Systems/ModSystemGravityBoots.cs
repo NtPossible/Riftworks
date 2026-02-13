@@ -6,7 +6,7 @@ namespace Riftworks.src.Systems
 {
     public class ModSystemGravityBoots : ModSystemWearableTick<ItemGravityBoots>
     {
-        ICoreServerAPI sapi;
+        ICoreServerAPI? sapi;
 
         public override bool ShouldLoad(EnumAppSide forSide) => true;
 
@@ -19,13 +19,13 @@ namespace Riftworks.src.Systems
         protected override void HandleItem(IPlayer player, ItemGravityBoots gravityBoots, ItemSlot slot, double hoursPassed, float dt)
         {
 
-            double fuelBefore = gravityBoots.GetFuelHours(slot.Itemstack);
+            double fuelBefore = FuelWearable.GetFuelHours(slot.Itemstack);
 
             if (hoursPassed > 0)
             {
-                gravityBoots.AddFuelHours(slot.Itemstack, -hoursPassed);
+                FuelWearable.AddFuelHours(slot.Itemstack, -hoursPassed);
 
-                double fuelAfter = gravityBoots.GetFuelHours(slot.Itemstack);
+                double fuelAfter = FuelWearable.GetFuelHours(slot.Itemstack);
 
                 if (System.Math.Abs(fuelAfter - fuelBefore) >= 0.02)
                 {

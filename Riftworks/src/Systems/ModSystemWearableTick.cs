@@ -9,7 +9,7 @@ namespace Riftworks.src.Systems
     public abstract class ModSystemWearableTick<TItem> : ModSystem
         where TItem : ItemWearable
     {
-        private ICoreServerAPI sapi;
+        private ICoreServerAPI? sapi;
 
         private double lastCheckTotalHours;
 
@@ -42,7 +42,7 @@ namespace Riftworks.src.Systems
                     continue; 
                 }
 
-                ItemSlot slot = inventory.FirstOrDefault(itemSlot => itemSlot?.Itemstack?.Collectible is TItem);
+                ItemSlot? slot = inventory.FirstOrDefault(itemSlot => itemSlot?.Itemstack?.Collectible is TItem);
                 if (slot?.Itemstack?.Collectible is TItem item)
                 {
                     HandleItem(player, item, slot, hoursPassed, dt);
