@@ -2,7 +2,6 @@
 using Riftworks.src.Items.Wearable;
 using System;
 using System.Linq;
-using System.Numerics;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
@@ -37,13 +36,30 @@ namespace Riftworks.src.Systems
         {
             EntityPlayer playerEntity = player.Entity;
             reconstitutionGear.UpdateAdaptation(dt, slot);
+
             if (playerEntity != null && playerEntity.Api != null && !playerEntity.HasBehavior<EntityBehaviorAdaptiveResistance>())
             {
                 playerEntity.AddBehavior(new EntityBehaviorAdaptiveResistance(playerEntity));
             }
+
+            // passive regen
+            if (playerEntity != null && playerEntity.Alive)
+            {
+                EntityBehaviorHealth? entityBehaviorHealth = playerEntity.GetBehavior<EntityBehaviorHealth>();
+                if (entityBehaviorHealth != null)
+                {
+                    if (entityBehaviorHealth.Health < entityBehaviorHealth.MaxHealth)
+                    {
+                        if (!entityBehaviorHealth.ActiveDoTEffects.Any(effect => effect.DamageType == EnumDamageType.Heal))
+                        {
+                            entityBehaviorHealth.ApplyDoTEffect(EnumDamageSource.Internal, EnumDamageType.Heal, 10, 50, TimeSpan.FromSeconds(10), 35, 0);
+                        }
+                    }
+                }
+            }
             slot.MarkDirty();
         }
-
+            
         protected override void HandleMissing(IPlayer player)
         {
             EntityPlayer playerEntity = player.Entity;

@@ -24,23 +24,34 @@ namespace Riftworks.src.Systems
 
         protected override void HandleItem(IPlayer player, ItemVectorStasisUnit stasisUnit, ItemSlot slot, double hoursPassed, float dt)
         {
-            // If this is the first time this player got handled, start listening
-            if (activeWearers.Add(player) && projectileTickListenerId < 0 && sapi != null)
-            {
-                projectileTickListenerId = (int)sapi.Event.RegisterGameTickListener(OnProjectileTick, 5);
-            }
-
             double fuelBefore = FuelWearable.GetFuelHours(slot.Itemstack);
+            double fuelAfter = fuelBefore;
 
             if (hoursPassed > 0)
             {
                 FuelWearable.AddFuelHours(slot.Itemstack, -hoursPassed);
-
-                double fuelAfter = FuelWearable.GetFuelHours(slot.Itemstack);
+                fuelAfter = FuelWearable.GetFuelHours(slot.Itemstack);
 
                 if (System.Math.Abs(fuelAfter - fuelBefore) >= 0.02)
                 {
                     slot.MarkDirty();
+                }
+            }
+
+            if (fuelAfter > 0)
+            {
+                if (activeWearers.Add(player) && projectileTickListenerId < 0 && sapi != null)
+                {
+                    projectileTickListenerId = (int)sapi.Event.RegisterGameTickListener(OnProjectileTick, 5);
+                }
+            }
+            else
+            {
+                if (activeWearers.Remove(player) && activeWearers.Count == 0 && projectileTickListenerId >= 0)
+                {
+                    sapi?.Event.UnregisterGameTickListener(projectileTickListenerId);
+                    projectileTickListenerId = -1;
+                    frozenEntities.Clear();
                 }
             }
         }
@@ -63,15 +74,18 @@ namespace Riftworks.src.Systems
             {
                 Vec3d playerPos = player.Entity.ServerPos.XYZ;
 
-                IEnumerable<EntityProjectile>? projectiles = sapi?.World.GetEntitiesAround(playerPos, 29, 29).OfType<EntityProjectile>()
+                IEnumerable<EntityProjectile>? projectiles = sapi?.World.GetEntitiesAround(playerPos, 29, 29)?.OfType<EntityProjectile>()
                         .Where(projectile => !projectile.Collided && !frozenEntities.Contains(projectile.EntityId));
 
-                foreach (EntityProjectile projectile in projectiles)
+                if (projectiles != null)
                 {
-                    Vec3d projectedPos = projectile.ServerPos.XYZ + projectile.ServerPos.Motion * dt;
-                    if (playerPos.DistanceTo(projectedPos) <= 4)
+                    foreach (EntityProjectile projectile in projectiles)
                     {
-                        FreezeProjectile(projectile);
+                        Vec3d projectedPos = projectile.ServerPos.XYZ + projectile.ServerPos.Motion * dt;
+                        if (playerPos.DistanceTo(projectedPos) <= 4)
+                        {
+                            FreezeProjectile(projectile);
+                        }
                     }
                 }
             }

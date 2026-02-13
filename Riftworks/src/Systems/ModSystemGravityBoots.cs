@@ -18,14 +18,14 @@ namespace Riftworks.src.Systems
 
         protected override void HandleItem(IPlayer player, ItemGravityBoots gravityBoots, ItemSlot slot, double hoursPassed, float dt)
         {
-
             double fuelBefore = FuelWearable.GetFuelHours(slot.Itemstack);
+            double fuelAfter = fuelBefore;
 
             if (hoursPassed > 0)
             {
                 FuelWearable.AddFuelHours(slot.Itemstack, -hoursPassed);
 
-                double fuelAfter = FuelWearable.GetFuelHours(slot.Itemstack);
+                fuelAfter = FuelWearable.GetFuelHours(slot.Itemstack);
 
                 if (System.Math.Abs(fuelAfter - fuelBefore) >= 0.02)
                 {
@@ -33,8 +33,12 @@ namespace Riftworks.src.Systems
                 }
             }
 
-            // allow walking on walls
+            if (fuelAfter <= 0)
+            {
+                return;
+            }
 
+            // allow walking on walls
         }
     }
 }

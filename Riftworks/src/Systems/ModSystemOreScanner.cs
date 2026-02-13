@@ -31,17 +31,23 @@ namespace Riftworks.src.Systems
         protected override void HandleItem(IPlayer player, ItemOreScanner oreScanner, ItemSlot slot, double hoursPassed, float dt)
         {
             double fuelBefore = FuelWearable.GetFuelHours(slot.Itemstack);
+            double fuelAfter = fuelBefore;
 
             if (hoursPassed > 0)
             {
                 FuelWearable.AddFuelHours(slot.Itemstack, -hoursPassed);
 
-                double fuelAfter = FuelWearable.GetFuelHours(slot.Itemstack);
+                fuelAfter = FuelWearable.GetFuelHours(slot.Itemstack);
 
                 if (System.Math.Abs(fuelAfter - fuelBefore) >= 0.02)
                 {
                     slot.MarkDirty();
                 }
+            }
+
+            if (fuelAfter <= 0)
+            {
+                return;
             }
 
             BlockPos centerPos = player.Entity.Pos.AsBlockPos;
