@@ -1,6 +1,8 @@
 ﻿using Riftworks.src.EntityClasses.Behavior;
 using Riftworks.src.Items.Wearable;
+using System;
 using System.Linq;
+using System.Numerics;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
@@ -38,7 +40,6 @@ namespace Riftworks.src.Systems
             if (playerEntity != null && playerEntity.Api != null && !playerEntity.HasBehavior<EntityBehaviorAdaptiveResistance>())
             {
                 playerEntity.AddBehavior(new EntityBehaviorAdaptiveResistance(playerEntity));
-
             }
             slot.MarkDirty();
         }

@@ -32,7 +32,7 @@ namespace Riftworks.src.EntityClasses.Behavior
                 IInventory? inventory = player.Player.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
                 ItemSlot? slot = inventory?.FirstOrDefault(slot => slot?.Itemstack?.Collectible is ItemAdaptiveReconstitutionGear);
                 ItemStack? stack = slot?.Itemstack;
-                if (stack?.Collectible is ItemAdaptiveReconstitutionGear)
+                if (stack?.Collectible is ItemAdaptiveReconstitutionGear && slot != null)
                 {
                     ITreeAttribute? resistanceLevels = stack.Attributes.GetTreeAttribute("resistances");
 
