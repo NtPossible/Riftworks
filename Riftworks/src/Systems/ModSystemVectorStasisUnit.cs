@@ -13,12 +13,14 @@ namespace Riftworks.src.Systems
         ICoreServerAPI? sapi;
         private int projectileTickListenerId = -1;
         private readonly HashSet<IPlayer> activeWearers = new();
-        private readonly HashSet<long> frozenEntities = new();
+        private readonly Dictionary<long, Entity> trackedProjectiles = new();
 
         public override void StartServerSide(ICoreServerAPI api)
         {
             sapi = api;
             base.StartServerSide(api);
+            api.Event.OnEntitySpawn += OnEntitySpawn;
+            api.Event.OnEntityDespawn += OnEntityDespawn;
         }
 
         protected override void HandleItem(IPlayer player, ItemVectorStasisUnit stasisUnit, ItemSlot slot, double hoursPassed, float dt)
@@ -50,7 +52,7 @@ namespace Riftworks.src.Systems
                 {
                     sapi?.Event.UnregisterGameTickListener(projectileTickListenerId);
                     projectileTickListenerId = -1;
-                    frozenEntities.Clear();
+                    trackedProjectiles.Clear();
                 }
             }
         }
@@ -61,45 +63,103 @@ namespace Riftworks.src.Systems
             {
                 sapi?.Event.UnregisterGameTickListener(projectileTickListenerId);
                 projectileTickListenerId = -1;
-                frozenEntities.Clear();
+                trackedProjectiles.Clear();
             }
+        }
+
+        private void OnEntitySpawn(Entity entity)
+        {
+            if (IsTrackableProjectile(entity))
+            {
+                trackedProjectiles[entity.EntityId] = entity;
+            }
+        }
+
+        private void OnEntityDespawn(Entity entity, EntityDespawnData data)
+        {
+            trackedProjectiles.Remove(entity.EntityId);
         }
 
         private void OnProjectileTick(float dt)
         {
-            frozenEntities.RemoveWhere(entityId => sapi?.World.GetEntityById(entityId) == null);
+            List<long> toRemove = new();
+            foreach (KeyValuePair<long, Entity> kvp in trackedProjectiles)
+            {
+                if (kvp.Value == null || !kvp.Value.Alive)
+                {
+                    toRemove.Add(kvp.Key);
+                }
+            }
+            foreach (long id in toRemove)
+            {
+                trackedProjectiles.Remove(id);
+            }
 
             foreach (IPlayer player in activeWearers)
             {
                 Entity playerEntity = player.Entity;
                 Vec3d playerPos = playerEntity.ServerPos.XYZ;
 
-                Entity[]? entities = sapi?.World.GetEntitiesAround(playerPos, 29, 29);
-                if (entities == null)
+                List<long> frozenThisTick = new();
+
+                foreach (KeyValuePair<long, Entity> kvp in trackedProjectiles)
                 {
-                    continue;
-                }
-                foreach (Entity entity in entities)
-                {
-                    if (frozenEntities.Contains(entity.EntityId))
+                    Entity entity = kvp.Value;
+
+                    if (!IsProjectile(entity, playerEntity))
                     {
                         continue;
                     }
-                    if (!IsProjectileLike(entity, playerEntity))
-                    {
-                        continue;
-                    }
-                    Vec3d projectedPos = entity.ServerPos.XYZ + entity.ServerPos.Motion * dt;
-                    if (playerPos.DistanceTo(projectedPos) <= 4)
+
+                    // Predict next position
+                    EntityPos pos = entity.ServerPos;
+                    double px = pos.X + pos.Motion.X * dt;
+                    double py = pos.Y + pos.Motion.Y * dt;
+                    double pz = pos.Z + pos.Motion.Z * dt;
+
+                    double dx = playerPos.X - px;
+                    double dy = playerPos.Y - py;
+                    double dz = playerPos.Z - pz;
+
+                    if (dx * dx + dy * dy + dz * dz <= 16)
                     {
                         FreezeProjectile(entity);
+                        frozenThisTick.Add(entity.EntityId);
                     }
+                }
+
+                // Remove frozen projectiles from tracking
+                foreach (long id in frozenThisTick)
+                {
+                    trackedProjectiles.Remove(id);
                 }
             }
         }
 
+        // to check if the spawned entity is an actual projectile
+        private static bool IsTrackableProjectile(Entity entity)
+        {
+            if (entity is EntityProjectile)
+            {
+                return true;
+            }
+            if (entity is EntityAgent)
+            {
+                return false;
+            }
+            if (entity is EntityItem)
+            {
+                return false;
+            }
+            if (entity.ServerPos.Motion.LengthSq() > 0.05 && !entity.OnGround)
+            {
+                return true;
+            }
+            return false;
+        }
 
-        private static bool IsProjectileLike(Entity entity, Entity playerEntity)
+        // to check if the entity is a projectile that should be frozen
+        private static bool IsProjectile(Entity entity, Entity playerEntity)
         {
             if (entity is EntityProjectile projectile)
             {
@@ -107,7 +167,7 @@ namespace Riftworks.src.Systems
                 {
                     return false;
                 }
-                // Ignore player's own shots
+                // Ignore player's own projectiles
                 if (projectile.FiredBy?.EntityId == playerEntity.EntityId)
                 {
                     return false;
@@ -136,14 +196,8 @@ namespace Riftworks.src.Systems
             return true;
         }
 
-        private void FreezeProjectile(Entity entity)
+        private static void FreezeProjectile(Entity entity)
         {
-            // Hashset to prevent duplicate processing
-            if (!frozenEntities.Add(entity.EntityId))
-            {
-                return;
-            }
-
             entity.ServerPos.Motion.Set(0, 0, 0);
             entity.Pos.SetPos(entity.ServerPos);
 
