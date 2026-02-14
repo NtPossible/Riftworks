@@ -1,6 +1,5 @@
 ﻿using Riftworks.src.Items.Wearable;
 using System.Collections.Generic;
-using System.Linq;
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
 using Vintagestory.API.MathTools;
@@ -72,23 +71,69 @@ namespace Riftworks.src.Systems
 
             foreach (IPlayer player in activeWearers)
             {
-                Vec3d playerPos = player.Entity.ServerPos.XYZ;
+                Entity playerEntity = player.Entity;
+                Vec3d playerPos = playerEntity.ServerPos.XYZ;
 
-                IEnumerable<EntityProjectile>? projectiles = sapi?.World.GetEntitiesAround(playerPos, 29, 29)?.OfType<EntityProjectile>()
-                        .Where(projectile => !projectile.Collided && !frozenEntities.Contains(projectile.EntityId));
-
-                if (projectiles != null)
+                Entity[]? entities = sapi?.World.GetEntitiesAround(playerPos, 29, 29);
+                if (entities == null)
                 {
-                    foreach (EntityProjectile projectile in projectiles)
+                    continue;
+                }
+                foreach (Entity entity in entities)
+                {
+                    if (frozenEntities.Contains(entity.EntityId))
                     {
-                        Vec3d projectedPos = projectile.ServerPos.XYZ + projectile.ServerPos.Motion * dt;
-                        if (playerPos.DistanceTo(projectedPos) <= 4)
-                        {
-                            FreezeProjectile(projectile);
-                        }
+                        continue;
+                    }
+                    if (!IsProjectileLike(entity, playerEntity))
+                    {
+                        continue;
+                    }
+                    Vec3d projectedPos = entity.ServerPos.XYZ + entity.ServerPos.Motion * dt;
+                    if (playerPos.DistanceTo(projectedPos) <= 4)
+                    {
+                        FreezeProjectile(entity);
                     }
                 }
             }
+        }
+
+
+        private static bool IsProjectileLike(Entity entity, Entity playerEntity)
+        {
+            if (entity is EntityProjectile projectile)
+            {
+                if (projectile.Collided)
+                {
+                    return false;
+                }
+                // Ignore player's own shots
+                if (projectile.FiredBy?.EntityId == playerEntity.EntityId)
+                {
+                    return false;
+                }
+                return true;
+            }
+
+            if (entity is EntityAgent)
+            {
+                return false;
+            }
+            if (entity is EntityItem)
+            {
+                return false;
+            }
+
+            if (entity.ServerPos.Motion.LengthSq() < 0.05)
+            {
+                return false;
+            }
+
+            if (entity.OnGround)
+            {
+                return false;
+            }
+            return true;
         }
 
         private void FreezeProjectile(Entity entity)
