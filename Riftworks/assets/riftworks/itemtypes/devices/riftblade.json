@@ -3,10 +3,10 @@
   "class": "riftworks:ItemRiftBlade",
   "damagedby": [ "blockbreaking", "attacking" ],
   "tool": "sword",
-  "creativeinventory": {
-    "general": [ "*" ],
-    "items": [ "*" ]
-  },
+  //"creativeinventory": {
+  //  "general": [ "*" ],
+  //  "items": [ "*" ]
+  //},
   "attributes": {
     "heldItemPitchFollow": 0.9,
     "handbook": { "groupBy": [ "blade-*" ] },
