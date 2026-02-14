@@ -4,7 +4,7 @@
 	"storageFlags": 128,
 	"attributes": {
 		"wearableAttachment": true,
-		"clothescategory": "armorhead"
+		"clothescategory": "head"
 	},
 	"shape": {
 		"base": "item/wearable/adaptivereconstitutiongear",
