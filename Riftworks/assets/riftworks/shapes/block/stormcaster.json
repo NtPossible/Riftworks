@@ -1,6 +1,5 @@
 {
 	"editor": {
-		"collapsedPaths": "Root/origin/CENTER/footE,Root/origin/chassis,Root/origin/CENTER/beamE,Root/origin/CENTER/beam-main/head-disc/disc-mount,Root/origin/CENTER/beam-main/head-down/beam-cover/glow-beam,Root/origin/CENTER/beam-main/cable1,Root/origin/CENTER/bottom,Root/origin/CENTER/beamW,Root/origin/CENTER/beam-main/head-disc,Root/origin/CENTER/footW,Root/origin/CENTER/beamS,Root/origin/CENTER/footS,Root/origin/CENTER/beamN",
 		"allAngles": false,
 		"entityTextureMode": false
 	},

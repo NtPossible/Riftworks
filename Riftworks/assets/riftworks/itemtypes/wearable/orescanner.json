@@ -6,83 +6,34 @@
 		"wearableAttachment": true,
 		"clothescategory": "face"
 	},
-	"shape": {
-		"base": "item/wearable/orescanner",
-		"type": "wearable"
-	},
-	"textures": {
-		"seraph": { "base": "game:block/transparent" }
-	},
+	"shape": { "base": "item/wearable/orescanner", "type": "wearable" },
+	"textures": { "seraph": { "base": "game:block/transparent" } },
 	"creativeinventory": {
 		"general": [ "*" ],
 		"items": [ "*" ]
 	},
 	"guiTransform": {
 		"rotate": false,
-		"translation": {
-			"x": 0,
-			"y": 0,
-			"z": 19
-		},
-		"rotation": {
-			"x": 174,
-			"y": -45,
-			"z": 23
-		},
-		"origin": {
-			"x": 0.46,
-			"y": 1.7,
-			"z": 0.55
-		},
-		"scale": 4.05,
-		"groundTransform": {
-			"translation": {
-				"x": 0,
-				"y": 0,
-				"z": 0
-			},
-			"rotation": {
-				"x": 0,
-				"y": 0,
-				"z": -22
-			},
-			"origin": {
-				"x": 0.5,
-				"y": 1.74,
-				"z": 0.5
-			},
-			"scale": 6
-		},
-		"fpHandTransform": {
-			"translation": {
-				"x": 0.08,
-				"y": -0.21,
-				"z": -0.5
-			},
-			"rotation": {
-				"x": 180,
-				"y": 42,
-				"z": -29
-			},
-			"origin": {
-				"x": 0.5,
-				"y": 1,
-				"z": 0.5
-			},
-			"scale": 2.5
-		},
-		"tpHandTransform": {
-			"translation": {
-				"x": -0.85,
-				"y": -2,
-				"z": -0.7
-			},
-			"rotation": {
-				"x": 0,
-				"y": -180,
-				"z": 0
-			},
-			"scale": 0.6
-		}
+		"translation": { "x": 0, "y": 0, "z": 19 },
+		"rotation": { "x": 174, "y": -45, "z": 23 },
+		"origin": { "x": 0.46, "y": 1.7, "z": 0.55 },
+		"scale": 4.05
+	},
+	"fpHandTransform": {
+		"translation": { "x": 0.08, "y": -0.21, "z": -0.5 },
+		"rotation": { "x": 180, "y": 42, "z": -29 },
+		"origin": { "x": 0.5, "y": 1, "z": 0.5 },
+		"scale": 2.5
+	},
+	"tpHandTransform": {
+		"translation": { "x": -0.85, "y": -2, "z": -0.7 },
+		"rotation": { "x": 0, "y": -180, "z": 0 },
+		"scale": 0.6
+	},
+	"groundTransform": {
+		"translation": { "x": 0, "y": 0, "z": 0 },
+		"rotation": { "x": 0, "y": 0, "z": -22 },
+		"origin": { "x": 0.5, "y": 1.74, "z": 0.5 },
+		"scale": 6
 	}
 }

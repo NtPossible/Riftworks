@@ -1,41 +1,14 @@
 {
   "ingredientPattern": "ABC,DEF",
   "ingredients": {
-    "A": {
-      "type": "item",
-      "code": "game:gear-temporal"
-    },
-    "B": {
-      "type": "item",
-      "code": "game:rod-cupronickel"
-    },
-    "C": {
-      "type": "item",
-      "code": "game:solderingiron",
-      "isTool": true,
-      "toolDurabilityCost": 1
-    },
-    "D": {
-      "type": "item",
-      "code": "game:rod-electrum"
-    },
-    "E": {
-      "type": "block",
-      "code": "game:metal-parts",
-      "quantity": 4
-    },
-    "F": {
-      "type": "item",
-      "code": "game:solderbar-*",
-      "name": "mat",
-      "allowedVariants": [ "tin", "silver" ],
-      "quantity": 2
-    }
+    "A": { "type": "item", "code": "game:gear-temporal" },
+    "B": { "type": "item", "code": "game:rod-cupronickel" },
+    "C": { "type": "item", "code": "game:solderingiron", "isTool": true, "toolDurabilityCost": 10 },
+    "D": { "type": "item", "code": "game:rod-electrum" },
+    "E": { "type": "block", "code": "game:metal-parts", "quantity": 4 },
+    "F": { "type": "item", "code": "game:solderbar-*", "name": "mat", "allowedVariants": [ "tin", "silver" ], "quantity": 2 }
   },
   "width": 3,
   "height": 2,
-  "output": {
-    "type": "item",
-    "code": "riftworks:orescanner"
-  }
+  "output": { "type": "item", "code": "riftworks:orescanner" }
 }

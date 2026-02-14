@@ -1,29 +1,12 @@
 {
 	"ingredientPattern": "AB,CD",
 	"ingredients": {
-		"A": {
-			"type": "item",
-			"code": "game:gear-temporal"
-		},
-		"B": {
-			"type": "item",
-			"code": "game:rod-cupronickel",
-			"quantity": 2
-		},
-		"C": {
-			"type": "item",
-			"code": "game:rod-electrum"
-		},
-		"D": {
-			"type": "block",
-			"code": "game:metal-parts",
-			"quantity": 4
-		}
+		"A": { "type": "item", "code": "game:gear-temporal" },
+		"B": { "type": "item", "code": "game:rod-cupronickel", "quantity": 2 },
+		"C": { "type": "item", "code": "game:rod-electrum" },
+		"D": { "type": "block", "code": "game:metal-parts", "quantity": 4 }
 	},
 	"width": 2,
 	"height": 2,
-	"output": {
-		"type": "item",
-		"code": "riftworks:reactivefielddisruptor"
-	}
+	"output": { "type": "item", "code": "riftworks:reactivefielddisruptor" }
 }

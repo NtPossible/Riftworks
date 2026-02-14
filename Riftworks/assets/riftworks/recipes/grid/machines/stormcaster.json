@@ -1,48 +1,16 @@
 {
   "ingredientPattern": "ABC,DED,GHI",
   "ingredients": {
-    "A": {
-      "type": "item",
-      "code": "game:gear-temporal"
-    },
-    "B": {
-      "type": "item",
-      "code": "game:rod-electrum"
-    },
-    "C": {
-      "type": "item",
-      "code": "game:gem-diamond-rough"
-    },
-    "D": {
-      "type": "item",
-      "code": "game:rod-electrum",
-      "quantity": 2
-    },
-    "E": {
-      "type": "item",
-      "code": "game:rod-iron",
-      "quantity": 4
-    },
-    "G": {
-      "type": "block",
-      "code": "game:metal-parts",
-      "quantity": 8
-    },
-    "H": {
-      "type": "item",
-      "code": "game:metalplate-iron",
-      "quantity": 4
-    },
-    "I": {
-      "type": "item",
-      "code": "game:metalnailsandstrips-*",
-      "quantity": 8
-    }
+    "A": { "type": "item", "code": "game:gear-temporal" },
+    "B": { "type": "item", "code": "game:rod-electrum" },
+    "C": { "type": "item", "code": "game:gem-diamond-rough" },
+    "D": { "type": "item", "code": "game:rod-electrum", "quantity": 2 },
+    "E": { "type": "item", "code": "game:rod-iron", "quantity": 4 },
+    "G": { "type": "block", "code": "game:metal-parts", "quantity": 8 },
+    "H": { "type": "item", "code": "game:metalplate-iron", "quantity": 4 },
+    "I": { "type": "item", "code": "game:metalnailsandstrips-*", "quantity": 8 }
   },
   "width": 3,
   "height": 3,
-  "output": {
-    "type": "block",
-    "code": "riftworks:stormcaster"
-  }
+  "output": { "type": "block", "code": "riftworks:stormcaster" }
 }

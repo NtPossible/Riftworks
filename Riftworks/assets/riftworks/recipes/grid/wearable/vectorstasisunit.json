@@ -1,33 +1,13 @@
 {
 	"ingredientPattern": "ABA,DDD,GHG",
 	"ingredients": {
-		"A": {
-			"type": "item",
-			"code": "game:metalnailsandstrips-*",
-			"quantity": 2
-		},
-		"B": {
-			"type": "item",
-			"code": "game:rod-cupronickel"
-		},
-		"D": {
-			"type": "item",
-			"code": "game:gear-temporal"
-		},
-		"G": {
-			"type": "block",
-			"code": "game:metal-parts",
-      "quantity": 2
-		},
-		"H": {
-			"type": "item",
-			"code": "game:rod-iron"
-		}
+		"A": { "type": "item", "code": "game:metalnailsandstrips-*", "quantity": 2 },
+		"B": { "type": "item", "code": "game:rod-cupronickel" },
+		"D": { "type": "item", "code": "game:gear-temporal" },
+		"G": { "type": "block", "code": "game:metal-parts", "quantity": 2 },
+		"H": { "type": "item", "code": "game:rod-iron" }
 	},
 	"width": 3,
 	"height": 3,
-	"output": {
-		"type": "item",
-		"code": "riftworks:vectorstasisunit"
-	}
+	"output": { "type": "item", "code": "riftworks:vectorstasisunit" }
 }

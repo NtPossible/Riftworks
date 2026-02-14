@@ -1,34 +1,13 @@
 {
 	"ingredientPattern": "ABA,CDE,ABA",
 	"ingredients": {
-		"A": {
-			"type": "block",
-			"code": "game:metal-parts",
-			"quantity": 4
-		},
-		"B": {
-			"type": "item",
-			"code": "game:metalplate-steel"
-		},
-		"C": {
-			"type": "item",
-			"code": "game:rod-cupronickel",
-			"quantity": 4
-		},
-		"D": {
-			"type": "item",
-			"code": "game:gear-temporal"
-		},
-		"E": {
-			"type": "item",
-			"code": "game:rod-electrum",
-			"quantity": 2
-		}
+		"A": { "type": "block", "code": "game:metal-parts", "quantity": 4 },
+		"B": { "type": "item", "code": "game:metalplate-steel" },
+		"C": { "type": "item", "code": "game:rod-cupronickel", "quantity": 4 },
+		"D": { "type": "item", "code": "game:gear-temporal" },
+		"E": { "type": "item", "code": "game:rod-electrum", "quantity": 2 }
 	},
 	"width": 3,
 	"height": 3,
-	"output": {
-		"type": "item",
-		"code": "riftworks:temporalcompressionchamber"
-	}
+	"output": { "type": "item", "code": "riftworks:temporalcompressionchamber" }
 }

@@ -1,24 +1,12 @@
 {
 	"ingredientPattern": "AB,C_",
 	"ingredients": {
-		"A": {
-			"type": "block",
-			"code": "game:metal-parts",
-			"quantity": 8
-		},
-		"B": {
-			"type": "item",
-			"code": "game:gear-temporal"
-		},
-		"C": {
-			"type": "item",
-			"code": "game:rod-cupronickel"
-		}
+		"A": { "type": "block", "code": "game:metal-parts", "quantity": 8 },
+		"B": { "type": "item", "code": "game:gear-temporal" },
+		"C": { "type": "item", "code": "game:rod-cupronickel" }
 	},
 	"width": 2,
 	"height": 2,
-	"output": {
-		"type": "item",
-		"code": "riftworks:temporalstreaminverter"
+	"output": { "type": "item", "code": "riftworks:temporalstreaminverter"
 	}
 }

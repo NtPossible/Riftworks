@@ -9,57 +9,21 @@
     "base": "item/temporalstreaminverter"
   },
   "guiTransform": {
-    "translation": {
-      "x": 0,
-      "y": 0,
-      "z": 0
-    },
-    "rotation": {
-      "x": 0,
-      "y": -20,
-      "z": 46
-    },
-    "origin": {
-      "x": 0.35,
-      "y": 0.5,
-      "z": 0
-    },
+    "translation": { "x": 0, "y": 0, "z": 0 },
+    "rotation": { "x": 0, "y": -20, "z": 46 },
+    "origin": { "x": 0.35, "y": 0.5, "z": 0 },
     "scale": 3
   },
   "tpHandTransform": {
-    "translation": {
-      "x": 0.43,
-      "y": -0.25,
-      "z": -0.45
-    },
-    "rotation": {
-      "x": 130,
-      "y": 0,
-      "z": 0
-    },
-    "origin": {
-      "x": 0,
-      "y": 0,
-      "z": 0
-    },
+    "translation": { "x": 0.43, "y": -0.25, "z": -0.45 },
+    "rotation": { "x": 130, "y": 0, "z": 0 },
+    "origin": { "x": 0, "y": 0, "z": 0 },
     "scale": 0.8
   },
   "groundTransform": {
-    "translation": {
-      "x": 0,
-      "y": 0,
-      "z": 0
-    },
-    "rotation": {
-      "x": 0,
-      "y": 0,
-      "z": 0
-    },
-    "origin": {
-      "x": 0.5,
-      "y": 0,
-      "z": 0.5
-    },
+    "translation": { "x": 0, "y": 0, "z": 0 },
+    "rotation": { "x": 0, "y": 0, "z": 0 },
+    "origin": { "x": 0.5, "y": 0, "z": 0.5 },
     "scale": 3.4
   }
 }

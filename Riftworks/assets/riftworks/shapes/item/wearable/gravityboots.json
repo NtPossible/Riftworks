@@ -1,7 +1,6 @@
 {
 	"editor": {
 		"backDropShape": "entity/humanoid/seraph",
-		"collapsedPaths": "Root/shoe L/LacesR1,Root/shoe L/LacesL1,Root/shoe L/front16",
 		"allAngles": true,
 		"entityTextureMode": true
 	},

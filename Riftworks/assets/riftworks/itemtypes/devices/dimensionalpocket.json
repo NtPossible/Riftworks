@@ -2,20 +2,7 @@
   "code": "dimensionalpocket",
   "maxstacksize": 1,
   "behaviors": [
-    {
-      "name": "GroundStorable",
-      "properties": {
-        "layout": "SingleCenter",
-        "collisionBox": {
-          "x1": 0.25,
-          "y1": 0,
-          "z1": 0.25,
-          "x2": 0.75,
-          "y2": 0.375,
-          "z2": 0.75
-        }
-      }
-    },
+    { "name": "GroundStorable", "properties": { "layout": "SingleCenter", "collisionBox": { "x1": 0.25, "y1": 0, "z1": 0.25, "x2": 0.75, "y2": 0.375, "z2": 0.75 } } },
     { "name": "HeldBag" }
   ],
   "shape": {
@@ -24,9 +11,7 @@
   "attributes": {
     "attachableToEntity": {
       "categoryCode": "backpack",
-      "attachedShape": {
-        "base": "item/bag/dimensionalpocket-attached"
-      }
+      "attachedShape": { "base": "item/bag/dimensionalpocket-attached" }
     },
     "wearableAttachment": true,
     "quantitySlots": 10
@@ -37,66 +22,26 @@
   //  "items": [ "*" ]
   //},
   "guiTransform": {
-    "translation": {
-      "x": 0,
-      "y": 0,
-      "z": 0
-    },
-    "rotation": {
-      "x": -20,
-      "y": 21,
-      "z": 180
-    },
-    "origin": {
-      "x": 0.53,
-      "y": 0.35,
-      "z": 0.5
-    },
+    "translation": { "x": 0, "y": 0, "z": 0 },
+    "rotation": { "x": -20, "y": 21, "z": 180 },
+    "origin": { "x": 0.53, "y": 0.35, "z": 0.5 },
     "scale": 2.3,
     "rotate": true
   },
   "fpHandTransform": {
-    "translation": {
-      "x": 0,
-      "y": 0,
-      "z": 0.2
-    },
-    "rotation": {
-      "x": 20,
-      "y": -73,
-      "z": 10
-    },
+    "translation": { "x": 0, "y": 0, "z": 0.2 },
+    "rotation": { "x": 20, "y": -73, "z": 10 },
     "scale": 2.5
   },
   "tpHandTransform": {
-    "translation": {
-      "x": -0.61,
-      "y": -0.67,
-      "z": -0.65
-    },
-    "rotation": {
-      "x": -6,
-      "y": 1,
-      "z": 3
-    },
+    "translation": { "x": -0.61, "y": -0.67, "z": -0.65 },
+    "rotation": { "x": -6, "y": 1, "z": 3 },
     "scale": 0.86
   },
   "groundTransform": {
-    "translation": {
-      "x": 0,
-      "y": 0,
-      "z": 0
-    },
-    "rotation": {
-      "x": 180,
-      "y": 33,
-      "z": -180
-    },
-    "origin": {
-      "x": 0.5,
-      "y": 0,
-      "z": 0.5
-    },
+    "translation": { "x": 0, "y": 0, "z": 0 },
+    "rotation": { "x": 180, "y": 33, "z": -180 },
+    "origin": { "x": 0.5, "y": 0, "z": 0.5 },
     "scale": 4.5
   }
 }

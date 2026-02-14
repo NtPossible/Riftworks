@@ -1,38 +1,14 @@
 {
 	"ingredientPattern": "ABA,CDE,AFA",
 	"ingredients": {
-		"A": {
-			"type": "item",
-			"code": "game:metalnailsandstrips-*",
-			"allowedVariants": [ "tinbronze", "bismuthbronze", "blackbronze", "iron", "meteoriciron", "steel" ],
-			"quantity": 4
-		},
-		"B": {
-			"type": "item",
-			"code": "game:rod-cupronickel",
-			"quantity": 2
-		},
-		"C": {
-			"type": "item",
-			"code": "temporalstreaminverter"
-		},
-		"D": {
-			"type": "item",
-			"code": "temporalcompressionchamber"
-		},
-		"E": {
-			"type": "item",
-			"code": "reactivefielddisruptor"
-		},
-		"F": {
-			"type": "item",
-			"code": "game:metalplate-steel"
-		}
+		"A": { "type": "item", "code": "game:metalnailsandstrips-*", "allowedVariants": [ "tinbronze", "bismuthbronze", "blackbronze", "iron", "meteoriciron", "steel" ], "quantity": 4 },
+		"B": { "type": "item", "code": "game:rod-cupronickel", "quantity": 2 },
+		"C": { "type": "item", "code": "temporalstreaminverter" },
+		"D": { "type": "item", "code": "temporalcompressionchamber" },
+		"E": { "type": "item", "code": "reactivefielddisruptor" },
+		"F": { "type": "item", "code": "game:metalplate-steel" }
 	},
 	"width": 3,
 	"height": 3,
-	"output": {
-		"type": "block",
-		"code": "riftworks:temporaldisassembler-north"
-	}
+	"output": { "type": "block", "code": "riftworks:temporaldisassembler-north" }
 }
