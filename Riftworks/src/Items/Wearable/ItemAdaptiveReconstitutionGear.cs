@@ -12,7 +12,7 @@ namespace Riftworks.src.Items.Wearable
 {
     public class ItemAdaptiveReconstitutionGear : ItemWearable
     {
-        private const float AdaptationDuration = 30f;
+        private const float adaptationDuration = 30f;
         private const float baseAdaptationRate = 0.0005f; // 0.05% per second
 
         private const string damageTypeKey = "adaptType";
@@ -56,7 +56,7 @@ namespace Riftworks.src.Items.Wearable
             }
 
             float timer = attributes.GetFloat(timerKey, 0f) + dt;
-            if (timer >= AdaptationDuration)
+            if (timer >= adaptationDuration)
             {
                 attributes.RemoveAttribute(damageTypeKey);
                 return;
