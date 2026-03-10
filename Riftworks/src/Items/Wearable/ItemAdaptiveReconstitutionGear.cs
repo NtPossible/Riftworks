@@ -74,12 +74,13 @@ namespace Riftworks.src.Items.Wearable
             float newResist = Math.Min(currentResistance + adaptationSpeed * dt, 1f);
             SetResistance(inSlot, damageType, newResist);
 
-            int oldPercentage = (int)(currentResistance * 10) * 20;
-            int newPercentage = (int)(newResist * 10) * 20;
+            int oldTier = (int)(currentResistance * 5f);
+            int newTier = (int)(newResist * 5f);
 
             attributes.SetFloat(timerKey, timer);
 
-            if (newPercentage > oldPercentage)
+            // Only play sound if a new 20% threshold was crossed
+            if (newTier > oldTier)
             {
                 IPlayer? player = (inSlot.Inventory as InventoryCharacter)?.Player;
                 if (player?.Entity is EntityPlayer entityPlayer)
@@ -118,7 +119,11 @@ namespace Riftworks.src.Items.Wearable
             {
                 List<string> adaptedResistances = resistanceLevels
                     .Where(resistanceEntry => resistanceEntry.Value is FloatAttribute floatAttribute && floatAttribute.value > 0)
-                    .Select(resistanceEntry => $"{Lang.Get(resistanceEntry.Key)}: {((FloatAttribute)resistanceEntry.Value).value * 100}%")
+                    .Select(resistanceEntry => {
+                        float raw = ((FloatAttribute)resistanceEntry.Value).value;
+                        float tiered = (float)Math.Floor(raw * 5f) / 5f;
+                        return $"{Lang.Get(resistanceEntry.Key)}: {tiered * 100}%";
+                    })
                     .ToList();
 
                 if (adaptedResistances.Count != 0)

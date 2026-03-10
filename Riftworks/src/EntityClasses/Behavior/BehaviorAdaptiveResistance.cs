@@ -39,8 +39,10 @@ namespace Riftworks.src.EntityClasses.Behavior
                     if (resistanceLevels != null)
                     {
                         float resistance = resistanceLevels.GetFloat(damageSource.Type.ToString(), 0f);
+                        // Floor to nearest 20% increment
+                        float tieredResistance = (float)Math.Floor(resistance * 5f) / 5f;
 
-                        float reducedDamage = damage * (1f - resistance);
+                        float reducedDamage = damage * (1f - tieredResistance);
                         damage = Math.Max(0, reducedDamage);
                     }
 
