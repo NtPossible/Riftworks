@@ -78,7 +78,7 @@ namespace Riftworks.src.Systems
                 return;
             }
 
-            ItemSlot? gearSlot = inventory.FirstOrDefault(s => s?.Itemstack?.Collectible is ItemAdaptiveReconstitutionGear);
+            ItemSlot? gearSlot = inventory.FirstOrDefault(slot => slot?.Itemstack?.Collectible is ItemAdaptiveReconstitutionGear);
             if (gearSlot?.Itemstack?.Collectible is ItemAdaptiveReconstitutionGear)
             {
                 ItemAdaptiveReconstitutionGear.ResetResistances(gearSlot);
