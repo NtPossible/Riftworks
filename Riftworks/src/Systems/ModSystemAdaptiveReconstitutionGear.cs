@@ -2,7 +2,6 @@
 using Riftworks.src.Items.Wearable;
 using System;
 using System.Linq;
-using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
 using Vintagestory.API.Config;
@@ -36,14 +35,14 @@ namespace Riftworks.src.Systems
             if (playerEntity != null && playerEntity.Alive)
             {
                 EntityBehaviorHealth? entityBehaviorHealth = playerEntity.GetBehavior<EntityBehaviorHealth>();
-                if (entityBehaviorHealth != null && entityBehaviorHealth.Health < entityBehaviorHealth.MaxHealth  && !entityBehaviorHealth.ActiveDoTEffects.Any(effect => effect.DamageType == EnumDamageType.Heal))
+                if (entityBehaviorHealth != null && entityBehaviorHealth.Health < entityBehaviorHealth.MaxHealth && !entityBehaviorHealth.ActiveDoTEffects.Any(effect => effect.DamageType == EnumDamageType.Heal))
                 {
                     entityBehaviorHealth.ApplyDoTEffect(EnumDamageSource.Internal, EnumDamageType.Heal, 10, 50, TimeSpan.FromSeconds(10), 35, 0);
                 }
             }
             slot.MarkDirty();
         }
-            
+
         protected override void HandleMissing(IPlayer player)
         {
             EntityPlayer playerEntity = player.Entity;

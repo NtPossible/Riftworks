@@ -14,11 +14,15 @@ namespace Riftworks.src.Items.Wearable
     {
         private const float adaptationDuration = 30f;
         private const float baseAdaptationRate = 0.0005f; // 0.05% per second
+        private const float adaptationSpeedScaling = 1.05f;
+        private const int resistanceTierCount = 5; // each tier is  an additional 20% so it goes like 0,20,40,60,80,100
 
         private const string damageTypeKey = "adaptType";
         private const string timerKey = "adaptTimer";
         private const string speedKey = "adaptSpeed";
         private const string resistancesKey = "resistances";
+
+        private static readonly AssetLocation gearSoundLocation = new("riftworks:sounds/gearspin.ogg");
 
         public static void HandleDamageTaken(EnumDamageType damageType, ItemSlot inSlot)
         {
@@ -28,64 +32,88 @@ namespace Riftworks.src.Items.Wearable
             }
 
             ITreeAttribute attributes = inSlot.Itemstack.Attributes;
-
             string current = attributes.GetString(damageTypeKey, null);
 
             if (current != damageType.ToString())
             {
+                // Switched damage type - reset speed and timer
                 attributes.SetString(damageTypeKey, damageType.ToString());
                 attributes.SetFloat(timerKey, 0f);
                 attributes.SetFloat(speedKey, baseAdaptationRate);
             }
             else
             {
+                // Same damage type — reset timer and ramp up speed
                 attributes.SetFloat(timerKey, 0f);
-                attributes.SetFloat(speedKey, attributes.GetFloat(speedKey, baseAdaptationRate) * 1.05f);
+                attributes.SetFloat(speedKey, attributes.GetFloat(speedKey, baseAdaptationRate) * adaptationSpeedScaling);
             }
         }
 
         public void UpdateAdaptation(float dt, ItemSlot inSlot)
         {
             ITreeAttribute attributes = inSlot.Itemstack.Attributes;
-            string currentDamageTypeKey = attributes.GetString(damageTypeKey, null);
+            string damageTypeString = attributes.GetString(damageTypeKey, null);
 
-            if (currentDamageTypeKey == null || !Enum.TryParse(currentDamageTypeKey, out EnumDamageType damageType))
+            if (damageTypeString == null || !Enum.TryParse(damageTypeString, out EnumDamageType damageType))
             {
-                attributes.RemoveAttribute(damageTypeKey);
+                ClearAdaptationState(attributes);
                 return;
             }
 
             float timer = attributes.GetFloat(timerKey, 0f) + dt;
             if (timer >= adaptationDuration)
             {
-                attributes.RemoveAttribute(damageTypeKey);
+                ClearAdaptationState(attributes);
+                return;
+            }
+
+            float currentResistance = GetResistance(inSlot, damageType);
+            if (currentResistance >= 1f)
+            {
+                ClearAdaptationState(attributes);
                 return;
             }
 
             float adaptationSpeed = attributes.GetFloat(speedKey, baseAdaptationRate);
-            float currentResistance = GetResistance(inSlot, damageType);
-
-            if (currentResistance >= 1f)
-            {
-                attributes.RemoveAttribute(damageTypeKey);
-                return;
-            }
-
-            float newResist = Math.Min(currentResistance + adaptationSpeed * dt, 1f);
-            SetResistance(inSlot, damageType, newResist);
-
-            int oldTier = (int)(currentResistance * 5f);
-            int newTier = (int)(newResist * 5f);
+            float newResistance = Math.Min(currentResistance + adaptationSpeed * dt, 1f);
+            SetResistance(inSlot, damageType, newResistance);
 
             attributes.SetFloat(timerKey, timer);
 
-            // Only play sound if a new 20% threshold was crossed
+            // Play sound when a new 20% threshold is crossed
+            int oldTier = (int)(currentResistance * resistanceTierCount);
+            int newTier = (int)(newResistance * resistanceTierCount);
             if (newTier > oldTier)
             {
                 IPlayer? player = (inSlot.Inventory as InventoryCharacter)?.Player;
                 if (player?.Entity is EntityPlayer entityPlayer)
                 {
                     PlayGearSound(api.World, entityPlayer);
+                }
+            }
+        }
+
+        public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
+        {
+            base.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
+
+            ITreeAttribute resistanceLevels = inSlot.Itemstack.Attributes.GetTreeAttribute(resistancesKey);
+
+            if (resistanceLevels != null)
+            {
+                List<string> adaptedResistances = resistanceLevels
+                    .Where(resistanceEntry => resistanceEntry.Value is FloatAttribute attribute && attribute.value > 0)
+                    .Select(entry => {
+                        float raw = ((FloatAttribute)entry.Value).value;
+                        float tiered = (float)Math.Floor(raw * resistanceTierCount) / resistanceTierCount;
+                        return $"{Lang.Get(entry.Key)}: {tiered * 100:0}%";
+                    })
+                    .ToList();
+
+                if (adaptedResistances.Count != 0)
+                {
+                    dsc.AppendLine(Lang.Get("riftworks:adaptations-label"));
+                    dsc.AppendLine(string.Join("\n", adaptedResistances));
                 }
             }
         }
@@ -100,79 +128,28 @@ namespace Riftworks.src.Items.Wearable
             slot.Itemstack.Attributes.GetOrAddTreeAttribute(resistancesKey).SetFloat(type.ToString(), value);
         }
 
+        // Clears adaptation tracking.
+        private static void ClearAdaptationState(ITreeAttribute attributes)
+        {
+            attributes.RemoveAttribute(damageTypeKey);
+            attributes.RemoveAttribute(timerKey);
+            attributes.RemoveAttribute(speedKey);
+        }
+
+        // Wipe all attributes
+        public static void ResetResistances(ItemSlot inSlot)
+        {
+            ClearAdaptationState(inSlot.Itemstack.Attributes);
+            inSlot.Itemstack.Attributes.RemoveAttribute(resistancesKey);
+        }
+
         private static void PlayGearSound(IWorldAccessor world, EntityPlayer player)
         {
             if (player == null)
             {
                 return;
             }
-            world.PlaySoundAt(new AssetLocation("riftworks:sounds/gearspin.ogg"), player.Pos.X, player.Pos.Y, player.Pos.Z, null, false, 32f, 1.0f);
+            world.PlaySoundAt(gearSoundLocation, player.Pos.X, player.Pos.Y, player.Pos.Z, null, false, 32f, 1.0f);
         }
-
-        public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
-        {
-            base.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
-
-            ITreeAttribute resistanceLevels = inSlot.Itemstack.Attributes.GetTreeAttribute(resistancesKey);
-
-            if (resistanceLevels != null)
-            {
-                List<string> adaptedResistances = resistanceLevels
-                    .Where(resistanceEntry => resistanceEntry.Value is FloatAttribute floatAttribute && floatAttribute.value > 0)
-                    .Select(resistanceEntry => {
-                        float raw = ((FloatAttribute)resistanceEntry.Value).value;
-                        float tiered = (float)Math.Floor(raw * 5f) / 5f;
-                        return $"{Lang.Get(resistanceEntry.Key)}: {tiered * 100}%";
-                    })
-                    .ToList();
-
-                if (adaptedResistances.Count != 0)
-                {
-                    dsc.AppendLine("Adaptations:");
-                    dsc.AppendLine(string.Join("\n", adaptedResistances));
-                }
-            }
-        }
-
-        public static void ResetResistances(ItemSlot inSlot)
-        {
-            ITreeAttribute attributes = inSlot.Itemstack.Attributes;
-            attributes.RemoveAttribute(resistancesKey);
-            attributes.RemoveAttribute(damageTypeKey);
-            attributes.RemoveAttribute(timerKey);
-            attributes.RemoveAttribute(speedKey);
-        }
-
-        //public override void OnBeforeRender(ICoreClientAPI capi, ItemStack itemstack, EnumItemRenderTarget target, ref ItemRenderInfo renderinfo)
-        //{
-        //    MultiTextureMeshRef meshRef = ObjectCacheUtil.GetOrCreate(capi, "adaptiveGearMesh", () =>
-        //    {
-        //        Shape shape = capi.Assets.TryGet(new AssetLocation("riftworks:shapes/item/devices/adaptivereconstitutiongear.json")).ToObject<Shape>();
-        //        capi.Tesselator.TesselateShape(this, shape, out MeshData meshdata);
-        //        return capi.Render.UploadMultiTextureMesh(meshdata);
-        //    });
-
-        //    base.OnBeforeRender(capi, itemstack, target, ref renderinfo);
-        //    renderinfo.ModelRef = meshRef;
-        //}
-
-        //public bool IsAttachable(Entity toEntity, ItemStack itemStack) => true;
-
-        //public void CollectTextures(ItemStack stack, Shape shape, string texturePrefixCode, Dictionary<string, CompositeTexture> intoDict)
-        //{
-        //}
-
-        //public string GetCategoryCode(ItemStack stack) => "adaptivegear";
-
-        //CompositeShape IAttachableToEntity.GetAttachedShape(ItemStack stack, string slotCode)
-        //{
-        //    return null; 
-        //}
-
-        //public string[] GetDisableElements(ItemStack stack) => null;
-
-        //public string[] GetKeepElements(ItemStack stack) => null;
-
-        //public string GetTexturePrefixCode(ItemStack stack) => "adaptivegear";
     }
 }
