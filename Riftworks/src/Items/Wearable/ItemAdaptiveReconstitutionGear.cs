@@ -12,8 +12,8 @@ namespace Riftworks.src.Items.Wearable
 {
     public class ItemAdaptiveReconstitutionGear : ItemWearable
     {
-        private const float ADAPTATION_DURATION = 30f;
-        private const float BASE_ADAPTATION_RATE = 0.0005f; // 0.05% per second
+        private const float AdaptationDuration = 30f;
+        private const float baseAdaptationRate = 0.0005f; // 0.05% per second
 
         private const string damageTypeKey = "adaptType";
         private const string timerKey = "adaptTimer";
@@ -35,12 +35,12 @@ namespace Riftworks.src.Items.Wearable
             {
                 attributes.SetString(damageTypeKey, damageType.ToString());
                 attributes.SetFloat(timerKey, 0f);
-                attributes.SetFloat(speedKey, BASE_ADAPTATION_RATE);
+                attributes.SetFloat(speedKey, baseAdaptationRate);
             }
             else
             {
                 attributes.SetFloat(timerKey, 0f);
-                attributes.SetFloat(speedKey, attributes.GetFloat(speedKey, BASE_ADAPTATION_RATE) * 1.05f);
+                attributes.SetFloat(speedKey, attributes.GetFloat(speedKey, baseAdaptationRate) * 1.05f);
             }
         }
 
@@ -56,13 +56,13 @@ namespace Riftworks.src.Items.Wearable
             }
 
             float timer = attributes.GetFloat(timerKey, 0f) + dt;
-            if (timer >= ADAPTATION_DURATION)
+            if (timer >= AdaptationDuration)
             {
                 attributes.RemoveAttribute(damageTypeKey);
                 return;
             }
 
-            float adaptationSpeed = attributes.GetFloat(speedKey, BASE_ADAPTATION_RATE);
+            float adaptationSpeed = attributes.GetFloat(speedKey, baseAdaptationRate);
             float currentResistance = GetResistance(inSlot, damageType);
 
             if (currentResistance >= 1f)
