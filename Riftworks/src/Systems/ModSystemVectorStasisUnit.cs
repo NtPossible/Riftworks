@@ -10,7 +10,6 @@ namespace Riftworks.src.Systems
 {
     public class ModSystemVectorStasisUnit : ModSystemWearableTick<ItemVectorStasisUnit>
     {
-        ICoreServerAPI? sapi;
         private int projectileTickListenerId = -1;
         private readonly HashSet<IPlayer> activeWearers = new();
         private readonly Dictionary<long, Entity> trackedProjectiles = new();

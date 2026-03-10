@@ -74,8 +74,8 @@ namespace Riftworks.src.Items.Wearable
             float newResist = Math.Min(currentResistance + adaptationSpeed * dt, 1f);
             SetResistance(inSlot, damageType, newResist);
 
-            int oldPercentage = (int)(currentResistance * 10) * 10;
-            int newPercentage = (int)(newResist * 10) * 10;
+            int oldPercentage = (int)(currentResistance * 10) * 20;
+            int newPercentage = (int)(newResist * 10) * 20;
 
             attributes.SetFloat(timerKey, timer);
 
@@ -131,17 +131,11 @@ namespace Riftworks.src.Items.Wearable
 
         public static void ResetResistances(ItemSlot inSlot)
         {
-            ItemStack stack = inSlot.Itemstack;
-            ITreeAttribute resistanceLevels = stack.Attributes.GetOrAddTreeAttribute(resistancesKey);
-
-            foreach (EnumDamageType damageType in Enum.GetValues(typeof(EnumDamageType)))
-            {
-                resistanceLevels.SetFloat(damageType.ToString(), 0f);
-            }
-
-            inSlot.Itemstack.Attributes.RemoveAttribute(damageTypeKey);
-            inSlot.Itemstack.Attributes.RemoveAttribute(timerKey);
-            inSlot.Itemstack.Attributes.RemoveAttribute(speedKey);
+            ITreeAttribute attributes = inSlot.Itemstack.Attributes;
+            attributes.RemoveAttribute(resistancesKey);
+            attributes.RemoveAttribute(damageTypeKey);
+            attributes.RemoveAttribute(timerKey);
+            attributes.RemoveAttribute(speedKey);
         }
 
         //public override void OnBeforeRender(ICoreClientAPI capi, ItemStack itemstack, EnumItemRenderTarget target, ref ItemRenderInfo renderinfo)

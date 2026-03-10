@@ -13,17 +13,7 @@ namespace Riftworks.src.Systems
 {
     public class AdaptiveReconstitutionSystem : ModSystemWearableTick<ItemAdaptiveReconstitutionGear>
     {
-        ICoreClientAPI? capi;
-        ICoreServerAPI? sapi;
-        EntityBehaviorPlayerInventory? bh;
-
-        public override bool ShouldLoad(EnumAppSide forSide) => true;
-
-        public override void StartClientSide(ICoreClientAPI api)
-        {
-            capi = api;
-            api.Event.LevelFinalize += Event_LevelFinalize;
-        }
+        public override bool ShouldLoad(EnumAppSide forSide) => forSide == EnumAppSide.Server;
 
         public override void StartServerSide(ICoreServerAPI api)
         {
@@ -96,12 +86,6 @@ namespace Riftworks.src.Systems
                     player.RemoveBehavior(behavior);
                 }
             }
-        }
-
-        private void Event_LevelFinalize()
-        {
-            EntityBehaviorPlayerInventory? behavior = capi?.World.Player.Entity.GetBehavior<EntityBehaviorPlayerInventory>();
-            bh = behavior;
         }
     }
 }

@@ -11,7 +11,6 @@ namespace Riftworks.src.Systems
 {
     public class ModSystemOreScanner : ModSystemWearableTick<ItemOreScanner>
     {
-        ICoreServerAPI? sapi;
         ICoreClientAPI? capi;
 
         public override bool ShouldLoad(EnumAppSide forSide) => true;

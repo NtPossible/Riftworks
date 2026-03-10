@@ -9,7 +9,7 @@ namespace Riftworks.src.Systems
     public abstract class ModSystemWearableTick<TItem> : ModSystem
         where TItem : ItemWearable
     {
-        private ICoreServerAPI? sapi;
+        protected ICoreServerAPI? sapi;
 
         private double lastCheckTotalHours;
 

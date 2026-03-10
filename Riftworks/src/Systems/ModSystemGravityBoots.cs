@@ -6,9 +6,7 @@ namespace Riftworks.src.Systems
 {
     public class ModSystemGravityBoots : ModSystemWearableTick<ItemGravityBoots>
     {
-        ICoreServerAPI? sapi;
-
-        public override bool ShouldLoad(EnumAppSide forSide) => true;
+        public override bool ShouldLoad(EnumAppSide forSide) => forSide == EnumAppSide.Server;
 
         public override void StartServerSide(ICoreServerAPI api)
         {
