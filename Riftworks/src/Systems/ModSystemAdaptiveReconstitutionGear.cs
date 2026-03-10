@@ -46,15 +46,9 @@ namespace Riftworks.src.Systems
             if (playerEntity != null && playerEntity.Alive)
             {
                 EntityBehaviorHealth? entityBehaviorHealth = playerEntity.GetBehavior<EntityBehaviorHealth>();
-                if (entityBehaviorHealth != null)
+                if (entityBehaviorHealth != null && entityBehaviorHealth.Health < entityBehaviorHealth.MaxHealth  && !entityBehaviorHealth.ActiveDoTEffects.Any(effect => effect.DamageType == EnumDamageType.Heal))
                 {
-                    if (entityBehaviorHealth.Health < entityBehaviorHealth.MaxHealth)
-                    {
-                        if (!entityBehaviorHealth.ActiveDoTEffects.Any(effect => effect.DamageType == EnumDamageType.Heal))
-                        {
-                            entityBehaviorHealth.ApplyDoTEffect(EnumDamageSource.Internal, EnumDamageType.Heal, 10, 50, TimeSpan.FromSeconds(10), 35, 0);
-                        }
-                    }
+                    entityBehaviorHealth.ApplyDoTEffect(EnumDamageSource.Internal, EnumDamageType.Heal, 10, 50, TimeSpan.FromSeconds(10), 35, 0);
                 }
             }
             slot.MarkDirty();
