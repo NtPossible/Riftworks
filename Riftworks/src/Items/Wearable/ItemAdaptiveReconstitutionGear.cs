@@ -2,17 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Vintagestory.API.Client;
 using Vintagestory.API.Common;
+using Vintagestory.API.Common.Entities;
 using Vintagestory.API.Config;
 using Vintagestory.API.Datastructures;
+using Vintagestory.API.Util;
 using Vintagestory.Common;
 using Vintagestory.GameContent;
 
 namespace Riftworks.src.Items.Wearable
 {
-    public class ItemAdaptiveReconstitutionGear : ItemWearable
+    public class ItemAdaptiveReconstitutionGear : ItemWearable, IAttachableToEntity
     {
-        private const float adaptationDuration = 30f;
+        private const float adaptationDuration = 60f;
         private const float baseAdaptationRate = 0.0005f; // 0.05% per second
         private const float adaptationSpeedScaling = 0.0002f; // adds 0.02% per second per hit
         private const int resistanceTierCount = 5; // each tier is an additional 20% so it goes like 0,20,40,60,80,100
@@ -23,6 +26,54 @@ namespace Riftworks.src.Items.Wearable
         private const string resistancesKey = "resistances";
 
         private static readonly AssetLocation gearSoundLocation = new("riftworks:sounds/gearspin.ogg");
+        internal const string spinGenKey = "spinGeneration";
+        private const string renderCacheKey = "adaptivegear-rendercache";
+
+        public static MeshRef? GetOrBuildMeshRef(ICoreClientAPI capi, ItemStack stack)
+        {
+            // return the cached mesh if we already built it
+            MeshRef? existing = ObjectCacheUtil.TryGet<MeshRef>(capi, renderCacheKey);
+            if (existing != null)
+            {
+                return existing;
+            }
+
+            // tessellate the item into raw mesh data
+            capi.Tesselator.TesselateItem(stack.Item, out MeshData meshData);
+            if (meshData == null)
+            {
+                return null;
+            }
+
+            // upload to gpu and cache it so its not done every frame
+            MeshRef meshRef = capi.Render.UploadMesh(meshData);
+            ObjectCacheUtil.GetOrCreate(capi, renderCacheKey, () => meshRef);
+            return meshRef;
+        }
+
+        public override void OnUnloaded(ICoreAPI api)
+        {
+            base.OnUnloaded(api);
+
+            if (api is ICoreClientAPI capi)
+            {
+                MeshRef? meshRef = ObjectCacheUtil.TryGet<MeshRef>(capi, renderCacheKey);
+                if (meshRef != null)
+                {
+                    meshRef.Dispose();
+                    ObjectCacheUtil.Delete(capi, renderCacheKey);
+                }
+            }
+        }
+
+        public int RequiresBehindSlots { get; set; } = 0;
+        public bool IsAttachable(Entity toEntity, ItemStack itemStack) => true;
+        public CompositeShape? GetAttachedShape(ItemStack stack, string slotCode) => new() { Base = new AssetLocation("game", "block/basic/invisible") };
+        public string GetCategoryCode(ItemStack stack) => Attributes["clothescategory"].AsString("head");
+        public void CollectTextures(ItemStack stack, Shape shape, string texturePrefixCode, Dictionary<string, CompositeTexture> intoDict) => IAttachableToEntity.CollectTexturesFromCollectible(stack, texturePrefixCode, shape, intoDict);
+        public string[]? GetDisableElements(ItemStack stack) => null;
+        public string[]? GetKeepElements(ItemStack stack) => null;
+        public string GetTexturePrefixCode(ItemStack stack) => "adaptivegear";
 
         public static void HandleDamageTaken(EnumDamageType damageType, ItemSlot inSlot)
         {
@@ -61,7 +112,7 @@ namespace Riftworks.src.Items.Wearable
                 return;
             }
 
-            // Get the timer - if 30 seconds pass since last hit, stop adapting
+            // Get the timer - if 60 seconds pass since last hit, stop adapting
             float timer = attributes.GetFloat(timerKey, 0f) + dt;
             if (timer >= adaptationDuration)
             {
@@ -80,16 +131,16 @@ namespace Riftworks.src.Items.Wearable
             float adaptationSpeed = attributes.GetFloat(speedKey, baseAdaptationRate);
 
             // Find which resistance tier the player is currently in
-            int tier = (int)(currentResistance * resistanceTierCount);
+            int currentTier = (int)(currentResistance * resistanceTierCount);
 
             // Remaining progress before reaching full resistance
             float remaining = 1f - currentResistance;
 
             // Tier modifier slows down adaptation as tiers increase - each tier makes getting the next tier harder.
-            float tierModifier = 1f / (1f + tier * 1.5f);
+            float tierModifier = 1f / (1f + currentTier * 1.5f);
 
             // Slows progress even more near 100% resistance, making the full immunity much harder to get.
-            float scaledSpeed = adaptationSpeed * remaining * remaining * tierModifier;
+            float scaledSpeed = adaptationSpeed * remaining * tierModifier;
 
             // Apply resistance gain over time
             float newResistance = Math.Min(currentResistance + scaledSpeed * dt, 1f);
@@ -98,22 +149,23 @@ namespace Riftworks.src.Items.Wearable
             attributes.SetFloat(timerKey, timer);
 
             // Check if in a new resistance tier 
-            int oldTier = (int)(currentResistance * resistanceTierCount);
             int newTier = (int)(newResistance * resistanceTierCount);
-            if (newTier > oldTier)
+            if (newTier > currentTier)
             {
                 // reset speed on new tier
                 attributes.SetFloat(speedKey, baseAdaptationRate);
+                attributes.SetInt(spinGenKey, attributes.GetInt(spinGenKey, 0) + 1);
+                
+                IPlayer? player = (inSlot.Inventory as InventoryCharacter)?.Player;
 
                 // insantly heal to full when a tier is passed
-                EntityBehaviorHealth? health = (inSlot.Inventory as InventoryCharacter)?.Player?.Entity?.GetBehavior<EntityBehaviorHealth>();
+                EntityBehaviorHealth? health = player?.Entity?.GetBehavior<EntityBehaviorHealth>();
                 if (health != null)
                 {
                     health.Health = health.MaxHealth;
                 }
 
                 // Play sound
-                IPlayer? player = (inSlot.Inventory as InventoryCharacter)?.Player;
                 if (player?.Entity is EntityPlayer entityPlayer)
                 {
                     PlayGearSound(api.World, entityPlayer);
@@ -179,10 +231,6 @@ namespace Riftworks.src.Items.Wearable
 
         private static void PlayGearSound(IWorldAccessor world, EntityPlayer player)
         {
-            if (player == null)
-            {
-                return;
-            }
             world.PlaySoundAt(gearSoundLocation, player.Pos.X, player.Pos.Y, player.Pos.Z, null, false, 32f, 1.0f);
         }
     }
