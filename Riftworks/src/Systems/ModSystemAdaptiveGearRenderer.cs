@@ -13,23 +13,37 @@ namespace Riftworks.src.Systems
     {
         private ICoreClientAPI capi = null!;
 
-        // Animation state
+        // Spin animation
         private float currentAngle = 0f;
         private float targetAngle = 0f;
         private const float SpinDuration = 0.25f;
         private const float SpinDegrees = 60f;
 
         // Tier change detection
-        private int lastSpinGeneration = -1;
+        private int lastSpinCount = -1;
+
+        // Glow animation state
+        private float glowOscillationTime = 0f;
+        private float glowFlashTimer = 0f;
+
+        // Glow flash parameters
+        private const float GlowFlashDuration = 1.2f;
+        private const float GlowFlashMin = 50f;
+        private const float GlowFlashMax = 220f;
+
+        // Glow oscillation parameters
+        private const float GlowOscillationBase = 37.5f;
+        private const float GlowOscillationAmplitude = 12.5f;
+        private const float GlowOscillationSpeed = 1.8f;
 
         // Cached mesh
         private MeshRef? meshRef;
 
-        private static readonly double[] IdentityMatrix = {                 
+        private static readonly double[] IdentityMatrix = {
             1,0,0,0,
             0,1,0,0,
             0,0,1,0,
-            0,0,0,1 
+            0,0,0,1
         };
 
         public double RenderOrder => 0.4;
@@ -61,9 +75,11 @@ namespace Riftworks.src.Systems
             ItemSlot? slot = inventory.FirstOrDefault(slot => slot?.Itemstack?.Collectible is ItemAdaptiveReconstitutionGear);
             if (slot == null || slot.Empty)
             {
-                lastSpinGeneration = -1;
+                lastSpinCount = -1;
                 currentAngle = 0f;
                 targetAngle = 0f;
+                glowOscillationTime = 0f;
+                glowFlashTimer = 0f;
                 InvalidateMesh();
                 return;
             }
@@ -77,21 +93,34 @@ namespace Riftworks.src.Systems
             }
 
             // check if a new tier was crossed since last frame
-            int currentGen = slot.Itemstack.Attributes.GetInt(ItemAdaptiveReconstitutionGear.spinGenKey, 0);
-            if (lastSpinGeneration == -1)
+            int currentSpinCount = slot.Itemstack.Attributes.GetInt(ItemAdaptiveReconstitutionGear.spinCountKey, 0);
+            if (lastSpinCount == -1)
             {
-                lastSpinGeneration = currentGen;
+                lastSpinCount = currentSpinCount;
             }
-            else if (currentGen > lastSpinGeneration)
+            else if (currentSpinCount > lastSpinCount)
             {
-                lastSpinGeneration = currentGen;
+                lastSpinCount = currentSpinCount;
                 targetAngle += SpinDegrees;
+
+                // big flash that fades back to the base glow
+                glowFlashTimer = GlowFlashDuration;
             }
 
             // do the spin
+            UpdateSpin(deltaTime);
+
+            int glow = UpdateGlow(deltaTime, slot.Itemstack);
+
+            RenderGearOnPlayer(entity, currentAngle, glow);
+        }
+
+        private void UpdateSpin(float deltaTime)
+        {
             if (currentAngle < targetAngle)
             {
-                currentAngle = Math.Min(currentAngle + (SpinDegrees / SpinDuration) * deltaTime, targetAngle);
+                float speed = SpinDegrees / SpinDuration;
+                currentAngle = Math.Min(currentAngle + speed * deltaTime, targetAngle);
             }
 
             if (currentAngle >= 360f)
@@ -99,10 +128,28 @@ namespace Riftworks.src.Systems
                 currentAngle -= 360f;
                 targetAngle = Math.Max(targetAngle - 360f, 0f);
             }
-            RenderGearOnPlayer(entity, currentAngle);
         }
 
-        private void RenderGearOnPlayer(EntityPlayer player, float spinAngleDeg)
+        private int UpdateGlow(float deltaTime, ItemStack stack)
+        {
+            if (glowFlashTimer > 0f)
+            {
+                glowFlashTimer = Math.Max(glowFlashTimer - deltaTime, 0f);
+                float progress = glowFlashTimer / GlowFlashDuration;
+                return (int)GameMath.Lerp(GlowFlashMin, GlowFlashMax, progress);
+            }
+
+            if (ItemAdaptiveReconstitutionGear.IsAdapting(stack))
+            {
+                glowOscillationTime += deltaTime * GlowOscillationSpeed;
+                return (int)(GlowOscillationBase + GlowOscillationAmplitude * MathF.Sin(glowOscillationTime));
+            }
+
+            glowOscillationTime = 0f;
+            return 0;
+        }
+
+        private void RenderGearOnPlayer(EntityPlayer player, float spinAngleDeg, int glow)
         {
             IRenderAPI rapi = capi.Render;
             EntityPos pos = player.Pos;
@@ -128,6 +175,7 @@ namespace Riftworks.src.Systems
             shader.ModelMatrix = rapi.CurrentModelviewMatrix;
             shader.ViewMatrix = rapi.CameraMatrixOriginf;
             shader.ProjectionMatrix = rapi.CurrentProjectionMatrix;
+            shader.ExtraGlow = glow;
 
             // bind the item texture atlas so the gear's texture renders correctly
             shader.Tex2D = capi.ItemTextureAtlas.AtlasTextures[0].TextureId;

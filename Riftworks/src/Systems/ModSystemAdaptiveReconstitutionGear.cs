@@ -24,7 +24,10 @@ namespace Riftworks.src.Systems
         protected override void HandleItem(IPlayer player, ItemAdaptiveReconstitutionGear reconstitutionGear, ItemSlot slot, double hoursPassed, float dt)
         {
             EntityPlayer playerEntity = player.Entity;
-            reconstitutionGear.UpdateAdaptation(dt, slot);
+            if (reconstitutionGear.UpdateAdaptation(dt, slot))
+            {
+                slot.MarkDirty();
+            }
 
             if (playerEntity != null && playerEntity.Api != null && !playerEntity.HasBehavior<EntityBehaviorAdaptiveResistance>())
             {
@@ -40,7 +43,6 @@ namespace Riftworks.src.Systems
                     entityBehaviorHealth.ApplyDoTEffect(EnumDamageSource.Internal, EnumDamageType.Heal, 10, 50, TimeSpan.FromSeconds(10), 35, 0);
                 }
             }
-            slot.MarkDirty();
         }
 
         protected override void HandleMissing(IPlayer player)
