@@ -6,7 +6,7 @@
 		"clothescategory": "head"
 	},
 	"shape": {
-		"base": "item/wearable/adaptivereconstitutiongeartest"
+		"base": "item/wearable/adaptivereconstitutiongear"
 	},
 	"textures": {
 		"seraph": { "base": "game:block/transparent" }
