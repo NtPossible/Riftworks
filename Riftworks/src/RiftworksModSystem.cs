@@ -74,6 +74,10 @@ public class RiftworksModSystem : ModSystem
         {
             recipes.RemoveAll(recipe => recipe.Output.Code.PathStartsWith("orescanner"));
         }
+        if (RiftworksConfig.Loaded.DisableAdaptiveReconstitutionGear)
+        {
+            recipes.RemoveAll(recipe => recipe.Output.Code.PathStartsWith("adaptivereconstitutiongear"));
+        }
     }
 
 }

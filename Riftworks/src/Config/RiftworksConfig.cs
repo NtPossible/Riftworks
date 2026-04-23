@@ -19,9 +19,9 @@ namespace Riftworks.src.Config
 
         public bool DisableOreScanner { get; set; } = false;
 
+        public bool DisableAdaptiveReconstitutionGear { get; set; } = false;
 
         //public bool DisableRiftBlade { get; set; } = false;
-        //public bool DisableAdaptiveReconstitutionGear { get; set; } = false;
         //public bool DisableGravityBoots { get; set; } = false;
 
     }
