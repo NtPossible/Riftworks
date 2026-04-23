@@ -1,0 +1,30 @@
+{
+	"code": "stormclock",
+	//"class": "riftworks:BlockStormClock",
+	//"entityClass": "riftworks:BEStormClock",
+	//"behaviors": [ { "name": "HorizontalOrientable" } ],
+	//"creativeinventory": { "general": ["*-north"], "mechanics": ["*-north"] },
+	//"maxstacksize": 64,
+	//	"variantgroups": [
+	//	{ "code":"side", "loadFromProperties": "abstract/horizontalorientation" }
+	//],
+	//	"shapebytype": {
+	//	"*-north": { "base": "block/stormclock", "rotateY": 180 },
+	//	"*-east": { "base": "block/stormclock", "rotateY": 90 },
+	//	"*-south": { "base": "block/stormclock", "rotateY": 0 },
+	//	"*-west": { "base": "block/stormclock", "rotateY": 270 }
+	//},
+	//"blockmaterial": "Metal",
+	//"drawtype": "json",
+	//"shape": {
+	//	"base": "block/stormclock"
+	//},
+	//"resistance": 3.5,
+	//"sideopaque": {
+	//	"all": false
+	//},
+	//"sounds": {
+	//	"place": "game:block/anvil",
+	//	"walk": "game:walk/stone"
+	//}
+}

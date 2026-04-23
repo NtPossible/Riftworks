@@ -156,7 +156,7 @@ namespace Riftworks.src.BE
             IEnumerable<GridRecipe> filteredRecipes = Api.World.GridRecipes
                 .Where(recipe =>
                 {
-                    ItemStack? outputStack = recipe.Output?.ResolvedItemstack;
+                    ItemStack? outputStack = recipe.Output?.ResolvedItemStack;
                     return outputStack != null
                         && MatchesExactVariant(outputStack, inputStack)
                         && inputStack.StackSize >= outputStack.StackSize
@@ -164,7 +164,7 @@ namespace Riftworks.src.BE
                 });
 
             // If multiple recipes exist, prefer the one with the largest output stack
-            GridRecipe? matchingRecipe = filteredRecipes?.OrderByDescending(recipe => recipe.Output?.ResolvedItemstack.StackSize).FirstOrDefault();
+            GridRecipe? matchingRecipe = filteredRecipes?.OrderByDescending(recipe => recipe.Output?.Quantity).FirstOrDefault();
 
             return matchingRecipe;
         }
@@ -176,7 +176,7 @@ namespace Riftworks.src.BE
 
             if (matchingRecipe != null)
             {
-                int batchSize = matchingRecipe.Output.ResolvedItemstack.StackSize;
+                int batchSize = matchingRecipe.Output.Quantity;
                 int batchCount = inputStack.StackSize / batchSize;
                 return batchCount * batchSize;
             }
@@ -261,28 +261,28 @@ namespace Riftworks.src.BE
             }
 
             List<ItemStack> resultItems = new();
-            int batchSize = matchingRecipe.Output.ResolvedItemstack.StackSize;
+            int batchSize = matchingRecipe.Output.Quantity;
             int batchCount = inputItem.StackSize / batchSize;
 
-            foreach (GridRecipeIngredient ingredient in matchingRecipe.resolvedIngredients)
+            foreach (CraftingRecipeIngredient ingredient in matchingRecipe.ResolvedIngredients)
             {
                 if (ingredient == null || ingredient.IsTool)
                 {
                     continue;
                 }
 
-                if (ingredient.ResolvedItemstack != null)
+                if (ingredient.ResolvedItemStack != null)
                 {
-                    if (ingredient.ResolvedItemstack.Collectible.Code.Path.Contains("schematic"))
+                    if (ingredient.ResolvedItemStack.Collectible.Code.Path.Contains("schematic"))
                     {
                         continue;
                     }
 
-                    ItemStack clone = ingredient.ResolvedItemstack.Clone();
+                    ItemStack clone = ingredient.ResolvedItemStack.Clone();
                     clone.StackSize *= batchCount;
                     resultItems.Add(clone);
                 }
-                else if (ingredient.IsWildCard)
+                else if (ingredient.MatchingType == EnumRecipeMatchType.Wildcard)
                 {
                     string? resolvedVariant = GetPreferredOrFirstWildcard(ingredient);
 
@@ -291,9 +291,9 @@ namespace Riftworks.src.BE
                         CraftingRecipeIngredient resolvedIngredient = ingredient.Clone();
                         resolvedIngredient.Code.Path = ingredient.Code.Path.Replace("*", resolvedVariant);
 
-                        if (resolvedIngredient.Resolve(Api.World, "TemporalDisassembler") && resolvedIngredient.ResolvedItemstack != null)
+                        if (resolvedIngredient.Resolve(Api.World, "TemporalDisassembler") && resolvedIngredient.ResolvedItemStack != null)
                         {
-                            ItemStack clone = resolvedIngredient.ResolvedItemstack.Clone();
+                            ItemStack clone = resolvedIngredient.ResolvedItemStack.Clone();
                             clone.StackSize *= batchCount;
                             resultItems.Add(clone);
                         }

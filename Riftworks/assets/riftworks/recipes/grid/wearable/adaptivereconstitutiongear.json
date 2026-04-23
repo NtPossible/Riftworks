@@ -1,0 +1,12 @@
+{
+  "ingredientPattern": "ABA,CDC,ABA",
+  "ingredients": {
+    "A": { "type": "block", "code": "game:metalblock-new-riveted-steel", "quantity": 4 },
+    "B": { "type": "item", "code": "game:rod-electrum" , "quantity": 16 },
+    "C": { "type": "item", "code": "game:rod-cupronickel", "quantity": 16 },
+    "D": { "type": "item", "code": "riftworks:temporalcompressionchamber" }
+  },
+  "width": 3,
+  "height": 3,
+  "output": { "type": "item", "code": "riftworks:adaptivereconstitutiongear" }
+}

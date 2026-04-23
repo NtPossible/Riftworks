@@ -1,5 +1,6 @@
 ﻿using Riftworks.src.Items.Wearable;
 using System.Collections.Generic;
+using System.Linq;
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
 using Vintagestory.API.MathTools;
@@ -13,7 +14,8 @@ namespace Riftworks.src.Systems
         private int projectileTickListenerId = -1;
         private readonly HashSet<IPlayer> activeWearers = new();
         private readonly Dictionary<long, Entity> trackedProjectiles = new();
-
+        private const double DetectRadiusSquared = 64.0; // 8 blocks — detection radius
+        private const double FreezeRadiusSquared = 9.0;  // 3 blocks — actually freeze
         public override void StartServerSide(ICoreServerAPI api)
         {
             sapi = api;
@@ -71,6 +73,7 @@ namespace Riftworks.src.Systems
             if (IsTrackableProjectile(entity))
             {
                 trackedProjectiles[entity.EntityId] = entity;
+                TryFreezeNear(entity);
             }
         }
 
@@ -94,24 +97,21 @@ namespace Riftworks.src.Systems
                 trackedProjectiles.Remove(id);
             }
 
-            foreach (IPlayer player in activeWearers)
+            foreach (Entity playerEntity in activeWearers.Select(player => player.Entity))
             {
-                Entity playerEntity = player.Entity;
-                Vec3d playerPos = playerEntity.ServerPos.XYZ;
+                Vec3d playerPos = playerEntity.Pos.XYZ;
 
                 List<long> frozenThisTick = new();
 
-                foreach (KeyValuePair<long, Entity> kvp in trackedProjectiles)
+                foreach (Entity entity in trackedProjectiles.Select(kvp => kvp.Value))
                 {
-                    Entity entity = kvp.Value;
-
                     if (!IsProjectile(entity, playerEntity))
                     {
                         continue;
                     }
 
                     // Predict next position
-                    EntityPos pos = entity.ServerPos;
+                    EntityPos pos = entity.Pos;
                     double px = pos.X + pos.Motion.X * dt;
                     double py = pos.Y + pos.Motion.Y * dt;
                     double pz = pos.Z + pos.Motion.Z * dt;
@@ -120,7 +120,7 @@ namespace Riftworks.src.Systems
                     double dy = playerPos.Y - py;
                     double dz = playerPos.Z - pz;
 
-                    if (dx * dx + dy * dy + dz * dz <= 16)
+                    if (dx * dx + dy * dy + dz * dz <= FreezeRadiusSquared)
                     {
                         FreezeProjectile(entity);
                         frozenThisTick.Add(entity.EntityId);
@@ -150,7 +150,7 @@ namespace Riftworks.src.Systems
             {
                 return false;
             }
-            if (entity.ServerPos.Motion.LengthSq() > 0.05 && !entity.OnGround)
+            if (entity.Pos.Motion.LengthSq() > 0.05 && !entity.OnGround)
             {
                 return true;
             }
@@ -183,7 +183,7 @@ namespace Riftworks.src.Systems
                 return false;
             }
 
-            if (entity.ServerPos.Motion.LengthSq() < 0.05)
+            if (entity.Pos.Motion.LengthSq() < 0.05)
             {
                 return false;
             }
@@ -195,13 +195,35 @@ namespace Riftworks.src.Systems
             return true;
         }
 
+        private void TryFreezeNear(Entity entity)
+        {
+            foreach (Entity playerEntity in activeWearers.Select(player => player.Entity))
+            {
+                if (!IsProjectile(entity, playerEntity))
+                {
+                    continue;
+                }
+
+                EntityPos pos = entity.Pos;
+                Vec3d playerPos = playerEntity.Pos.XYZ;
+
+                double dx = playerPos.X - pos.X;
+                double dy = playerPos.Y - pos.Y;
+                double dz = playerPos.Z - pos.Z;
+
+                if (dx * dx + dy * dy + dz * dz <= DetectRadiusSquared)
+                {
+                    FreezeProjectile(entity);
+                    trackedProjectiles.Remove(entity.EntityId);
+                    return;
+                }
+            }
+        }
+
         private static void FreezeProjectile(Entity entity)
         {
-            entity.ServerPos.Motion.Set(0, 0, 0);
-            entity.Pos.SetPos(entity.ServerPos);
-
-            entity.ServerPos.SetPos(entity.Pos);
-            entity.Pos.SetPos(entity.ServerPos);
+            entity.Pos.Motion.Set(0, 0, 0);
+            entity.Pos.SetPos(entity.Pos);
         }
     }
 }

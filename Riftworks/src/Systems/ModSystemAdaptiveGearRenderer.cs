@@ -1,5 +1,6 @@
 ﻿using Riftworks.src.Items.Wearable;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
@@ -13,18 +14,22 @@ namespace Riftworks.src.Systems
     {
         private ICoreClientAPI capi = null!;
 
+        private sealed class GearState
+        {
+            public MeshRef? MeshRef;
+            public float CurrentAngle;
+            public float TargetAngle;
+            public int LastSpinCount = -1;
+            public float GlowOscillationTime;
+            public float GlowFlashTimer;
+        }
+
+        private readonly Dictionary<long, GearState> gearStates = new();
+        private readonly HashSet<long> activePlayerIds = new();
+
         // Spin animation
-        private float currentAngle = 0f;
-        private float targetAngle = 0f;
-        private const float SpinDuration = 0.25f;
+        private const float SpinSpeed = 240f;
         private const float SpinDegrees = 60f;
-
-        // Tier change detection
-        private int lastSpinCount = -1;
-
-        // Glow animation state
-        private float glowOscillationTime = 0f;
-        private float glowFlashTimer = 0f;
 
         // Glow flash parameters
         private const float GlowFlashDuration = 1.2f;
@@ -36,158 +41,154 @@ namespace Riftworks.src.Systems
         private const float GlowOscillationAmplitude = 12.5f;
         private const float GlowOscillationSpeed = 1.8f;
 
-        // Cached mesh
-        private MeshRef? meshRef;
-
-        private static readonly double[] IdentityMatrix = {
-            1,0,0,0,
-            0,1,0,0,
-            0,0,1,0,
-            0,0,0,1
-        };
-
         public double RenderOrder => 0.4;
         public int RenderRange => 24;
+
+        private readonly Matrixf matrixf = new();
 
         public override bool ShouldLoad(EnumAppSide forSide) => forSide == EnumAppSide.Client;
 
         public override void StartClientSide(ICoreClientAPI api)
         {
             capi = api;
-            capi.Event.RegisterRenderer(this, EnumRenderStage.Opaque, "adaptivegear-spin");
+            capi.Event.RegisterRenderer(this, EnumRenderStage.Opaque, "adaptivegear-opaque");
         }
 
         public void OnRenderFrame(float deltaTime, EnumRenderStage stage)
         {
-            IClientPlayer? player = capi.World.Player;
-            EntityPlayer? entity = player?.Entity;
-            if (entity == null)
+            activePlayerIds.Clear();
+
+            foreach (EntityPlayer? entity in capi.World.AllOnlinePlayers.Select(player => player.Entity))
             {
-                return;
+                if (entity == null)
+                {
+                    continue;
+                }
+                ItemSlot? slot = FindGearSlot(entity);
+                long id = entity.EntityId;
+
+                if (slot == null || slot.Empty)
+                {
+                    gearStates.Remove(id);
+                    continue;
+                }
+
+                activePlayerIds.Add(id);
+
+                if (!gearStates.TryGetValue(id, out GearState? state))
+                {
+                    state = new GearState();
+                    gearStates[id] = state;
+                }
+
+                state.MeshRef ??= ItemAdaptiveReconstitutionGear.GetOrBuildMeshRef(capi, slot.Itemstack);
+                if (state.MeshRef == null)
+                {
+                    continue;
+                }
+
+                int currentSpinCount = slot.Itemstack.Attributes.GetInt(ItemAdaptiveReconstitutionGear.spinCountKey, 0);
+                if (state.LastSpinCount == -1)
+                {
+                    state.LastSpinCount = currentSpinCount;
+                }
+                else if (currentSpinCount > state.LastSpinCount)
+                {
+                    state.LastSpinCount = currentSpinCount;
+                    state.TargetAngle += SpinDegrees;
+                    state.GlowFlashTimer = GlowFlashDuration;
+                }
+
+                UpdateSpin(state, deltaTime);
+                int glow = UpdateGlow(state, deltaTime, slot.Itemstack);
+                RenderGearOnPlayer(entity, state.CurrentAngle, glow, state.MeshRef);
             }
 
-            IInventory? inventory = player!.InventoryManager.GetOwnInventory(GlobalConstants.characterInvClassName);
-            if (inventory == null)
+            foreach (long id in gearStates.Keys.Where(id => !activePlayerIds.Contains(id)).ToList())
             {
-                return;
-            }
-
-            ItemSlot? slot = inventory.FirstOrDefault(slot => slot?.Itemstack?.Collectible is ItemAdaptiveReconstitutionGear);
-            if (slot == null || slot.Empty)
-            {
-                lastSpinCount = -1;
-                currentAngle = 0f;
-                targetAngle = 0f;
-                glowOscillationTime = 0f;
-                glowFlashTimer = 0f;
-                InvalidateMesh();
-                return;
-            }
-
-            // build the mesh if we don't have one yet
-            meshRef ??= ItemAdaptiveReconstitutionGear.GetOrBuildMeshRef(capi, slot.Itemstack);
-
-            if (meshRef == null)
-            {
-                return;
-            }
-
-            // check if a new tier was crossed since last frame
-            int currentSpinCount = slot.Itemstack.Attributes.GetInt(ItemAdaptiveReconstitutionGear.spinCountKey, 0);
-            if (lastSpinCount == -1)
-            {
-                lastSpinCount = currentSpinCount;
-            }
-            else if (currentSpinCount > lastSpinCount)
-            {
-                lastSpinCount = currentSpinCount;
-                targetAngle += SpinDegrees;
-
-                // big flash that fades back to the base glow
-                glowFlashTimer = GlowFlashDuration;
-            }
-
-            // do the spin
-            UpdateSpin(deltaTime);
-
-            int glow = UpdateGlow(deltaTime, slot.Itemstack);
-
-            RenderGearOnPlayer(entity, currentAngle, glow);
-        }
-
-        private void UpdateSpin(float deltaTime)
-        {
-            if (currentAngle < targetAngle)
-            {
-                float speed = SpinDegrees / SpinDuration;
-                currentAngle = Math.Min(currentAngle + speed * deltaTime, targetAngle);
-            }
-
-            if (currentAngle >= 360f)
-            {
-                currentAngle -= 360f;
-                targetAngle = Math.Max(targetAngle - 360f, 0f);
+                gearStates.Remove(id);
             }
         }
 
-        private int UpdateGlow(float deltaTime, ItemStack stack)
+        private static ItemSlot? FindGearSlot(EntityPlayer entity)
         {
-            if (glowFlashTimer > 0f)
+            ItemSlot? slot = null;
+            entity.WalkInventory(itemSlot =>
             {
-                glowFlashTimer = Math.Max(glowFlashTimer - deltaTime, 0f);
-                float progress = glowFlashTimer / GlowFlashDuration;
+                if (itemSlot?.Itemstack?.Collectible is ItemAdaptiveReconstitutionGear && itemSlot.Inventory?.ClassName == GlobalConstants.characterInvClassName)
+                {
+                    slot = itemSlot;
+                    return false;
+                }
+                return true;
+            });
+            return slot;
+        }
+
+        private static void UpdateSpin(GearState state, float deltaTime)
+        {
+            if (state.CurrentAngle < state.TargetAngle)
+            {
+                state.CurrentAngle = Math.Min(state.CurrentAngle + SpinSpeed * deltaTime, state.TargetAngle);
+            }
+
+            if (state.CurrentAngle >= 360f)
+            {
+                state.CurrentAngle -= 360f;
+                state.TargetAngle = Math.Max(state.TargetAngle - 360f, 0f);
+            }
+        }
+
+        private static int UpdateGlow(GearState state, float deltaTime, ItemStack stack)
+        {
+            if (state.GlowFlashTimer > 0f)
+            {
+                state.GlowFlashTimer = Math.Max(state.GlowFlashTimer - deltaTime, 0f);
+                float progress = state.GlowFlashTimer / GlowFlashDuration;
                 return (int)GameMath.Lerp(GlowFlashMin, GlowFlashMax, progress);
             }
 
             if (ItemAdaptiveReconstitutionGear.IsAdapting(stack))
             {
-                glowOscillationTime += deltaTime * GlowOscillationSpeed;
-                return (int)(GlowOscillationBase + GlowOscillationAmplitude * MathF.Sin(glowOscillationTime));
+                state.GlowOscillationTime += deltaTime * GlowOscillationSpeed;
+                return (int)(GlowOscillationBase + GlowOscillationAmplitude * MathF.Sin(state.GlowOscillationTime));
             }
 
-            glowOscillationTime = 0f;
+            state.GlowOscillationTime = 0f;
             return 0;
         }
 
-        private void RenderGearOnPlayer(EntityPlayer player, float spinAngleDeg, int glow)
+        private void RenderGearOnPlayer(EntityPlayer player, float spinAngleDeg, int glow, MeshRef meshRef)
         {
-            IRenderAPI rapi = capi.Render;
-            EntityPos pos = player.Pos;
+            IRenderAPI renderAPI = capi.Render;
 
-            // start with a blank matrix so our position/rotation is in world space - using the camera matrix made the gear fly around
-            rapi.GlPushMatrix();
-            rapi.GlLoadMatrix(IdentityMatrix);
+            // Offset this player's position relative to the local camera origin
+            EntityPos localPos = capi.World.Player.Entity.Pos;
+            float dx = (float)(player.Pos.X - localPos.X);
+            float dy = (float)(player.Pos.Y - localPos.Y);
+            float dz = (float)(player.Pos.Z - localPos.Z);
 
-            // position above the player's head
-            rapi.GlTranslate(0, player.LocalEyePos.Y + 0.5, 0);
+            // Start with a blank matrix so our position/rotation is in world space - using the camera matrix made the gear fly around
+            matrixf.Identity();
+            // Position above the player's head
+            matrixf.Translate(dx, dy + (float)player.LocalEyePos.Y + 0.5f, dz);
+            // Rotate the gear to the facing direction
+            matrixf.RotateY(player.BodyYaw);
+            // Apply the spin
+            matrixf.RotateY(spinAngleDeg * GameMath.DEG2RAD);
 
-            // rotate the gear to the facing direction
-            rapi.GlRotate((player.BodyYaw * GameMath.RAD2DEG), 0, 1, 0);
-
-            // apply the spin
-            rapi.GlRotate(spinAngleDeg, 0, 1, 0);
-
-            // set up the shader with lighting from the player's world position
-            BlockPos blockPos = pos.AsBlockPos;
-            IStandardShaderProgram shader = rapi.PreparedStandardShader(blockPos.X, blockPos.Y, blockPos.Z);
-
-            // model matrix is our transforms, view is the camera (kept separate so head rotation only affects the view and doesn't move the gear's world position)
-            shader.ModelMatrix = rapi.CurrentModelviewMatrix;
-            shader.ViewMatrix = rapi.CameraMatrixOriginf;
-            shader.ProjectionMatrix = rapi.CurrentProjectionMatrix;
+            // Set up the shader with lighting from the player's world position
+            BlockPos blockPos = player.Pos.AsBlockPos;
+            IStandardShaderProgram shader = renderAPI.PreparedStandardShader(blockPos.X, blockPos.Y, blockPos.Z);
+            shader.ModelMatrix = matrixf.Values;
+            shader.ViewMatrix = renderAPI.CameraMatrixOriginf;
+            shader.ProjectionMatrix = renderAPI.CurrentProjectionMatrix;
             shader.ExtraGlow = glow;
 
-            // bind the item texture atlas so the gear's texture renders correctly
+            // Bind the item texture atlas so the gear's texture renders correctly
             shader.Tex2D = capi.ItemTextureAtlas.AtlasTextures[0].TextureId;
-            rapi.RenderMesh(meshRef!);
-
+            renderAPI.RenderMesh(meshRef);
             shader.Stop();
-            rapi.GlPopMatrix();
-        }
-
-        private void InvalidateMesh()
-        {
-            meshRef = null;
         }
     }
 }

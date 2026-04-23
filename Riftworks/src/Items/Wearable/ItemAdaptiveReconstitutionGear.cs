@@ -33,10 +33,10 @@ namespace Riftworks.src.Items.Wearable
         public static MeshRef? GetOrBuildMeshRef(ICoreClientAPI capi, ItemStack stack)
         {
             // return the cached mesh if we already built it
-            MeshRef? existing = ObjectCacheUtil.TryGet<MeshRef>(capi, renderCacheKey);
-            if (existing != null)
+            MeshRef? existingMeshRef = ObjectCacheUtil.TryGet<MeshRef>(capi, renderCacheKey);
+            if (existingMeshRef != null)
             {
-                return existing;
+                return existingMeshRef;
             }
 
             // tessellate the item into raw mesh data

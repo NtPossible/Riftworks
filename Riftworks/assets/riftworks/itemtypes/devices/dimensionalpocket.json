@@ -5,22 +5,22 @@
     { "name": "GroundStorable", "properties": { "layout": "SingleCenter", "collisionBox": { "x1": 0.25, "y1": 0, "z1": 0.25, "x2": 0.75, "y2": 0.375, "z2": 0.75 } } },
     { "name": "HeldBag" }
   ],
-  "shape": {
-    "base": "item/bag/dimensionalpocket"
-  },
+  "shape": { "base": "item/bag/dimensionalpocket" },
   "attributes": {
     "attachableToEntity": {
       "categoryCode": "backpack",
       "attachedShape": { "base": "item/bag/dimensionalpocket-attached" }
     },
     "wearableAttachment": true,
-    "quantitySlots": 10
+    "backpack": {
+      "quantitySlots": 12
+    }
   },
   "storageFlags": 2,
-  //"creativeinventory": {
-  //  "general": [ "*" ],
-  //  "items": [ "*" ]
-  //},
+  "creativeinventory": {
+    "general": [ "*" ],
+    "items": [ "*" ]
+  },
   "guiTransform": {
     "translation": { "x": 0, "y": 0, "z": 0 },
     "rotation": { "x": -20, "y": 21, "z": 180 },
