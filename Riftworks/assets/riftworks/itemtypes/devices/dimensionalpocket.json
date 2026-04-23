@@ -17,10 +17,10 @@
     }
   },
   "storageFlags": 2,
-  "creativeinventory": {
-    "general": [ "*" ],
-    "items": [ "*" ]
-  },
+  //"creativeinventory": {
+  //  "general": [ "*" ],
+  //  "items": [ "*" ]
+  //},
   "guiTransform": {
     "translation": { "x": 0, "y": 0, "z": 0 },
     "rotation": { "x": -20, "y": 21, "z": 180 },
