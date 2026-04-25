@@ -5,10 +5,10 @@
 	"behaviors": [ { "name": "HorizontalOrientable" } ],
 	"creativeinventory": { "general": ["*-north"], "mechanics": ["*-north"] },
 	"maxstacksize": 64,
-		"variantgroups": [
+	"variantgroups": [
 		{ "code":"side", "loadFromProperties": "abstract/horizontalorientation" }
 	],
-		"shapebytype": {
+	"shapebytype": {
 		"*-north": { "base": "block/temporaldisassembler", "rotateY": 180 },
 		"*-east": { "base": "block/temporaldisassembler", "rotateY": 90 },
 		"*-south": { "base": "block/temporaldisassembler", "rotateY": 0 },

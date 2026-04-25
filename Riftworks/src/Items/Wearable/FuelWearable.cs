@@ -3,11 +3,10 @@ using System.Text;
 using Vintagestory.API.Client;
 using Vintagestory.API.Common;
 using Vintagestory.API.Config;
-using Vintagestory.GameContent;
 
 namespace Riftworks.src.Items.Wearable
 {
-    public abstract class FuelWearable : ItemWearable
+    public abstract class FuelWearable : Item
     {
         protected abstract float FuelHoursCapacity { get; }
 

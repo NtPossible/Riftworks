@@ -13,7 +13,7 @@ using Vintagestory.GameContent;
 
 namespace Riftworks.src.Items.Wearable
 {
-    public class ItemAdaptiveReconstitutionGear : ItemWearable, IAttachableToEntity
+    public class ItemAdaptiveReconstitutionGear : Item, IAttachableToEntity
     {
         private const float adaptationDuration = 60f;
         private const float baseAdaptationRate = 0.0005f; // 0.05% per second

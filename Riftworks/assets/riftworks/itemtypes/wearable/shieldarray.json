@@ -1,6 +1,5 @@
 ﻿{
     "code": "shieldarray",
-    "class": "ItemWearable",
     "heldTpIdleAnimation": "holdunderarm",
     "shape": { "base": "game:entity/humanoid/seraph/armor/plate/body" },
     "textures": {
@@ -8,6 +7,9 @@
         "material": { "base": "game:entity/humanoid/serapharmor/plate/steel" }
     },
     "storageFlags": 128,
+    "behaviors": [
+		{ "name": "Wearable" }
+	],
     "attributes": {
         //"visibleDamageEffect": true,
         "clothesCategory": "armorbody",

@@ -2,6 +2,9 @@
 	"code": "adaptivereconstitutiongear",
 	"class": "riftworks:ItemAdaptiveReconstitutionGear",
 	"storageFlags": 128,
+	"behaviors": [
+		{ "name": "Wearable" }
+	],
 	"attributes": {
 		"clothescategory": "head"
 	},
@@ -33,7 +36,7 @@
 		"rotation": { "x": 0, "y": 0, "z": 0 },
 		"origin": { "x": 0, "y": 1.58, "z": 0 },
 		"scale": 6
-	},	
+	},
 	"tpHandTransform": {
 		"translation": { "x": 0.63, "y": -0.05, "z": -0.05 },
 		"rotation": { "x": 0, "y": -90, "z": -90 },

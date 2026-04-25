@@ -7,7 +7,7 @@ using Vintagestory.GameContent;
 namespace Riftworks.src.Systems
 {
     public abstract class ModSystemWearableTick<TItem> : ModSystem
-        where TItem : ItemWearable
+        where TItem : Item
     {
         protected ICoreServerAPI? sapi;
 
