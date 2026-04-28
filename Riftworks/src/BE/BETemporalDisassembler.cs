@@ -34,7 +34,7 @@ namespace Riftworks.src.BE
 
         public override string InventoryClassName
         {
-            get { return "temporal disassembler"; }
+            get { return "temporaldisassembler"; }
         }
 
         public virtual string DialogTitle

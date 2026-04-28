@@ -5,6 +5,9 @@
     "block-stormcaster": "Storm Caster",
     "blockdesc-stormcaster": "<font color=\"#99c9f9\"><i>He sought to prevent seafarers from coming across his work. So he created a machine to commandeer an endless storm.</i></font><br>",
 
+    // Machine dialogs
+    "Temporal Disassembler": "Temporal Disassembler",
+
     // Devices
     "item-riftblade": "Riftblade",
     "itemdesc-riftblade": "<font color=\"#99c9f9\"><i>A marvel of engineering, even so it was of little use against what was coming for them.</i></font><br>",
