@@ -7,15 +7,12 @@ using System.Threading.Tasks;
 namespace Riftworks.src.Config
 {
     public class RiftworksConfig
-    {
-        public static RiftworksConfig Loaded { get; set; } = new RiftworksConfig();
-        
+    {        
         public bool DisableTemporalDisassembler { get; set; } = false;
+
         public bool DisableStormCaster { get; set; } = false;
 
         public bool DisableVectorStasisUnit { get; set; } = false;
-
-        public bool DisableDivingHelmet { get; set; } = false;
 
         public bool DisableOreScanner { get; set; } = false;
 

@@ -55,28 +55,29 @@ public class RiftworksModSystem : ModSystem
 
         List<GridRecipe> recipes = api.World.GridRecipes;
 
-        if (RiftworksConfig.Loaded.DisableDivingHelmet)
+        if (Config.DisableVectorStasisUnit)
         {
-            recipes.RemoveAll(recipe => recipe.Output.Code.PathStartsWith("divinghelmet"));
+            recipes.RemoveAll(recipe => recipe?.Output?.Code?.PathStartsWith("vectorstasisunit") == true);
         }
-        if (RiftworksConfig.Loaded.DisableVectorStasisUnit)
+
+        if (Config.DisableStormCaster)
         {
-            recipes.RemoveAll(recipe => recipe.Output.Code.PathStartsWith("vectorstasisunit"));
+            recipes.RemoveAll(recipe => recipe?.Output?.Code?.PathStartsWith("stormcaster") == true);
         }
-        if (RiftworksConfig.Loaded.DisableStormCaster) { 
-            recipes.RemoveAll(recipe => recipe.Output.Code.PathStartsWith("stormcaster"));
-        }
-        if (RiftworksConfig.Loaded.DisableTemporalDisassembler)
+
+        if (Config.DisableTemporalDisassembler)
         {
-            recipes.RemoveAll(recipe => recipe.Output.Code.PathStartsWith("temporaldisassembler"));
+            recipes.RemoveAll(recipe => recipe?.Output?.Code?.PathStartsWith("temporaldisassembler") == true);
         }
-        if (RiftworksConfig.Loaded.DisableOreScanner)
+
+        if (Config.DisableOreScanner)
         {
-            recipes.RemoveAll(recipe => recipe.Output.Code.PathStartsWith("orescanner"));
+            recipes.RemoveAll(recipe => recipe?.Output?.Code?.PathStartsWith("orescanner") == true);
         }
-        if (RiftworksConfig.Loaded.DisableAdaptiveReconstitutionGear)
+
+        if (Config.DisableAdaptiveReconstitutionGear)
         {
-            recipes.RemoveAll(recipe => recipe.Output.Code.PathStartsWith("adaptivereconstitutiongear"));
+            recipes.RemoveAll(recipe => recipe?.Output?.Code?.PathStartsWith("adaptivereconstitutiongear") == true);
         }
     }
 

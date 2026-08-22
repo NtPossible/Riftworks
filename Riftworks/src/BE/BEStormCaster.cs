@@ -242,6 +242,11 @@ namespace Riftworks.src.BE
 
         public override void OnBlockRemoved()
         {
+            if (sapi != null && On)
+            {
+                ApplyWeather(on: false);
+            }
+
             base.OnBlockRemoved();
 
             ambientSound?.Dispose();
